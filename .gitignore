@@ -1,0 +1,6 @@
+__pycache__
+*.zarr
+*.smiles
+output
+*.pt
+screen.log
