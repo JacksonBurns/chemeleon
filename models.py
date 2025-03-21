@@ -1,88 +1,16 @@
-import math
 from itertools import chain
-from types import SimpleNamespace
-from typing import List, Tuple
+from typing import Tuple
 
 import torch
-import numpy as np
-from torchmetrics.functional import pearson_corrcoef
-from fastprop.data import standard_scale, inverse_standard_scale
-from fastprop.model import fastprop
-from fastprop.metrics import SCORE_LOOKUP
+from fastprop.data import standard_scale
 
 from lightning import LightningModule
 from torch import distributed
 
 
-
 # code for the SNN has been adapted from the author's demo notebook on GitHub:
 # https://github.com/bioinf-jku/SNNs/blob/master/Pytorch/SelfNormalizingNetworks_MLP_MNIST.ipynb
 
-
-class fastpropFineTuner(fastprop):
-    def __init__(
-        self,
-        pretrained_checkpoint,
-        fine_tune_layers: Tuple[int, ...] = (
-            1800,
-            1800,
-        ),
-        readout_size: int = 1,
-        num_tasks: int = 1,
-        problem_type: str = "regression",
-        learning_rate: float = 0.0001,
-        target_names: List[str] = [],
-        target_means: torch.Tensor = None,
-        target_vars: torch.Tensor = None,
-        freeze_pretrained: bool = True,
-    ):
-        pretrained: fastpropAutoEncoder = fastpropAutoEncoder.load_from_checkpoint(pretrained_checkpoint)
-        super().__init__(
-            input_size=1,  # we will overwrite this
-            hidden_size=1,  # and this
-            fnn_layers=0,  # and this
-            readout_size=1,  # and this
-            num_tasks=num_tasks,
-            learning_rate=learning_rate,
-            problem_type=problem_type,
-            target_names=target_names,
-            feature_means=pretrained.feature_means,
-            feature_vars=pretrained.feature_vars,
-            target_means=target_means,
-            target_vars=target_vars,
-        )
-        del self.fnn
-        del self.readout
-        if freeze_pretrained:
-            for param in pretrained.model_weights.values():
-                param.requires_grad_(False)
-        self.pretrained_encoder = lambda x: pretrained._encode(x)
-        mlp_modules = []
-        for curr_size, next_size in zip(chain([pretrained.hparams['encoding_size']], fine_tune_layers), fine_tune_layers):
-            mlp_modules.extend((torch.nn.Linear(curr_size, next_size), torch.nn.SELU()))
-        if len(mlp_modules) > 2:  # remove the last activation for MLPs
-            mlp_modules.pop()
-        self.mlp = torch.nn.Sequential(*mlp_modules)
-        self.readout = torch.nn.Linear(pretrained.hparams['encoding_size'] if not fine_tune_layers else fine_tune_layers[-1], readout_size)
-
-        self._reset_parameters()
-        self.save_hyperparameters()
-
-    def _reset_parameters(self):
-        for param in chain(self.mlp.parameters(), self.readout.parameters()):
-            # biases zero
-            if len(param.shape) == 1:
-                torch.nn.init.constant_(param, 0)
-            # others using lecun-normal initialization
-            else:
-                torch.nn.init.kaiming_normal_(param, mode='fan_in', nonlinearity='linear')
-
-    def forward(self, x):
-        x = standard_scale(x, self.feature_means, self.feature_vars)
-        x = self.pretrained_encoder(x)
-        x = self.mlp(x)
-        x = self.readout(x)
-        return x
 
 class fastpropFoundation(LightningModule):
     def __init__(
@@ -128,7 +56,7 @@ class fastpropFoundation(LightningModule):
         Returns:
             dict: Optimizer name and instance.
         """
-        return {"optimizer": torch.optim.Adam(self.parameters(), lr=self.learning_rate)}
+        return {"optimizer": torch.optim.AdamW(self.parameters(), lr=self.learning_rate)}
 
     def log(self, name, value, **kwargs):
         """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""

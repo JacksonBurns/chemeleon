@@ -6,62 +6,94 @@ as float32 to a zarr file
 """
 
 import sys
+from multiprocessing import Pool
+import warnings
 
 import numpy as np
 from rdkit import rdBase
 from mordred import Calculator, descriptors
-from rdkit import Chem
+from rdkit.Chem import MolFromSmiles
 from tqdm import tqdm
 import zarr
 
-calc = Calculator(descriptors, ignore_3D=True)
-calc.config(timeout=60)
+warnings.filterwarnings('ignore', category=FutureWarning)
 
-n_features = len(calc)
 
-blocker = rdBase.BlockLogs()
-try:
-    smiles_file = sys.argv[1]
-    out_file = sys.argv[2]
-except:
-    print("Usage: python features.py SMILES_FILE OUTPUT_PATH")
-    exit(1)
+# convert to mols, filtering invalid
+def _f(smi):
+    return MolFromSmiles(smi) is not None
 
-with open(smiles_file, "r") as file:
-    smiles = [i.strip() for i in file.readlines()]
+# convert to mols
+def _s(smi):
+    return MolFromSmiles(smi)
 
-mols = list(filter(lambda m: m is not None, map(Chem.MolFromSmiles, tqdm(smiles, desc="Generating RDKit mols"))))
-for mol in mols:
-    mol.SetProp("_Name", "")
-n_mols = len(mols)
 
-# Define array dimensions
-shape = (n_mols, n_features)
-dtype = np.float32
+if __name__ == "__main__":
+    p = Pool(64)
 
-# Estimate chunk size for ~64MB chunks
-# suggested here: https://github.com/zarr-developers/zarr-python/issues/86#issuecomment-254439393
-bytes_per_value = np.dtype(dtype).itemsize
-chunk_rows = (64 * 1024 * 1024) // (n_features * bytes_per_value)
-chunk_shape = (chunk_rows, n_features)
-print(f"Number of rows per chunk: {chunk_rows}")
+    calc = Calculator(descriptors, ignore_3D=True)
+    calc.config(timeout=1)
 
-# Create the dataset with compression and concurrency settings
-z = zarr.create_array(
-    store=out_file,
-    shape=shape,
-    chunks=chunk_shape,
-    dtype=dtype,
-    compressors=None,  # disable compression
-)
+    n_features = len(calc)
 
-i = 0
-with tqdm(total=n_mols, desc="Calculating features") as pbar:
-    while i < n_mols:
-        batch = np.array(list(calc.map(mols[i:i+chunk_rows], quiet=True)), dtype=dtype)
-        z[i:i+chunk_rows, :] = batch
-        pbar.update(chunk_rows)
-        i += chunk_rows
-    batch = np.array(list(calc.map(mols[i-chunk_rows:n_mols], quiet=True)), dtype=dtype)
-    z[i-chunk_rows:n_mols, :] = batch
-    pbar.update(n_mols - (i-chunk_rows))
+    blocker = rdBase.BlockLogs()
+    try:
+        smiles_file = sys.argv[1]
+        out_file = sys.argv[2]
+    except:
+        print("Usage: python features.py SMILES_FILE OUTPUT_PATH")
+        exit(1)
+
+    with open(smiles_file, "r") as file:
+        smiles = [i.strip() for i in tqdm(file.readlines(), "Reading SMILES")]
+
+    # monomethyl auristatin E (one of the largest small molecule drugs) has a SMILES string
+    # with 143 characters - let's filter out anything much larger than that
+    cutoff = 150
+    smiles = list(filter(lambda s: len(s) < cutoff, tqdm(smiles, desc=f"Filtering SMILES > {cutoff} chars.")))
+
+    # filter out mixtures
+    smiles = list(filter(lambda s: "." not in s, tqdm(smiles, desc=f"Filtering mixture SMILES")))
+
+    valid_mols = list(p.map(_f, tqdm(smiles, desc="Generating RDKit mols"), chunksize=1_024))
+
+    smiles = [s for (s, v) in zip(smiles, valid_mols) if v]
+    n_mols = len(smiles)
+
+    # Define array dimensions
+    shape = (n_mols, n_features)
+    dtype = np.float32
+
+    # Estimate chunk size for ~1MB chunks
+    # other suggestions here: https://github.com/zarr-developers/zarr-python/issues/86#issuecomment-254439393
+    bytes_per_value = np.dtype(dtype).itemsize
+    chunk_rows = (1 * 1024 * 1024) // (n_features * bytes_per_value)
+    chunk_shape = (chunk_rows, n_features)
+    print(f"Number of rows per chunk: {chunk_rows}")
+
+    # Create the dataset with compression and concurrency settings
+    z = zarr.create_array(
+        store=out_file,
+        shape=shape,
+        chunks=chunk_shape,
+        dtype=dtype,
+        compressors=None,  # disable compression
+        fill_value=np.nan,
+    )
+
+    i = 0
+    with tqdm(total=n_mols, desc="Calculating features") as pbar:
+        while i < n_mols:
+            mols = list(p.map(_s, smiles[i:i+chunk_rows], chunksize=128))
+            for mol in mols:
+                mol.SetProp("_Name", "")  # prevent mordred from doing this in a rather expensive way
+            batch = calc.pandas(mols, quiet=True, nproc=64).fill_missing().to_numpy(dtype=np.float32)
+            z[i:i+chunk_rows, :] = batch
+            pbar.update(chunk_rows)
+            i += chunk_rows
+        mols = list(p.map(_s, smiles[i-chunk_rows:n_mols], chunksize=128))
+        for mol in mols:
+            mol.SetProp("_Name", "")  # prevent mordred from doing this in a rather expensive way
+        batch = calc.pandas(mols, quiet=True, nproc=64).fill_missing().to_numpy(dtype=np.float32)
+        z[i-chunk_rows:n_mols, :] = batch
+        pbar.update(n_mols - (i-chunk_rows))

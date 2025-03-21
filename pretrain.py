@@ -27,8 +27,8 @@ from utils.torchford import Welford
 
 
 # autoencoder architecture
-HIDDEN_SIZES = (512,)
-ENCODING_SIZE = 16
+HIDDEN_SIZES = (1500, 1300, 1100, 900, 700, 500, 300, 100)
+ENCODING_SIZE = 32
 
 # training configuration
 LEARNING_RATE = 1e-4
@@ -51,7 +51,7 @@ class ZarrDataset(TorchDataset):
 
 if __name__ == "__main__":
     try:
-        training_store = sys.argv[1]
+        training_store = Path(sys.argv[1])
         output_dir = Path(sys.argv[2])
     except:
         print("usage: python pretrain.py TRAINING_STORE OUTPUT_DIR")
@@ -61,11 +61,11 @@ if __name__ == "__main__":
     n_samples = z.shape[0]
     n_features = z.shape[1]
 
-    cached_means_fpath = f"feature_means_cached_{training_store[:-5]}.pt"
-    cached_vars_fpath = f"feature_vars_cached_{training_store[:-5]}.pt"
+    cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
+    cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
     if not os.path.exists(cached_means_fpath) or not os.path.exists(cached_vars_fpath):
         w = Welford()
-        idx_batches = np.array_split(np.arange(n_samples), n_samples // 10_000)
+        idx_batches = np.array_split(np.arange(n_samples), n_samples // 1_024)
         for idxs in tqdm(idx_batches, desc="Calculating Feature Statistics"):
             batch = torch.tensor(z[idxs], dtype=torch.float32).to("cuda:0")
             w.add_all(batch)
