@@ -1,3 +1,9 @@
+"""
+finetune models using the fastpropFoundation encoding as an input vector
+
+note that polaris requires zarr<3 but the feature generator requires
+zarr>=3 so two separate python environments are needed
+"""
 from pathlib import Path
 import sys
 
