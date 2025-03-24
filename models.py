@@ -116,6 +116,7 @@ class fastpropFoundation(LightningModule):
             x = torch.nn.functional.selu(x)
             x = self.dropout_50(x)
         x = torch.nn.functional.linear(x, self.model_weights[-1], bias=None)
+        x = torch.nn.functional.sigmoid(x)
         return x
 
     def _decode(self, x):
