@@ -28,7 +28,8 @@ from utils.torchford import Welford
 
 # autoencoder architecture
 ENCODING_SIZE = 4096
-HIDDEN_SIZES = tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
+HIDDEN_SIZES = (2048, 2896)
+# tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
 # tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
 
 # training configuration
@@ -98,6 +99,7 @@ if __name__ == "__main__":
         hidden_sizes=HIDDEN_SIZES,
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,
+        snn=False,
     )
     # model = fastpropBatchNormAutoEncoder.load_from_checkpoint(".ckpt")
     rank_zero_info(model)

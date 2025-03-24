@@ -1,3 +1,4 @@
+import math
 from itertools import chain
 from typing import Tuple
 
@@ -34,6 +35,7 @@ class fastpropFoundation(LightningModule):
         hidden_sizes: Tuple[int, ...] = (1024,),
         encoding_size: int = 256,
         learning_rate: float = 0.001,
+        snn: bool = True,
     ):
         """Implements a mordred-descriptor based Self Normalizing Denoising autoencoder with tied weights.
 
@@ -45,14 +47,16 @@ class fastpropFoundation(LightningModule):
             hidden_sizes (Tuple[int, ...], optional): Tuple of sizes for hidden layers. Defaults to (1024,).
             encoding_size (int, optional): Size of final encoding. Defaults to 256.
             learning_rate (float, optional): Learning rate for optimizer. Defaults to 0.001.
+            snn (bool, optional): Use self-normalizing architecture. Default True.
         """
         super().__init__()
         self.n_layers = 1 + len(hidden_sizes)
         self.register_buffer("feature_means", feature_means)
         self.register_buffer("feature_vars", feature_vars)
         self.learning_rate = learning_rate
-        self.dropout_80 = torch.nn.AlphaDropout(p=0.80)
-        self.dropout_50 = torch.nn.AlphaDropout(p=0.50)
+        self.act = torch.nn.SELU() if snn else torch.nn.LeakyReLU()
+        self.dropout_80 = torch.nn.AlphaDropout(p=0.80) if snn else torch.nn.Dropout(p=0.8)
+        self.dropout_50 = torch.nn.AlphaDropout(p=0.50) if snn else torch.nn.Dropout(p=0.5)
         self.winsorize = False
         if winsorization_factor is not None:
             self.winsorize = WinsorizeStdevN(winsorization_factor)
@@ -64,7 +68,7 @@ class fastpropFoundation(LightningModule):
         ):
             # opposite of expected order since torch.nn.functional.linear will transpose the weights
             self.model_weights.append(torch.empty(out_features, in_features, dtype=torch.float32))
-        self._reset_parameters()
+        self._reset_parameters(snn)
         self.save_hyperparameters()
     
     def configure_optimizers(self):
@@ -79,14 +83,12 @@ class fastpropFoundation(LightningModule):
         """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
         return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
 
-    def _reset_parameters(self):
+    def _reset_parameters(self, snn):
         for weight in chain(self.model_weights,):
-            # zero out biases
-            if len(weight.shape) == 1:
-                torch.nn.init.constant_(weight, 0)
-            else:
-                # lecun-normal initialization for weights
+            if snn:
                 torch.nn.init.kaiming_normal_(weight, mode="fan_in", nonlinearity="linear")
+            else:
+                torch.nn.init.kaiming_uniform_(weight, a=math.sqrt(5))
     
     def _scale(self, x: torch.Tensor):
         x = standard_scale(x, self.feature_means, self.feature_vars)
@@ -113,14 +115,14 @@ class fastpropFoundation(LightningModule):
         x = self.dropout_80(x)
         for i in range(self.n_layers - 1):
             x = torch.nn.functional.linear(x, self.model_weights[i], bias=None)
-            x = torch.nn.functional.selu(x)
+            x = self.act(x)
             x = self.dropout_50(x)
         x = torch.nn.functional.linear(x, self.model_weights[-1], bias=None)
         return x
 
     def _decode(self, x):
         for i in reversed(range(1, self.n_layers)):
-            x = torch.nn.functional.selu(torch.nn.functional.linear(x, self.model_weights[i].T, bias=None))
+            x = self.act(torch.nn.functional.linear(x, self.model_weights[i].T, bias=None))
         x = torch.nn.functional.linear(x, self.model_weights[0].T, bias=None)
         return x
 
