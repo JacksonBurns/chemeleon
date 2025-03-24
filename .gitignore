@@ -4,3 +4,4 @@ __pycache__
 output
 *.pt
 screen.log
+*.ckpt
