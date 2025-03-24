@@ -25,8 +25,9 @@ from models import fastpropFoundation
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 
-def get_pretrained_encodings(smiles, ckpt_path):
-    model = fastpropFoundation.load_from_checkpoint(ckpt_path)
+def get_pretrained_encodings(smiles, pt_path):
+    model: fastpropFoundation = torch.load(pt_path, weights_only=False)
+    # model = fastpropFoundation.load(pt_path)
     model.eval()
     calc = Calculator(descriptors, ignore_3D=True)
     calc.config(timeout=1)
@@ -59,12 +60,12 @@ pretrained model: {ckpt_path}
         # "polaris/pkis2-kit-wt-cls-v2",
         # "polaris/pkis2-kit-wt-reg-v2",
         # "polaris/pkis2-egfr-wt-reg-v2",
-        "biogen/adme-fang-solu-reg-v1",
-        "biogen/adme-fang-rppb-reg-v1",
-        "biogen/adme-fang-hppb-reg-v1",
-        "biogen/adme-fang-perm-reg-v1",
-        "biogen/adme-fang-rclint-reg-v1",
-        "biogen/adme-fang-hclint-reg-v1",
+        "polaris/adme-fang-solu-reg-v1",
+        "polaris/adme-fang-rppb-reg-v1",
+        "polaris/adme-fang-hppb-reg-v1",
+        "polaris/adme-fang-perm-reg-v1",
+        "polaris/adme-fang-rclint-reg-v1",
+        "polaris/adme-fang-hclint-reg-v1",
         # "tdcommons/lipophilicity-astrazeneca",
         # "tdcommons/ppbr-az",
         # "tdcommons/clearance-hepatocyte-az",
