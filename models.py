@@ -116,7 +116,6 @@ class fastpropFoundation(LightningModule):
             x = torch.nn.functional.selu(x)
             x = self.dropout_50(x)
         x = torch.nn.functional.linear(x, self.model_weights[-1], bias=None)
-        x = torch.nn.functional.sigmoid(x)
         return x
 
     def _decode(self, x):
@@ -131,7 +130,7 @@ class fastpropFoundation(LightningModule):
     def _step(self, descriptors, name):
         descriptors = self._scale(descriptors)
         reconstruction = self(descriptors)
-        loss = torch.nn.functional.huber_loss(reconstruction, descriptors, reduction="mean")
+        loss = torch.nn.functional.mse_loss(reconstruction, descriptors, reduction="mean")
         self.log(f"{name}/loss", loss)
         return loss
 

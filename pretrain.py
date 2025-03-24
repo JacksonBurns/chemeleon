@@ -27,8 +27,8 @@ from utils.torchford import Welford
 
 
 # autoencoder architecture
-ENCODING_SIZE = 2048
-HIDDEN_SIZES = tuple(reversed(range(ENCODING_SIZE-42, 1613, -42)))  # overcomplete 
+ENCODING_SIZE = 4096
+HIDDEN_SIZES = tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
 # tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
 
 # training configuration
@@ -59,16 +59,23 @@ if __name__ == "__main__":
         exit(1)
 
     z = zarr.open_array(training_store, mode='r')
-    n_samples = z.shape[0]
     n_features = z.shape[1]
+    del z
+    
+    dataset = ZarrDataset(training_store)
+    gen = torch.Generator().manual_seed(1701)
+    train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
+    train_dataloader = TorchDataLoader(train_dset, num_workers=32, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
+    val_dataloader = TorchDataLoader(val_dset, num_workers=16, batch_size=BATCH_SIZE, persistent_workers=True)
+    test_dataloader = TorchDataLoader(test_dset, num_workers=16, batch_size=BATCH_SIZE, persistent_workers=True)
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
     if not os.path.exists(cached_means_fpath) or not os.path.exists(cached_vars_fpath):
         w = Welford()
-        idx_batches = np.array_split(np.arange(n_samples), n_samples // 1_024)
-        for idxs in tqdm(idx_batches, desc="Calculating Feature Statistics"):
-            batch = torch.tensor(z[idxs], dtype=torch.float32).to("cuda:0")
+        loader = TorchDataLoader(train_dset, batch_size=BATCH_SIZE)
+        for batch in tqdm(loader, desc="Calculating Feature Statistics"):
+            batch = batch.to("cuda:0")
             w.add_all(batch)
         # set all missing and invariant features means and vars to zero
         torch.save(
@@ -79,23 +86,15 @@ if __name__ == "__main__":
             torch.nan_to_num(w.var_p, posinf=0.0, neginf=0.0),
             cached_vars_fpath,
         )
-        del w
-    del z
+        del w, loader
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
-    
-    dataset = ZarrDataset(training_store)
-    gen = torch.Generator().manual_seed(1701)
-    train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = TorchDataLoader(train_dset, num_workers=32, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader = TorchDataLoader(val_dset, num_workers=16, batch_size=BATCH_SIZE, persistent_workers=True)
-    test_dataloader = TorchDataLoader(test_dset, num_workers=16, batch_size=BATCH_SIZE, persistent_workers=True)
 
     model = fastpropFoundation(
         feature_means=feature_means,
         feature_vars=feature_vars,
         num_features=n_features,
-        winsorization_factor=5,
+        winsorization_factor=6,
         hidden_sizes=HIDDEN_SIZES,
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,
@@ -137,3 +136,4 @@ if __name__ == "__main__":
     model = model.__class__.load_from_checkpoint(ckpt_path)
     trainer = Trainer(devices=1, logger=tensorboard_logger)
     trainer.test(model, test_dataloader)
+    torch.save(model, output_dir / "best.pt")
