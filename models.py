@@ -12,12 +12,25 @@ from torch import distributed
 # https://github.com/bioinf-jku/SNNs/blob/master/Pytorch/SelfNormalizingNetworks_MLP_MNIST.ipynb
 
 
+class WinsorizeStdevN(torch.nn.Module):
+    def __init__(self, n: float) -> None:
+        super().__init__()
+        self.n = n
+
+    def forward(self, batch: torch.Tensor):
+        return torch.clamp(batch, min=-self.n, max=self.n)
+
+    def extra_repr(self) -> str:
+        return f"n={self.n}"
+
+
 class fastpropFoundation(LightningModule):
     def __init__(
         self,
         feature_means: torch.Tensor,
         feature_vars: torch.Tensor,
         num_features: int = 1613,
+        winsorization_factor=None,
         hidden_sizes: Tuple[int, ...] = (1024,),
         encoding_size: int = 256,
         learning_rate: float = 0.001,
@@ -28,6 +41,7 @@ class fastpropFoundation(LightningModule):
             feature_means (torch.Tensor): Means of input features.
             feature_vars (torch.Tensor): Variances of input features.
             num_features (int, optional): Number of input features. Defaults to 1613.
+            winsorization_factor (int, optional): # of stdev to cutoff rescaled inputs. Defaults to None (i.e. disabled).
             hidden_sizes (Tuple[int, ...], optional): Tuple of sizes for hidden layers. Defaults to (1024,).
             encoding_size (int, optional): Size of final encoding. Defaults to 256.
             learning_rate (float, optional): Learning rate for optimizer. Defaults to 0.001.
@@ -39,6 +53,9 @@ class fastpropFoundation(LightningModule):
         self.learning_rate = learning_rate
         self.dropout_80 = torch.nn.AlphaDropout(p=0.80)
         self.dropout_50 = torch.nn.AlphaDropout(p=0.50)
+        self.winsorize = False
+        if winsorization_factor is not None:
+            self.winsorize = WinsorizeStdevN(winsorization_factor)
         self.model_weights = torch.nn.ParameterList()
         for i, in_features, out_features in zip(
             range(len(hidden_sizes) + 1),  # layer counter
@@ -72,7 +89,11 @@ class fastpropFoundation(LightningModule):
                 torch.nn.init.kaiming_normal_(weight, mode="fan_in", nonlinearity="linear")
     
     def _scale(self, x: torch.Tensor):
-        return standard_scale(x, self.feature_means, self.feature_vars)
+        x = standard_scale(x, self.feature_means, self.feature_vars)
+        if not self.winsorize:
+            return x
+        else:
+            return self.winsorize(x) 
     
     def encode(self, descriptors: torch.Tensor):
         """Public facing encode function

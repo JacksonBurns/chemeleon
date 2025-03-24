@@ -27,11 +27,11 @@ from utils.torchford import Welford
 
 
 # autoencoder architecture
-HIDDEN_SIZES = (1500, 1300, 1100, 900, 700, 500, 300, 100)
 ENCODING_SIZE = 32
+HIDDEN_SIZES = tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
 
 # training configuration
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-5
 NUM_EPOCHS = 20
 PATIENCE = 2
 BATCH_SIZE = 1024
@@ -94,6 +94,7 @@ if __name__ == "__main__":
         feature_means=feature_means,
         feature_vars=feature_vars,
         num_features=n_features,
+        winsorization_factor=5,
         hidden_sizes=HIDDEN_SIZES,
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,

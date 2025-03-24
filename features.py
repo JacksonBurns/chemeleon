@@ -84,14 +84,14 @@ if __name__ == "__main__":
     i = 0
     with tqdm(total=n_mols, desc="Calculating features") as pbar:
         while i < n_mols:
-            mols = list(p.map(_s, smiles[i:i+chunk_rows], chunksize=128))
+            mols = list(p.map(_s, smiles[i:i+chunk_rows], chunksize=chunk_rows // 64))
             for mol in mols:
                 mol.SetProp("_Name", "")  # prevent mordred from doing this in a rather expensive way
             batch = calc.pandas(mols, quiet=True, nproc=64).fill_missing().to_numpy(dtype=np.float32)
             z[i:i+chunk_rows, :] = batch
             pbar.update(chunk_rows)
             i += chunk_rows
-        mols = list(p.map(_s, smiles[i-chunk_rows:n_mols], chunksize=128))
+        mols = list(p.map(_s, smiles[i-chunk_rows:n_mols], chunksize=chunk_rows // 64))
         for mol in mols:
             mol.SetProp("_Name", "")  # prevent mordred from doing this in a rather expensive way
         batch = calc.pandas(mols, quiet=True, nproc=64).fill_missing().to_numpy(dtype=np.float32)
