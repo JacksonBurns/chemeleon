@@ -5,3 +5,4 @@ output
 *.pt
 screen.log
 *.ckpt
+*.log
