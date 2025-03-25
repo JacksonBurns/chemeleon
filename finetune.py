@@ -162,8 +162,8 @@ pretrained model: {pt_path}
 
         # build the fine tuner
         encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-        model = FineTuner(encoder, 1_024, task_type, (128, 128), learning_rate=1e-5)
-
+        model = FineTuner(encoder, 1_024, task_type, tuple(), learning_rate=1e-5)
+        
         # fit model
         train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
         test_dataset = torch.utils.data.TensorDataset(test_desc)
