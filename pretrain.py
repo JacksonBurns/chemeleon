@@ -22,20 +22,20 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_info
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
-from models import fastpropFoundation
+from models import fastpropFoundation, fastpropFoundationMaskedDAE
 from utils.torchford import Welford
 
 
 # autoencoder architecture
-ENCODING_SIZE = 4096
-HIDDEN_SIZES = (2048, 2896)
+ENCODING_SIZE = 1024
+HIDDEN_SIZES = (1024, 1024)
 # tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
 # tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
 
 # training configuration
 LEARNING_RATE = 1e-5
-NUM_EPOCHS = 20
-PATIENCE = 2
+NUM_EPOCHS = 500
+PATIENCE = 50
 BATCH_SIZE = 1024
 
 
@@ -91,7 +91,17 @@ if __name__ == "__main__":
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
-    model = fastpropFoundation(
+    # model = fastpropFoundation(
+    #     feature_means=feature_means,
+    #     feature_vars=feature_vars,
+    #     num_features=n_features,
+    #     winsorization_factor=6,
+    #     hidden_sizes=HIDDEN_SIZES,
+    #     encoding_size=ENCODING_SIZE,
+    #     learning_rate=LEARNING_RATE,
+    #     snn=False,
+    # )
+    model = fastpropFoundationMaskedDAE(
         feature_means=feature_means,
         feature_vars=feature_vars,
         num_features=n_features,
@@ -101,7 +111,6 @@ if __name__ == "__main__":
         learning_rate=LEARNING_RATE,
         snn=False,
     )
-    # model = fastpropBatchNormAutoEncoder.load_from_checkpoint(".ckpt")
     rank_zero_info(model)
 
     tensorboard_logger = TensorBoardLogger(
