@@ -9,16 +9,18 @@ import sys
 import datetime
 import warnings
 import json
+from typing import Tuple
 
 import torch
 from mordred import Calculator, descriptors
 import numpy as np
 from rdkit.Chem import MolFromSmiles
 import polaris as po
+from torch import distributed
 from polaris.utils.types import TargetType
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
-from lightning import Trainer
+from lightning import Trainer, LightningModule
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
@@ -26,6 +28,61 @@ from models import fastpropFoundation, FineTuner
 
 
 warnings.filterwarnings('ignore', category=FutureWarning)
+
+class FineTuner(LightningModule):
+    def __init__(
+        self,
+        encoder: torch.nn.Module,
+        input_dim: int,
+        task_type: TargetType,
+        hidden_sizes: Tuple[int, ...] = (1024,),
+        learning_rate: float = 0.0001,
+    ):
+        super().__init__()
+        self.encoder: fastpropFoundation = encoder
+        self.learning_rate = learning_rate
+        modules = []
+        for i in range(len(hidden_sizes)):
+            modules.append(torch.nn.Linear(input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]))
+            modules.append(torch.nn.ReLU())
+        modules.append(torch.nn.Linear(hidden_sizes[-1], 1))
+        if task_type == TargetType.CLASSIFICATION:
+            modules.append(torch.nn.Sigmoid())
+        self.task_type = task_type
+        self.fnn = torch.nn.Sequential(*modules)
+        self.save_hyperparameters()
+    
+    def configure_optimizers(self):
+        return {"optimizer": torch.optim.Adam(self.parameters(), lr=self.learning_rate)}
+
+    def log(self, name, value, **kwargs):
+        """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
+        return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
+
+    def forward(self, descriptors):
+        return self.fnn(self.encoder.encode(descriptors))
+
+    def _step(self, batch, name):
+        descriptors, y = batch
+        y_hat = self(descriptors)
+        if self.task_type == TargetType.CLASSIFICATION:
+            loss = torch.nn.functional.binary_cross_entropy(y_hat, y, reduction="mean")
+        else:
+            loss = torch.nn.functional.mse_loss(y_hat, y, reduction="mean")
+        self.log(f"{name}/loss", loss)
+        return loss
+
+    def training_step(self, batch, batch_idx):
+        return self._step(batch, "train")
+
+    def validation_step(self, batch, batch_idx):
+        return self._step(batch, "validation")
+
+    def test_step(self, batch, batch_idx):
+        return self._step(batch, "test")
+
+    def predict_step(self, batch, batch_idx):
+        return self(batch[0])
 
 
 if __name__ == "__main__":
@@ -38,9 +95,11 @@ if __name__ == "__main__":
     if not output_dir.exists():
         output_dir.mkdir()
     output_file = open(output_dir / "finetune_results.md", "w")
+    encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
     output_file.write(f"""# `fastprop` Finetuning Results
 timestamp: {datetime.datetime.now()}
 pretrained model: {pt_path}
+{encoder}
 """)
     performance_dict = {}
     polaris_benchmarks = [
@@ -100,11 +159,11 @@ pretrained model: {pt_path}
             mol.SetProp("_Name", "")
         train_desc = torch.tensor(calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
         test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
-        
+
         # build the fine tuner
         encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
         model = FineTuner(encoder, 1_024, task_type, (128, 128), learning_rate=1e-5)
-        
+
         # fit model
         train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
         test_dataset = torch.utils.data.TensorDataset(test_desc)

@@ -6,7 +6,6 @@ import torch
 from fastprop.data import standard_scale
 from lightning import LightningModule
 from torch import distributed
-from polaris.utils.types import TargetType
 
 from utils.dyt import DynamicTanh
 
@@ -25,62 +24,6 @@ class WinsorizeStdevN(torch.nn.Module):
 
     def extra_repr(self) -> str:
         return f"n={self.n}"
-
-
-class FineTuner(LightningModule):
-    def __init__(
-        self,
-        encoder: torch.nn.Module,
-        input_dim: int,
-        task_type: TargetType,
-        hidden_sizes: Tuple[int, ...] = (1024,),
-        learning_rate: float = 0.0001,
-    ):
-        super().__init__()
-        self.encoder: fastpropFoundation = encoder
-        self.learning_rate = learning_rate
-        modules = []
-        for i in range(len(hidden_sizes)):
-            modules.append(torch.nn.Linear(input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]))
-            modules.append(torch.nn.ReLU())
-        modules.append(torch.nn.Linear(hidden_sizes[-1], 1))
-        if task_type == TargetType.CLASSIFICATION:
-            modules.append(torch.nn.Sigmoid())
-        self.task_type = task_type
-        self.fnn = torch.nn.Sequential(*modules)
-        self.save_hyperparameters()
-    
-    def configure_optimizers(self):
-        return {"optimizer": torch.optim.Adam(self.parameters(), lr=self.learning_rate)}
-
-    def log(self, name, value, **kwargs):
-        """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
-        return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
-
-    def forward(self, descriptors):
-        return self.fnn(self.encoder.encode(descriptors))
-
-    def _step(self, batch, name):
-        descriptors, y = batch
-        y_hat = self(descriptors)
-        if self.task_type == TargetType.CLASSIFICATION:
-            loss = torch.nn.functional.binary_cross_entropy(y_hat, y, reduction="mean")
-        else:
-            loss = torch.nn.functional.mse_loss(y_hat, y, reduction="mean")
-        self.log(f"{name}/loss", loss)
-        return loss
-
-    def training_step(self, batch, batch_idx):
-        return self._step(batch, "train")
-
-    def validation_step(self, batch, batch_idx):
-        return self._step(batch, "validation")
-
-    def test_step(self, batch, batch_idx):
-        return self._step(batch, "test")
-
-    def predict_step(self, batch, batch_idx):
-        return self(batch[0])
 
 
 class fastpropFoundation(LightningModule):
@@ -213,7 +156,6 @@ class fastpropFoundationMaskedDAE(LightningModule):
         hidden_sizes: Tuple[int, ...] = (1024,),
         encoding_size: int = 256,
         learning_rate: float = 0.001,
-        snn: bool = True,
         masking_ratio: float = 0.15,
     ):
         """Implements a mordred-descriptor based Self Normalizing Denoising autoencoder with tied weights.
@@ -229,25 +171,20 @@ class fastpropFoundationMaskedDAE(LightningModule):
             snn (bool, optional): Use self-normalizing architecture. Default True.
         """
         super().__init__()
-        self.n_layers = 1 + len(hidden_sizes)
         self.register_buffer("feature_means", feature_means)
         self.register_buffer("feature_vars", feature_vars)
         self.learning_rate = learning_rate
-        self.act = torch.nn.SELU() if snn else torch.nn.LeakyReLU()
-        self.dropout_50 = torch.nn.AlphaDropout(p=0.50) if snn else torch.nn.Dropout(p=0.5)
         self.winsorize = False
         self.masking_ratio = masking_ratio
         if winsorization_factor is not None:
             self.winsorize = WinsorizeStdevN(winsorization_factor)
-        self.model_weights = torch.nn.ParameterList()
-        for i, in_features, out_features in zip(
-            range(len(hidden_sizes) + 1),  # layer counter
-            chain([num_features], hidden_sizes),  # input -> last hidden layer
-            chain(hidden_sizes, [encoding_size]),  # first hidden layer -> readout
-        ):
-            # opposite of expected order since torch.nn.functional.linear will transpose the weights
-            self.model_weights.append(torch.empty(out_features, in_features, dtype=torch.float32))
-        self._reset_parameters(snn)
+        modules = []
+        for i in range(len(hidden_sizes)):
+            modules.append(torch.nn.Linear(num_features if i == 0 else hidden_sizes[i], hidden_sizes[i]))
+            modules.append(torch.nn.LeakyReLU())
+        modules.append(torch.nn.Linear(hidden_sizes[-1], encoding_size))
+        self.encoder = torch.nn.Sequential(*modules)
+        self.decoder = torch.nn.Linear(encoding_size, num_features)
         self.save_hyperparameters()
     
     def configure_optimizers(self):
@@ -261,13 +198,6 @@ class fastpropFoundationMaskedDAE(LightningModule):
     def log(self, name, value, **kwargs):
         """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
         return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
-
-    def _reset_parameters(self, snn):
-        for weight in chain(self.model_weights,):
-            if snn:
-                torch.nn.init.kaiming_normal_(weight, mode="fan_in", nonlinearity="linear")
-            else:
-                torch.nn.init.kaiming_uniform_(weight, a=math.sqrt(5))
     
     def _scale(self, x: torch.Tensor):
         x = standard_scale(x, self.feature_means, self.feature_vars)
@@ -291,18 +221,10 @@ class fastpropFoundationMaskedDAE(LightningModule):
         return self._encode(descriptors)
 
     def _encode(self, x):
-        for i in range(self.n_layers - 1):
-            x = torch.nn.functional.linear(x, self.model_weights[i], bias=None)
-            x = self.act(x)
-            x = self.dropout_50(x)
-        x = torch.nn.functional.linear(x, self.model_weights[-1], bias=None)
-        return x
+        return self.encoder(x)
 
     def _decode(self, x):
-        for i in reversed(range(1, self.n_layers)):
-            x = self.act(torch.nn.functional.linear(x, self.model_weights[i].T, bias=None))
-        x = torch.nn.functional.linear(x, self.model_weights[0].T, bias=None)
-        return x
+        return self.decoder(x)
 
     def forward(self, desccriptors):
         return self._decode(self._encode(desccriptors))

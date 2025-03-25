@@ -109,7 +109,6 @@ if __name__ == "__main__":
         hidden_sizes=HIDDEN_SIZES,
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,
-        snn=False,
     )
     rank_zero_info(model)
 
