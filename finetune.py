@@ -18,29 +18,19 @@ import polaris as po
 from polaris.utils.types import TargetType
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from lightning import Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from lightning.pytorch.loggers import TensorBoardLogger
 
-from models import fastpropFoundation
+from models import fastpropFoundation, FineTuner
 
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 
-def get_pretrained_encodings(smiles, pt_path):
-    model: fastpropFoundation = torch.load(pt_path, weights_only=False)
-    # model = fastpropFoundation.load(pt_path)
-    model.eval()
-    calc = Calculator(descriptors, ignore_3D=True)
-    calc.config(timeout=1)
-    mols = list(map(MolFromSmiles, smiles))
-    for mol in mols:
-        mol.SetProp("_Name", "")
-    desc = torch.tensor(calc.pandas(mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32).to(device=model.device)
-    enc = model.encode(desc).numpy(force=True)
-    return enc
-    
 if __name__ == "__main__":
     try:
-        ckpt_path = Path(sys.argv[1])
+        pt_path = Path(sys.argv[1])
         output_dir = Path(sys.argv[2])
     except:
         print("usage: python pretrain.py PRETRAINED_CHECKPOINT_PATH OUTPUT_DIR")
@@ -50,22 +40,21 @@ if __name__ == "__main__":
     output_file = open(output_dir / "finetune_results.md", "w")
     output_file.write(f"""# `fastprop` Finetuning Results
 timestamp: {datetime.datetime.now()}
-pretrained model: {ckpt_path}
+pretrained model: {pt_path}
 """)
     performance_dict = {}
     polaris_benchmarks = [
-        # "polaris/pkis2-lok-slk-cls-v2",  <-- need to add support for multitask binary classification
         "polaris/pkis2-ret-wt-cls-v2",
         # "polaris/pkis2-ret-wt-reg-v2",
         # "polaris/pkis2-kit-wt-cls-v2",
         # "polaris/pkis2-kit-wt-reg-v2",
         # "polaris/pkis2-egfr-wt-reg-v2",
-        "polaris/adme-fang-solu-reg-v1",
-        "polaris/adme-fang-rppb-reg-v1",
-        "polaris/adme-fang-hppb-reg-v1",
-        "polaris/adme-fang-perm-reg-v1",
-        "polaris/adme-fang-rclint-reg-v1",
-        "polaris/adme-fang-hclint-reg-v1",
+        "polaris/adme-fang-solu-1",
+        "polaris/adme-fang-rppb-1",
+        "polaris/adme-fang-hppb-1",
+        "polaris/adme-fang-perm-1",
+        "polaris/adme-fang-rclint-1",
+        "polaris/adme-fang-hclint-1",
         # "tdcommons/lipophilicity-astrazeneca",
         # "tdcommons/ppbr-az",
         # "tdcommons/clearance-hepatocyte-az",
@@ -88,33 +77,78 @@ pretrained model: {ckpt_path}
         # "tdcommons/ld50-zhu",
     ]
 
+    calc = Calculator(descriptors, ignore_3D=True)
+    calc.config(timeout=1)
     for benchmark_name in polaris_benchmarks:
+        # load the benchmarking data
         benchmark = po.load_benchmark(benchmark_name)
         smiles_col = list(benchmark.input_cols)[0]
         target_cols = list(benchmark.target_cols)
         train, test = benchmark.get_train_test_split()
         train_df, test_df = train.as_dataframe(), test.as_dataframe()
-        encodings = get_pretrained_encodings(train_df[smiles_col], ckpt_path)
-        test_encodings = get_pretrained_encodings(test_df[smiles_col], ckpt_path)
+
+        # extract metadata, targets, and inputs
+        task_type = benchmark.target_types[target_cols[0]]
         targets = train_df[target_cols]
         targets = targets.fillna(targets.mean(axis=0)).to_numpy()
-        if targets.shape[1] == 1:
-            targets = targets.flatten()
-        # fit a random forest model
-        task_type = benchmark.target_types[target_cols[0]]
-        if task_type == TargetType.CLASSIFICATION:
-            model = MLPClassifier()
-            model.fit(encodings, targets)
-            predictions = model.predict_proba(test_encodings)
-            predictions = predictions[:, 1].flatten()
-        elif task_type == TargetType.REGRESSION:
-            model = MLPRegressor()
-            model.fit(encodings, targets)
-            predictions = model.predict(test_encodings)
-        else:
-            print(f"Unknown task type {task_type}")
-            exit(1)
-        # run inference
+        targets = torch.tensor(targets, dtype=torch.float32)
+        train_mols = list(map(MolFromSmiles, train_df[smiles_col]))
+        for mol in train_mols:
+            mol.SetProp("_Name", "")
+        test_mols = list(map(MolFromSmiles, test_df[smiles_col]))
+        for mol in test_mols:
+            mol.SetProp("_Name", "")
+        train_desc = torch.tensor(calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
+        test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
+        
+        # build the fine tuner
+        encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
+        model = FineTuner(encoder, 1_024, task_type, (128, 128), learning_rate=1e-5)
+        
+        # fit model
+        train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
+        test_dataset = torch.utils.data.TensorDataset(test_desc)
+        gen = torch.Generator().manual_seed(1701)
+        train_dataset, validation_dataset = torch.utils.data.random_split(train_dataset, [0.8, 0.2], gen)
+        train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=8, shuffle=True)
+        val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=8, persistent_workers=True)
+        test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=8, persistent_workers=True)
+        _subdir = "".join(c  if c.isalnum() else "_" for c in benchmark_name)
+        tensorboard_logger = TensorBoardLogger(
+            output_dir / _subdir,
+            name="tensorboard_logs",
+            default_hp_metric=False,
+        )
+        callbacks = [
+            EarlyStopping(
+                monitor="validation/loss",
+                mode="min",
+                verbose=False,
+                patience=5,
+            ),
+            ModelCheckpoint(
+                monitor="validation/loss",
+                save_top_k=2,
+                mode="min",
+                dirpath=output_dir  / _subdir / "checkpoints",
+            ),
+        ]
+        callbacks[1].STARTING_VERSION = 0
+        trainer = Trainer(
+            max_epochs=50,
+            logger=tensorboard_logger,
+            log_every_n_steps=1,
+            enable_checkpointing=True,
+            check_val_every_n_epoch=1,
+            callbacks=callbacks,
+        )
+        trainer.fit(model, train_dataloader, val_dataloader)
+        ckpt_path = trainer.checkpoint_callback.best_model_path
+        print(f"Reloading best model from checkpoint file: {ckpt_path}")
+        model = model.__class__.load_from_checkpoint(ckpt_path)
+        trainer = Trainer(logger=tensorboard_logger)
+        predictions = torch.vstack(trainer.predict(model, test_dataloader)).numpy(force=True).flatten()
+        
         # prepare the predictions in the format polaris expects
         if task_type == TargetType.CLASSIFICATION:
             results = benchmark.evaluate(predictions > 0.5, predictions)

@@ -6,6 +6,7 @@ import torch
 from fastprop.data import standard_scale
 from lightning import LightningModule
 from torch import distributed
+from polaris.utils.types import TargetType
 
 from utils.dyt import DynamicTanh
 
@@ -31,8 +32,9 @@ class FineTuner(LightningModule):
         self,
         encoder: torch.nn.Module,
         input_dim: int,
+        task_type: TargetType,
         hidden_sizes: Tuple[int, ...] = (1024,),
-        learning_rate: float = 0.001,
+        learning_rate: float = 0.0001,
     ):
         super().__init__()
         self.encoder: fastpropFoundation = encoder
@@ -42,6 +44,9 @@ class FineTuner(LightningModule):
             modules.append(torch.nn.Linear(input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]))
             modules.append(torch.nn.ReLU())
         modules.append(torch.nn.Linear(hidden_sizes[-1], 1))
+        if task_type == TargetType.CLASSIFICATION:
+            modules.append(torch.nn.Sigmoid())
+        self.task_type = task_type
         self.fnn = torch.nn.Sequential(*modules)
         self.save_hyperparameters()
     
@@ -58,7 +63,10 @@ class FineTuner(LightningModule):
     def _step(self, batch, name):
         descriptors, y = batch
         y_hat = self(descriptors)
-        loss = torch.nn.functional.mse_loss(y_hat, y, reduction="mean")
+        if self.task_type == TargetType.CLASSIFICATION:
+            loss = torch.nn.functional.binary_cross_entropy(y_hat, y, reduction="mean")
+        else:
+            loss = torch.nn.functional.mse_loss(y_hat, y, reduction="mean")
         self.log(f"{name}/loss", loss)
         return loss
 
@@ -70,6 +78,9 @@ class FineTuner(LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self._step(batch, "test")
+
+    def predict_step(self, batch, batch_idx):
+        return self(batch[0])
 
 
 class fastpropFoundation(LightningModule):
