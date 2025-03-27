@@ -179,8 +179,10 @@ class fastpropFoundationMaskedDAE(LightningModule):
         if winsorization_factor is not None:
             self.winsorize = WinsorizeStdevN(winsorization_factor)
         modules = []
-        for i in range(len(hidden_sizes)):
-            modules.append(torch.nn.Linear(num_features if i == 0 else hidden_sizes[i], hidden_sizes[i]))
+        modules.append(torch.nn.Linear(num_features, hidden_sizes[0]))
+        modules.append(torch.nn.LeakyReLU())
+        for i in range(len(hidden_sizes)-1):
+            modules.append(torch.nn.Linear(hidden_sizes[i], hidden_sizes[i+1]))
             modules.append(torch.nn.LeakyReLU())
         modules.append(torch.nn.Linear(hidden_sizes[-1], encoding_size))
         self.encoder = torch.nn.Sequential(*modules)

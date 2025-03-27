@@ -27,8 +27,8 @@ from utils.torchford import Welford
 
 
 # autoencoder architecture
-ENCODING_SIZE = 1024
-HIDDEN_SIZES = (1024, 1024)
+ENCODING_SIZE = 64
+HIDDEN_SIZES = (1024, 512, 256, 128)
 # tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
 # tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
 
@@ -109,6 +109,7 @@ if __name__ == "__main__":
         hidden_sizes=HIDDEN_SIZES,
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,
+        masking_ratio=0.15,
     )
     rank_zero_info(model)
 
