@@ -22,13 +22,15 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_info
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
-from models import fastpropFoundation, fastpropFoundationMaskedDAE
+from models import fastpropFoundation
 from utils.torchford import Welford
 
 
-# autoencoder architecture
-ENCODING_SIZE = 64
-HIDDEN_SIZES = (1024, 512, 256, 128)
+# architecture
+ENCODING_SIZE = 4_096
+HIDDEN_SIZES = tuple([ENCODING_SIZE] * 3)
+EMBEDDING_DIM = 8
+# (1129, 790, 553, 387, 270, 189, 132, 92)  # contiually shrink by 30%
 # tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
 # tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
 
@@ -91,17 +93,7 @@ if __name__ == "__main__":
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
-    # model = fastpropFoundation(
-    #     feature_means=feature_means,
-    #     feature_vars=feature_vars,
-    #     num_features=n_features,
-    #     winsorization_factor=6,
-    #     hidden_sizes=HIDDEN_SIZES,
-    #     encoding_size=ENCODING_SIZE,
-    #     learning_rate=LEARNING_RATE,
-    #     snn=False,
-    # )
-    model = fastpropFoundationMaskedDAE(
+    model = fastpropFoundation(
         feature_means=feature_means,
         feature_vars=feature_vars,
         num_features=n_features,
@@ -110,6 +102,7 @@ if __name__ == "__main__":
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,
         masking_ratio=0.15,
+        embedding_dim=EMBEDDING_DIM,
     )
     rank_zero_info(model)
 
