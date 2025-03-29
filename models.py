@@ -35,6 +35,7 @@ class fastpropFoundation(LightningModule):
         num_features: int = 1613,
         winsorization_factor=None,
         hidden_sizes: Tuple[int, ...] = (1024,),
+        decoder_sizes: Tuple[int, ...] = (256,),
         encoding_size: int = 256,
         learning_rate: float = 0.001,
         masking_ratio: float = 0.15,
@@ -61,7 +62,14 @@ class fastpropFoundation(LightningModule):
         modules.append(torch.nn.Linear(hidden_sizes[-1], encoding_size))
         self.encoder = torch.nn.Sequential(*modules)
         # decoder
-        self.decoder = torch.nn.Linear(encoding_size, num_features)
+        modules = []
+        modules.append(torch.nn.Linear(encoding_size, decoder_sizes[0]))
+        modules.append(torch.nn.LeakyReLU())
+        for i in range(len(decoder_sizes)-1):
+            modules.append(torch.nn.Linear(decoder_sizes[i], decoder_sizes[i+1]))
+            modules.append(torch.nn.LeakyReLU())
+        modules.append(torch.nn.Linear(decoder_sizes[-1], num_features))
+        self.decoder = torch.nn.Sequential(*modules)
 
         self.save_hyperparameters()
     

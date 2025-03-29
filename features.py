@@ -12,7 +12,7 @@ import warnings
 import numpy as np
 from rdkit import rdBase
 from mordred import Calculator, descriptors
-from rdkit.Chem import MolFromSmiles
+from rdkit.Chem import MolFromSmiles, RemoveHs
 from tqdm import tqdm
 import zarr
 
@@ -21,7 +21,15 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 
 # convert to mols, filtering invalid
 def _f(smi):
-    return MolFromSmiles(smi) is not None
+    mol = MolFromSmiles(smi)
+    if mol is None:
+        return False
+    try:
+        _ = RemoveHs(mol, updateExplicitCount=True)
+    except:
+        print("Skipping mol {smi} - failed RemoveHs")
+        return False
+    return True
 
 # convert to mols
 def _s(smi):
@@ -72,16 +80,18 @@ if __name__ == "__main__":
     print(f"Number of rows per chunk: {chunk_rows}")
 
     # Create the dataset with compression and concurrency settings
-    z = zarr.create_array(
-        store=out_file,
-        shape=shape,
-        chunks=chunk_shape,
-        dtype=dtype,
-        compressors=None,  # disable compression
-        fill_value=np.nan,
-    )
+    # z = zarr.create_array(
+    #     store=out_file,
+    #     shape=shape,
+    #     chunks=chunk_shape,
+    #     dtype=dtype,
+    #     compressors=None,  # disable compression
+    #     fill_value=np.nan,
+    # )
+    z = zarr.open_array(out_file)
 
-    i = 0
+    # restarting from previous - otherwise start at i = 0
+    i = 7_680_096
     with tqdm(total=n_mols, desc="Calculating features") as pbar:
         while i < n_mols:
             mols = list(p.map(_s, smiles[i:i+chunk_rows], chunksize=chunk_rows // 64))

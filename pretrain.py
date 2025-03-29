@@ -27,12 +27,14 @@ from utils.torchford import Welford
 
 
 # architecture
-ENCODING_SIZE = 4_096
-HIDDEN_SIZES = tuple([ENCODING_SIZE] * 3)
 EMBEDDING_DIM = 8
-# (1129, 790, 553, 387, 270, 189, 132, 92)  # contiually shrink by 30%
-# tuple(reversed(range(ENCODING_SIZE-440, 1613, -440)))  # overcomplete 
-# tuple(reversed(range(ENCODING_SIZE + 42, 1613, 42)))  # (1500, 1300, 1100, 900, 700, 500, 300, 100)
+ENCODING_SIZE = 128
+HIDDEN_SIZES = (8192, 4096, 2048, 1024, 512, 256)
+DECODER_SIZES = (128, 128)
+# output/pubchem1MM_MDAE_PLR_15mask_8embedding_4096x3layers_4096encoding
+# tuple([ENCODING_SIZE] * 3) encoding 4096
+# output/pubchem1MM_MDAE_15mask_64encoding_shrinkpercent30
+# (1129, 790, 553, 387, 270, 189, 132, 92)  # contiually shrink by 30% encoding 64
 
 # training configuration
 LEARNING_RATE = 1e-5
@@ -99,6 +101,7 @@ if __name__ == "__main__":
         num_features=n_features,
         winsorization_factor=6,
         hidden_sizes=HIDDEN_SIZES,
+        decoder_sizes=DECODER_SIZES,
         encoding_size=ENCODING_SIZE,
         learning_rate=LEARNING_RATE,
         masking_ratio=0.15,
@@ -138,6 +141,5 @@ if __name__ == "__main__":
     ckpt_path = trainer.checkpoint_callback.best_model_path
     print(f"Reloading best model from checkpoint file: {ckpt_path}")
     model = model.__class__.load_from_checkpoint(ckpt_path)
-    trainer = Trainer(devices=1, logger=tensorboard_logger)
     trainer.test(model, test_dataloader)
     torch.save(model, output_dir / "best.pt")
