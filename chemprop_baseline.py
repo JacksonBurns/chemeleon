@@ -1,5 +1,5 @@
 """
-finetune models using the fastpropFoundation encoding as an input vector
+fit a chemprop model directly on the smiles
 
 note that polaris requires zarr<3 but the feature generator requires
 zarr>=3 so two separate python environments are needed
@@ -7,98 +7,35 @@ zarr>=3 so two separate python environments are needed
 from pathlib import Path
 import sys
 import datetime
-import warnings
 import json
-from typing import Tuple
 
 import torch
 from mordred import Calculator, descriptors
-import numpy as np
-from rdkit.Chem import MolFromSmiles
 import polaris as po
-from torch import distributed
 from polaris.utils.types import TargetType
-from lightning import Trainer, LightningModule
+from lightning import Trainer
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
+from astartes import train_test_split
 
-from models import fastpropFoundation
-
-
-warnings.filterwarnings('ignore', category=FutureWarning)
-
-
-class FineTuner(LightningModule):
-    def __init__(
-        self,
-        encoder: torch.nn.Module,
-        input_dim: int,
-        task_type: TargetType,
-        hidden_sizes: Tuple[int, ...] = (1024,),
-        learning_rate: float = 0.0001,
-    ):
-        super().__init__()
-        self.encoder: fastpropFoundation = encoder
-        self.learning_rate = learning_rate
-        modules = []
-        for i in range(len(hidden_sizes)):
-            modules.append(torch.nn.Linear(input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]))
-            modules.append(torch.nn.ReLU())
-        modules.append(torch.nn.Linear(hidden_sizes[-1], 1))
-        if task_type == TargetType.CLASSIFICATION:
-            modules.append(torch.nn.Sigmoid())
-        self.task_type = task_type
-        self.fnn = torch.nn.Sequential(*modules)
-        self.save_hyperparameters()
-    
-    def configure_optimizers(self):
-        return {"optimizer": torch.optim.Adam(self.parameters(), lr=self.learning_rate)}
-
-    def log(self, name, value, **kwargs):
-        """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
-        return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
-
-    def forward(self, descriptors):
-        return self.fnn(self.encoder.encode(descriptors))
-
-    def _step(self, batch, name):
-        descriptors, y = batch
-        y_hat = self(descriptors)
-        if self.task_type == TargetType.CLASSIFICATION:
-            loss = torch.nn.functional.binary_cross_entropy(y_hat, y, reduction="mean")
-        else:
-            loss = torch.nn.functional.mse_loss(y_hat, y, reduction="mean")
-        self.log(f"{name}/loss", loss)
-        return loss
-
-    def training_step(self, batch, batch_idx):
-        return self._step(batch, "train")
-
-    def validation_step(self, batch, batch_idx):
-        return self._step(batch, "validation")
-
-    def test_step(self, batch, batch_idx):
-        return self._step(batch, "test")
-
-    def predict_step(self, batch, batch_idx):
-        return self(batch[0])
+from chemprop.data import MoleculeDatapoint, MoleculeDataset, build_dataloader
+from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
+from chemprop.nn import BondMessagePassing, BinaryClassificationFFN, RegressionFFN, UnscaleTransform
+from chemprop.models import MPNN
+from chemprop.nn.agg import MeanAggregation
 
 
 if __name__ == "__main__":
     try:
-        pt_path = Path(sys.argv[1])
-        output_dir = Path(sys.argv[2])
+        output_dir = Path(sys.argv[1])
     except:
-        print("usage: python pretrain.py PRETRAINED_CHECKPOINT_PATH OUTPUT_DIR")
+        print("usage: python pretrain.py OUTPUT_DIR")
         exit(1)
     if not output_dir.exists():
         output_dir.mkdir()
-    output_file = open(output_dir / "finetune_results.md", "w")
-    encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-    output_file.write(f"""# `fastprop` Finetuning Results
+    output_file = open(output_dir / "train_results.md", "w")
+    output_file.write(f"""# ChemProp Baseline Results
 timestamp: {datetime.datetime.now()}
-pretrained model: {pt_path}
-{encoder}
 """)
     performance_dict = {}
     polaris_benchmarks = [
@@ -149,28 +86,29 @@ pretrained model: {pt_path}
         task_type = benchmark.target_types[target_cols[0]]
         targets = train_df[target_cols]
         targets = targets.fillna(targets.mean(axis=0)).to_numpy()
-        targets = torch.tensor(targets, dtype=torch.float32)
-        train_mols = list(map(MolFromSmiles, train_df[smiles_col]))
-        for mol in train_mols:
-            mol.SetProp("_Name", "")
-        test_mols = list(map(MolFromSmiles, test_df[smiles_col]))
-        for mol in test_mols:
-            mol.SetProp("_Name", "")
-        train_desc = torch.tensor(calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
-        test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
 
-        # build the fine tuner
-        encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-        model = FineTuner(encoder, 128, task_type, (128, 128), learning_rate=1e-5)
+        # typical chemprop training
+        train_idxs, val_idxs = train_test_split(range(len(targets)), train_size=0.80, test_size=0.20, random_state=1701)
+        train_data = [MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(train_df[smiles_col][train_idxs], targets[train_idxs])]
+        val_data = [MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(train_df[smiles_col][val_idxs], targets[val_idxs])]
+        test_data = list(map(MoleculeDatapoint.from_smi, test_df[smiles_col]))
+        featurizer = SimpleMoleculeMolGraphFeaturizer()
+        train_dataset = MoleculeDataset(train_data, featurizer)
+        val_dataset = MoleculeDataset(val_data, featurizer)
+        test_dataset = MoleculeDataset(test_data, featurizer)
+        scaler = None
+        if task_type == TargetType.REGRESSION:
+            scaler = train_dataset.normalize_targets()
+            val_dataset.normalize_targets(scaler)
+        train_dataloader = build_dataloader(train_dataset, num_workers=1)
+        val_dataloader = build_dataloader(val_dataset, num_workers=1, shuffle=False)
+        test_dataloader = build_dataloader(test_dataset, num_workers=1, shuffle=False)
+        mp = BondMessagePassing()
+        agg = MeanAggregation()
+        output_transform = UnscaleTransform.from_standard_scaler(scaler) if scaler is not None else torch.nn.Identity()
+        fnn = RegressionFFN(output_transform=output_transform) if task_type == TargetType.REGRESSION else BinaryClassificationFFN(output_transform=output_transform)
+        model = MPNN(mp, agg, fnn)
         
-        # fit model
-        train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
-        test_dataset = torch.utils.data.TensorDataset(test_desc)
-        gen = torch.Generator().manual_seed(1701)
-        train_dataset, validation_dataset = torch.utils.data.random_split(train_dataset, [0.8, 0.2], gen)
-        train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=8, shuffle=True)
-        val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=8, persistent_workers=True)
-        test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=8, persistent_workers=True)
         _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
         tensorboard_logger = TensorBoardLogger(
             output_dir / _subdir,
@@ -179,13 +117,13 @@ pretrained model: {pt_path}
         )
         callbacks = [
             EarlyStopping(
-                monitor="validation/loss",
+                monitor="val_loss",
                 mode="min",
                 verbose=False,
                 patience=5,
             ),
             ModelCheckpoint(
-                monitor="validation/loss",
+                monitor="val_loss",
                 save_top_k=2,
                 mode="min",
                 dirpath=output_dir  / _subdir / "checkpoints",
@@ -203,9 +141,9 @@ pretrained model: {pt_path}
         trainer.fit(model, train_dataloader, val_dataloader)
         ckpt_path = trainer.checkpoint_callback.best_model_path
         print(f"Reloading best model from checkpoint file: {ckpt_path}")
-        del model, train_dataloader, train_dataset, val_dataloader, validation_dataset, encoder
+        del model, train_dataloader, train_dataset, val_dataloader, val_dataset
         torch.cuda.empty_cache()
-        model = FineTuner.load_from_checkpoint(ckpt_path)
+        model = MPNN.load_from_checkpoint(ckpt_path)
         trainer = Trainer(logger=tensorboard_logger)
         predictions = torch.vstack(trainer.predict(model, test_dataloader)).numpy(force=True).flatten()
         

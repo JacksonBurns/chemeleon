@@ -1,5 +1,5 @@
 """
-finetune models using the fastpropFoundation encoding as an input vector
+fit a basic descriptor-based model directly on the un-encoded features
 
 note that polaris requires zarr<3 but the feature generator requires
 zarr>=3 so two separate python environments are needed
@@ -18,14 +18,27 @@ from rdkit.Chem import MolFromSmiles
 import polaris as po
 from torch import distributed
 from polaris.utils.types import TargetType
+from fastprop.data import standard_scale
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from lightning import Trainer, LightningModule
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
+from astartes import train_test_split
 
 from models import fastpropFoundation
 
 
 warnings.filterwarnings('ignore', category=FutureWarning)
+
+class RescalingEncoder(torch.nn.Module):
+    def __init__(self, feature_means, feature_vars):
+        super().__init__()
+        self.register_buffer("feature_means", feature_means)
+        self.register_buffer("feature_vars", feature_vars)
+    
+    def encode(self, x):
+        return standard_scale(x, self.feature_means, self.feature_vars)
 
 
 class FineTuner(LightningModule):
@@ -86,19 +99,15 @@ class FineTuner(LightningModule):
 
 if __name__ == "__main__":
     try:
-        pt_path = Path(sys.argv[1])
-        output_dir = Path(sys.argv[2])
+        output_dir = Path(sys.argv[1])
     except:
-        print("usage: python pretrain.py PRETRAINED_CHECKPOINT_PATH OUTPUT_DIR")
+        print("usage: python pretrain.py OUTPUT_DIR")
         exit(1)
     if not output_dir.exists():
         output_dir.mkdir()
     output_file = open(output_dir / "finetune_results.md", "w")
-    encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-    output_file.write(f"""# `fastprop` Finetuning Results
+    output_file.write(f"""# `fastprop` Baseline Results
 timestamp: {datetime.datetime.now()}
-pretrained model: {pt_path}
-{encoder}
 """)
     performance_dict = {}
     polaris_benchmarks = [
@@ -159,17 +168,19 @@ pretrained model: {pt_path}
         train_desc = torch.tensor(calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
         test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
 
+        train_idxs, val_idxs = train_test_split(range(train_desc.shape[0]), train_size=0.80, test_size=0.20, random_state=1701)
+        _, feature_means, feature_vars = standard_scale(train_desc[train_idxs])
+        encoder = RescalingEncoder(feature_means, feature_vars)
+
         # build the fine tuner
-        encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-        model = FineTuner(encoder, 128, task_type, (128, 128), learning_rate=1e-5)
+        model = FineTuner(encoder, train_desc.shape[1], task_type, (1_800, 1_800), learning_rate=1e-4)
         
         # fit model
-        train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
+        train_dataset = torch.utils.data.TensorDataset(train_desc[train_idxs], targets[train_idxs])
+        val_dataset = torch.utils.data.TensorDataset(train_desc[val_idxs], targets[val_idxs])
         test_dataset = torch.utils.data.TensorDataset(test_desc)
-        gen = torch.Generator().manual_seed(1701)
-        train_dataset, validation_dataset = torch.utils.data.random_split(train_dataset, [0.8, 0.2], gen)
         train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=8, shuffle=True)
-        val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=8, persistent_workers=True)
+        val_dataloader = torch.utils.data.DataLoader(val_dataset, num_workers=1, batch_size=8, persistent_workers=True)
         test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=8, persistent_workers=True)
         _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
         tensorboard_logger = TensorBoardLogger(
@@ -203,7 +214,7 @@ pretrained model: {pt_path}
         trainer.fit(model, train_dataloader, val_dataloader)
         ckpt_path = trainer.checkpoint_callback.best_model_path
         print(f"Reloading best model from checkpoint file: {ckpt_path}")
-        del model, train_dataloader, train_dataset, val_dataloader, validation_dataset, encoder
+        del model, train_dataloader, train_dataset, val_dataloader, val_dataset, encoder
         torch.cuda.empty_cache()
         model = FineTuner.load_from_checkpoint(ckpt_path)
         trainer = Trainer(logger=tensorboard_logger)
