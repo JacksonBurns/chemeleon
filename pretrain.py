@@ -28,11 +28,11 @@ from utils.torchford import Welford
 
 # architecture
 EMBEDDING_DIM = 8
-ENCODING_SIZE = 128
-HIDDEN_SIZES = (8192, 4096, 2048, 1024, 512, 256)
-DECODER_SIZES = (128, 128)
+ENCODING_SIZE = 4096
+HIDDEN_SIZES = tuple([ENCODING_SIZE] * 3)
+DECODER_SIZES = tuple()
 # output/pubchem1MM_MDAE_PLR_15mask_8embedding_4096x3layers_4096encoding
-# tuple([ENCODING_SIZE] * 3) encoding 4096
+# 
 # output/pubchem1MM_MDAE_15mask_64encoding_shrinkpercent30
 # (1129, 790, 553, 387, 270, 189, 132, 92)  # contiually shrink by 30% encoding 64
 
@@ -70,9 +70,9 @@ if __name__ == "__main__":
     dataset = ZarrDataset(training_store)
     gen = torch.Generator().manual_seed(1701)
     train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = TorchDataLoader(train_dset, num_workers=32, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader = TorchDataLoader(val_dset, num_workers=16, batch_size=BATCH_SIZE, persistent_workers=True)
-    test_dataloader = TorchDataLoader(test_dset, num_workers=16, batch_size=BATCH_SIZE, persistent_workers=True)
+    train_dataloader = TorchDataLoader(train_dset, num_workers=64, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
+    val_dataloader = TorchDataLoader(val_dset, num_workers=64, batch_size=BATCH_SIZE, persistent_workers=True)
+    test_dataloader = TorchDataLoader(test_dset, num_workers=64, batch_size=BATCH_SIZE, persistent_workers=True)
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
@@ -140,6 +140,9 @@ if __name__ == "__main__":
     trainer.fit(model, train_dataloader, val_dataloader)
     ckpt_path = trainer.checkpoint_callback.best_model_path
     print(f"Reloading best model from checkpoint file: {ckpt_path}")
-    model = model.__class__.load_from_checkpoint(ckpt_path)
+    del model
+    torch.cuda.empty_cache()
+    model = fastpropFoundation.load_from_checkpoint(ckpt_path)
+    del train_dataloader, val_dataloader
     trainer.test(model, test_dataloader)
     torch.save(model, output_dir / "best.pt")

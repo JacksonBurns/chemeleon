@@ -63,12 +63,15 @@ class fastpropFoundation(LightningModule):
         self.encoder = torch.nn.Sequential(*modules)
         # decoder
         modules = []
-        modules.append(torch.nn.Linear(encoding_size, decoder_sizes[0]))
-        modules.append(torch.nn.LeakyReLU())
-        for i in range(len(decoder_sizes)-1):
-            modules.append(torch.nn.Linear(decoder_sizes[i], decoder_sizes[i+1]))
+        if len(decoder_sizes) > 0:
+            modules.append(torch.nn.Linear(encoding_size, decoder_sizes[0]))
             modules.append(torch.nn.LeakyReLU())
-        modules.append(torch.nn.Linear(decoder_sizes[-1], num_features))
+            for i in range(len(decoder_sizes)-1):
+                modules.append(torch.nn.Linear(decoder_sizes[i], decoder_sizes[i+1]))
+                modules.append(torch.nn.LeakyReLU())
+            modules.append(torch.nn.Linear(decoder_sizes[-1], num_features))
+        else:
+            modules.append(torch.nn.Linear(encoding_size, num_features))
         self.decoder = torch.nn.Sequential(*modules)
 
         self.save_hyperparameters()
