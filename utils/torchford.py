@@ -20,7 +20,7 @@ class Welford:
     def __init__(self):
         self.__shape = None
         # current attribute values
-        self.__count = 0
+        self.__count = None
         self.__m = None
         self.__s = None
         # previous attribute values for rollbacking
@@ -57,6 +57,7 @@ class Welford:
         # Initialize if not yet.
         if self.__shape is None:
             self.__shape = element.shape
+            self.__count = torch.zeros(element.shape).to(element.device)
             self.__m = torch.zeros(element.shape).to(element.device)
             self.__s = torch.zeros(element.shape).to(element.device)
             self.__init_old_with_nan()
@@ -68,11 +69,13 @@ class Welford:
         if backup_flg:
             self.__backup_attrs()
 
-        # Welford's algorithm
-        self.__count += 1
-        delta = element - self.__m
-        self.__m += delta / self.__count
-        self.__s += delta * (element - self.__m)
+        # Welford's algorithm, but masking NaNs
+        nan_mask = torch.isnan(element).logical_not().int()
+        self.__count += nan_mask
+        nan_mask = nan_mask.bool()
+        delta = element[nan_mask] - self.__m[nan_mask]
+        self.__m[nan_mask] += delta / self.__count[nan_mask]
+        self.__s[nan_mask] += delta * (element[nan_mask] - self.__m[nan_mask])
 
     def add_all(self, elements, backup_flg=True):
         """ add_all
@@ -113,13 +116,10 @@ class Welford:
         self.__s = s
 
     def __getvars(self, ddof):
-        if self.__count <= 0:
-            return None
-        min_count = ddof
-        if self.__count <= min_count:
-            return torch.full(self.__shape, torch.nan)
-        else:
-            return self.__s / (self.__count - ddof)
+        nonzero_mask = (self.__count > ddof).bool()
+        result = torch.full(self.__shape, torch.nan).to(nonzero_mask.device)
+        result[nonzero_mask] = self.__s[nonzero_mask] / (self.__count[nonzero_mask] - ddof)
+        return result
 
     def __backup_attrs(self):
         if self.__shape is None:
