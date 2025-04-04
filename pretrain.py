@@ -12,7 +12,6 @@ from pathlib import Path
 
 import torch
 import zarr
-import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader as TorchDataLoader
 from torch.utils.data import Dataset as TorchDataset
@@ -140,9 +139,6 @@ if __name__ == "__main__":
     trainer.fit(model, train_dataloader, val_dataloader)
     ckpt_path = trainer.checkpoint_callback.best_model_path
     print(f"Reloading best model from checkpoint file: {ckpt_path}")
-    del model
-    torch.cuda.empty_cache()
-    model = fastpropFoundation.load_from_checkpoint(ckpt_path)
-    del train_dataloader, val_dataloader
+    model = fastpropFoundation.load_from_checkpoint(ckpt_path, map_location="cpu")
     trainer.test(model, test_dataloader)
     torch.save(model, output_dir / "best.pt")
