@@ -161,7 +161,7 @@ pretrained model: {pt_path}
 
         # build the fine tuner
         encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-        model = FineTuner(encoder, 128, task_type, (128, 128), learning_rate=1e-5)
+        model = FineTuner(encoder, 4096, task_type, (128, 128), learning_rate=1e-5)
         
         # fit model
         train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
@@ -203,9 +203,7 @@ pretrained model: {pt_path}
         trainer.fit(model, train_dataloader, val_dataloader)
         ckpt_path = trainer.checkpoint_callback.best_model_path
         print(f"Reloading best model from checkpoint file: {ckpt_path}")
-        del model, train_dataloader, train_dataset, val_dataloader, validation_dataset, encoder
-        torch.cuda.empty_cache()
-        model = FineTuner.load_from_checkpoint(ckpt_path)
+        model = FineTuner.load_from_checkpoint(ckpt_path, map_location="cpu")
         trainer = Trainer(logger=tensorboard_logger)
         predictions = torch.vstack(trainer.predict(model, test_dataloader)).numpy(force=True).flatten()
         
