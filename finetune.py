@@ -89,7 +89,7 @@ if __name__ == "__main__":
         pt_path = Path(sys.argv[1])
         output_dir = Path(sys.argv[2])
     except:
-        print("usage: python pretrain.py PRETRAINED_CHECKPOINT_PATH OUTPUT_DIR")
+        print("usage: python finetune.py PRETRAINED_CHECKPOINT_PATH OUTPUT_DIR")
         exit(1)
     if not output_dir.exists():
         output_dir.mkdir()
