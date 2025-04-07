@@ -18,7 +18,7 @@ from rdkit.Chem import MolFromSmiles
 import polaris as po
 from torch import distributed
 from polaris.utils.types import TargetType
-from fastprop.data import standard_scale
+from fastprop.data import standard_scale, inverse_standard_scale
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from lightning import Trainer, LightningModule
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     try:
         output_dir = Path(sys.argv[1])
     except:
-        print("usage: python pretrain.py OUTPUT_DIR")
+        print("usage: python baseline.py OUTPUT_DIR")
         exit(1)
     if not output_dir.exists():
         output_dir.mkdir()
@@ -176,11 +176,14 @@ timestamp: {datetime.datetime.now()}
         model = FineTuner(encoder, train_desc.shape[1], task_type, (1_800, 1_800), learning_rate=1e-4)
         
         # fit model
+        if task_type == TargetType.REGRESSION:
+            _, target_means, target_vars = standard_scale(targets[train_idxs])
+            targets = standard_scale(targets, target_means, target_vars)
         train_dataset = torch.utils.data.TensorDataset(train_desc[train_idxs], targets[train_idxs])
-        val_dataset = torch.utils.data.TensorDataset(train_desc[val_idxs], targets[val_idxs])
+        validation_dataset = torch.utils.data.TensorDataset(train_desc[val_idxs], targets[val_idxs])
         test_dataset = torch.utils.data.TensorDataset(test_desc)
         train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=8, shuffle=True)
-        val_dataloader = torch.utils.data.DataLoader(val_dataset, num_workers=1, batch_size=8, persistent_workers=True)
+        val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=8, persistent_workers=True)
         test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=8, persistent_workers=True)
         _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
         tensorboard_logger = TensorBoardLogger(
@@ -214,11 +217,12 @@ timestamp: {datetime.datetime.now()}
         trainer.fit(model, train_dataloader, val_dataloader)
         ckpt_path = trainer.checkpoint_callback.best_model_path
         print(f"Reloading best model from checkpoint file: {ckpt_path}")
-        del model, train_dataloader, train_dataset, val_dataloader, val_dataset, encoder
-        torch.cuda.empty_cache()
-        model = FineTuner.load_from_checkpoint(ckpt_path)
+        model = FineTuner.load_from_checkpoint(ckpt_path, map_location="cpu")
         trainer = Trainer(logger=tensorboard_logger)
-        predictions = torch.vstack(trainer.predict(model, test_dataloader)).numpy(force=True).flatten()
+        predictions = torch.vstack(trainer.predict(model, test_dataloader))
+        if task_type == TargetType.REGRESSION:
+            predictions = inverse_standard_scale(predictions, target_means, target_vars)
+        predictions = predictions.numpy(force=True).flatten()
         
         # prepare the predictions in the format polaris expects
         if task_type == TargetType.CLASSIFICATION:
@@ -235,10 +239,6 @@ timestamp: {datetime.datetime.now()}
 """)
         performance = results.results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
         performance_dict[benchmark_name] = performance
-
-        # actually free the memory
-        del model, test_dataloader, test_dataset
-        torch.cuda.empty_cache()
     
     output_file.write(f"""
 # Summary

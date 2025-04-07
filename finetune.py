@@ -10,8 +10,10 @@ import datetime
 import warnings
 import json
 from typing import Tuple
+from statistics import mean
 
 import torch
+from astartes import train_test_split
 from mordred import Calculator, descriptors
 import numpy as np
 from rdkit.Chem import MolFromSmiles
@@ -21,11 +23,24 @@ from polaris.utils.types import TargetType
 from lightning import Trainer, LightningModule
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
+from fastprop.data import standard_scale, inverse_standard_scale
 
 from models import fastpropFoundation
 
 
 warnings.filterwarnings('ignore', category=FutureWarning)
+
+
+class UnsupervisedDataset(torch.utils.data.Dataset):
+    def __init__(self, features: torch.Tensor):
+        self.features = features
+        self.len = features.shape[0]
+
+    def __len__(self):
+        return self.len
+
+    def __getitem__(self, batch_idx: list[int]):
+        return self.features[batch_idx]
 
 
 class FineTuner(LightningModule):
@@ -138,6 +153,7 @@ pretrained model: {pt_path}
     calc = Calculator(descriptors, ignore_3D=True)
     calc.config(timeout=1)
     for benchmark_name in polaris_benchmarks:
+        _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
         # load the benchmarking data
         benchmark = po.load_benchmark(benchmark_name)
         smiles_col = list(benchmark.input_cols)[0]
@@ -159,21 +175,84 @@ pretrained model: {pt_path}
         train_desc = torch.tensor(calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
         test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
 
+        initial_error = 0.0
+        tuned_error = 0.0
+        # fine tuning stage 1 - unsupervised
+        # all_desc = torch.cat((train_desc, test_desc))
+        # train_idxs, val_idxs = train_test_split(range(all_desc.shape[0]), train_size=0.80, test_size=0.20, random_state=1701)
+        # _, feature_means, feature_vars = standard_scale(all_desc[train_idxs])
+        # train_dataset = UnsupervisedDataset(all_desc[train_idxs])
+        # validation_dataset = UnsupervisedDataset(all_desc[val_idxs])
+        # train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=64, shuffle=True)
+        # val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=64, persistent_workers=True)
+        model: fastpropFoundation = torch.load(pt_path, weights_only=False)
+        # model = fastpropFoundation(
+        #     feature_means=feature_means,
+        #     feature_vars=feature_vars,
+        #     num_features=train_desc.shape[1],
+        #     winsorization_factor=6,
+        #     hidden_sizes=(1024, 1024, 1024),
+        #     decoder_sizes=tuple(),
+        #     encoding_size=1_024,
+        #     learning_rate=1e-4,
+        #     masking_ratio=0.15,
+        #     embedding_dim=4,
+        # )
+        # unsupervised_output = output_dir / _subdir / "unsupervised"
+        # tensorboard_logger = TensorBoardLogger(
+        #     unsupervised_output,
+        #     name="tensorboard_logs",
+        #     default_hp_metric=False,
+        # )
+        # callbacks = [
+        #     EarlyStopping(
+        #         monitor="validation/loss",
+        #         mode="min",
+        #         verbose=False,
+        #         patience=50,
+        #     ),
+        #     ModelCheckpoint(
+        #         monitor="validation/loss",
+        #         save_top_k=2,
+        #         mode="min",
+        #         dirpath=unsupervised_output / "checkpoints",
+        #     ),
+        # ]
+        # callbacks[1].STARTING_VERSION = 0
+        # trainer = Trainer(
+        #     max_epochs=500,
+        #     logger=tensorboard_logger,
+        #     log_every_n_steps=1,
+        #     enable_checkpointing=True,
+        #     check_val_every_n_epoch=1,
+        #     callbacks=callbacks,
+        # )
+        # initial_error = trainer.validate(model, val_dataloader)[0]['validation/loss']
+        # trainer.fit(model, train_dataloader, val_dataloader)
+        # ckpt_path = trainer.checkpoint_callback.best_model_path
+        # print(f"Reloading best model from checkpoint file: {ckpt_path}")
+        # encoder = fastpropFoundation.load_from_checkpoint(ckpt_path, map_location="cpu")
+        # tuned_error = trainer.validate(encoder, val_dataloader)[0]['validation/loss']
+
+        # part 2 - supervised training
+        supervised_output = output_dir / _subdir / "supervised"
         # build the fine tuner
-        encoder: fastpropFoundation = torch.load(pt_path, weights_only=False)
-        model = FineTuner(encoder, 4096, task_type, (128, 128), learning_rate=1e-5)
+        model = FineTuner(encoder, 4_096, task_type, (128, 128), learning_rate=1e-5)
         
         # fit model
-        train_dataset = torch.utils.data.TensorDataset(train_desc, targets)
+        train_idxs, val_idxs = train_test_split(np.arange(train_desc.shape[0]), train_size=0.80, random_state=1701)
+        if task_type == TargetType.REGRESSION:
+            _, target_means, target_vars = standard_scale(targets[train_idxs])
+            targets = standard_scale(targets, target_means, target_vars)
+        train_dataset = torch.utils.data.TensorDataset(train_desc[train_idxs], targets[train_idxs])
+        validation_dataset = torch.utils.data.TensorDataset(train_desc[val_idxs], targets[val_idxs])
         test_dataset = torch.utils.data.TensorDataset(test_desc)
-        gen = torch.Generator().manual_seed(1701)
-        train_dataset, validation_dataset = torch.utils.data.random_split(train_dataset, [0.8, 0.2], gen)
-        train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=8, shuffle=True)
-        val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=8, persistent_workers=True)
-        test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=8, persistent_workers=True)
-        _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
+        train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=64, shuffle=True)
+        val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=64, persistent_workers=True)
+        test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=64, persistent_workers=True)
+        
         tensorboard_logger = TensorBoardLogger(
-            output_dir / _subdir,
+            supervised_output,
             name="tensorboard_logs",
             default_hp_metric=False,
         )
@@ -182,13 +261,13 @@ pretrained model: {pt_path}
                 monitor="validation/loss",
                 mode="min",
                 verbose=False,
-                patience=5,
+                patience=10,
             ),
             ModelCheckpoint(
                 monitor="validation/loss",
                 save_top_k=2,
                 mode="min",
-                dirpath=output_dir  / _subdir / "checkpoints",
+                dirpath=supervised_output / "checkpoints",
             ),
         ]
         callbacks[1].STARTING_VERSION = 0
@@ -205,7 +284,10 @@ pretrained model: {pt_path}
         print(f"Reloading best model from checkpoint file: {ckpt_path}")
         model = FineTuner.load_from_checkpoint(ckpt_path, map_location="cpu")
         trainer = Trainer(logger=tensorboard_logger)
-        predictions = torch.vstack(trainer.predict(model, test_dataloader)).numpy(force=True).flatten()
+        predictions = torch.vstack(trainer.predict(model, test_dataloader))
+        if task_type == TargetType.REGRESSION:
+            predictions = inverse_standard_scale(predictions, target_means, target_vars)
+        predictions = predictions.numpy(force=True).flatten()
         
         # prepare the predictions in the format polaris expects
         if task_type == TargetType.CLASSIFICATION:
@@ -216,6 +298,9 @@ pretrained model: {pt_path}
             results = benchmark.evaluate(predictions)
         output_file.write(f"""
 ## `{benchmark_name}`
+
+Pre-trained Encoder Reconstruction Error: {initial_error:.4f}
+Fine-tuned Encoder Reconstruction Error: {tuned_error:.4f}
 
 {results.results.to_markdown()}
 
