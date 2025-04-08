@@ -99,6 +99,28 @@ class FineTuner(LightningModule):
         return self(batch[0])
 
 
+class SkipConnectionFineTuner(FineTuner):
+    def __init__(
+        self,
+        encoder: torch.nn.Module,
+        input_dim: int,
+        task_type: TargetType,
+        feature_means: torch.Tensor,
+        feature_vars: torch.Tensor,
+        hidden_sizes: Tuple[int, ...] = (1024,),
+        learning_rate: float = 0.0001,
+    ):
+        super().__init__(encoder, input_dim, task_type, hidden_sizes, learning_rate)
+        self.register_buffer("feature_means", feature_means)
+        self.register_buffer("feature_vars", feature_vars)
+        self.save_hyperparameters()
+
+    def forward(self, descriptors):
+        x_1 = self.encoder.encode(descriptors)
+        x_2 = standard_scale(descriptors, self.feature_means, self.feature_vars)
+        return self.fnn(torch.cat((x_1, x_2), dim=1))
+
+
 if __name__ == "__main__":
     try:
         pt_path = Path(sys.argv[1])
@@ -236,11 +258,10 @@ pretrained model: {pt_path}
 
         # part 2 - supervised training
         supervised_output = output_dir / _subdir / "supervised"
-        # build the fine tuner
-        model = FineTuner(encoder, 4_096, task_type, (128, 128), learning_rate=1e-5)
         
         # fit model
         train_idxs, val_idxs = train_test_split(np.arange(train_desc.shape[0]), train_size=0.80, random_state=1701)
+        _, feature_means, feature_vars = standard_scale(train_desc[train_idxs])   # only used for skip connection
         if task_type == TargetType.REGRESSION:
             _, target_means, target_vars = standard_scale(targets[train_idxs])
             targets = standard_scale(targets, target_means, target_vars)
@@ -250,7 +271,18 @@ pretrained model: {pt_path}
         train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=64, shuffle=True)
         val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=64, persistent_workers=True)
         test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=64, persistent_workers=True)
-        
+    
+        # build the fine tuner
+        # model = FineTuner(encoder, 4_096, task_type, (128, 128), learning_rate=1e-5)
+        model = SkipConnectionFineTuner(
+            encoder=encoder,
+            input_dim=4_096 + 1_613,
+            task_type=task_type,
+            feature_means=feature_means,
+            feature_vars=feature_vars,
+            hidden_sizes=[128, 128],
+            learning_rate=1e-5,
+        ) 
         tensorboard_logger = TensorBoardLogger(
             supervised_output,
             name="tensorboard_logs",
@@ -282,7 +314,7 @@ pretrained model: {pt_path}
         trainer.fit(model, train_dataloader, val_dataloader)
         ckpt_path = trainer.checkpoint_callback.best_model_path
         print(f"Reloading best model from checkpoint file: {ckpt_path}")
-        model = FineTuner.load_from_checkpoint(ckpt_path, map_location="cpu")
+        model = model.__class__.load_from_checkpoint(ckpt_path, map_location="cpu")
         trainer = Trainer(logger=tensorboard_logger)
         predictions = torch.vstack(trainer.predict(model, test_dataloader))
         if task_type == TargetType.REGRESSION:
