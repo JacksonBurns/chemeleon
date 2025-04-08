@@ -58,8 +58,11 @@ if __name__ == "__main__":
     try:
         training_store = Path(sys.argv[1])
         output_dir = Path(sys.argv[2])
+        restart_ckpt = None
+        if len(sys.argv) == 4:
+            restart_ckpt = Path(sys.argv[3])
     except:
-        print("usage: python pretrain.py TRAINING_STORE OUTPUT_DIR")
+        print("usage: python pretrain.py TRAINING_STORE OUTPUT_DIR [RESTART_CKPT]")
         exit(1)
 
     z = zarr.open_array(training_store, mode='r')
@@ -94,18 +97,21 @@ if __name__ == "__main__":
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
-    model = fastpropFoundation(
-        feature_means=feature_means,
-        feature_vars=feature_vars,
-        num_features=n_features,
-        winsorization_factor=6,
-        hidden_sizes=HIDDEN_SIZES,
-        decoder_sizes=DECODER_SIZES,
-        encoding_size=ENCODING_SIZE,
-        learning_rate=LEARNING_RATE,
-        masking_ratio=0.15,
-        embedding_dim=EMBEDDING_DIM,
-    )
+    if restart_ckpt is None:
+        model = fastpropFoundation(
+            feature_means=feature_means,
+            feature_vars=feature_vars,
+            num_features=n_features,
+            winsorization_factor=6,
+            hidden_sizes=HIDDEN_SIZES,
+            decoder_sizes=DECODER_SIZES,
+            encoding_size=ENCODING_SIZE,
+            learning_rate=LEARNING_RATE,
+            masking_ratio=0.15,
+            embedding_dim=EMBEDDING_DIM,
+        )
+    else:
+        model = fastpropFoundation.load_from_checkpoint(restart_ckpt, map_location="cpu")
     rank_zero_info(model)
 
     tensorboard_logger = TensorBoardLogger(
