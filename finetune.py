@@ -273,16 +273,16 @@ pretrained model: {pt_path}
         test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=64, persistent_workers=True)
     
         # build the fine tuner
-        # model = FineTuner(encoder, 4_096, task_type, (128, 128), learning_rate=1e-5)
-        model = SkipConnectionFineTuner(
-            encoder=encoder,
-            input_dim=4_096 + 1_613,
-            task_type=task_type,
-            feature_means=feature_means,
-            feature_vars=feature_vars,
-            hidden_sizes=[128, 128],
-            learning_rate=1e-5,
-        ) 
+        model = FineTuner(encoder, 4_096, task_type, (128, 128), learning_rate=1e-5)
+        # model = SkipConnectionFineTuner(
+        #     encoder=encoder,
+        #     input_dim=4_096 + 1_613,
+        #     task_type=task_type,
+        #     feature_means=feature_means,
+        #     feature_vars=feature_vars,
+        #     hidden_sizes=[128, 128],
+        #     learning_rate=1e-5,
+        # ) 
         tensorboard_logger = TensorBoardLogger(
             supervised_output,
             name="tensorboard_logs",
