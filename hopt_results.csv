@@ -1,0 +1,2 @@
+,number,value,datetime_start,datetime_complete,duration,params_embedding_size,params_hidden_size,params_num_layers,state
+0,0,0.4991062581539154,2025-04-09 20:17:17.460041,2025-04-09 20:20:42.740268,0 days 00:03:25.280227,4,4096,2,COMPLETE

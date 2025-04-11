@@ -127,7 +127,7 @@ class fastpropFoundation(LightningModule):
 
     def training_step(self, batch, batch_idx):
         descriptors = self._scale(batch)
-        mask = (torch.rand_like(descriptors) > self.masking_ratio).float()
+        mask = (torch.rand_like(descriptors) < self.masking_ratio).int()
         descriptors *= mask
         reconstruction = self(descriptors)
         loss = torch.nn.functional.mse_loss(reconstruction[mask.bool()], descriptors[mask.bool()], reduction="mean")

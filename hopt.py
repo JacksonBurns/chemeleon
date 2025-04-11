@@ -1,4 +1,5 @@
 import sys
+import os
 from pathlib import Path
 
 import torch
@@ -9,13 +10,13 @@ from lightning import Trainer
 from lightning.pytorch.utilities.rank_zero import rank_zero_info
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
+from tqdm import tqdm
 
-import ray
-from ray import tune
-from ray.tune.search.optuna import OptunaSearch
+import optuna
 
 from models import fastpropFoundation
 from pretrain import ZarrDataset
+from utils.torchford import Welford
 
 
 # training configuration
@@ -27,21 +28,18 @@ BATCH_SIZE = 1024
 # hopt config
 NUM_HOPT_TRIALS = 10
 
-ray.init(num_cpus=64, num_gpus=8)
 
-
-def define_by_run_func(trial):
-    trial.suggest_categorical("embedding_size", (4, 8, 12, 16))
-    trial.suggest_categorical("num_layers", (2, 3, 4))
-    trial.suggest_categorical("hidden_size", (1024, 2048, 4096))
+def fit_one(trial, training_store, n_features, output_dir):
+    embedding_size = trial.suggest_categorical("embedding_size", (4, 8, 12, 16))
+    num_layers = trial.suggest_categorical("num_layers", (2, 3, 4))
+    hidden_size = trial.suggest_categorical("hidden_size", (1024, 2048, 4096))
     
-def fit_one(training_store, n_features, output_dir, embedding_size, num_layers, hidden_size):
     dataset = ZarrDataset(training_store)
     gen = torch.Generator().manual_seed(1701)
     train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = TorchDataLoader(train_dset, num_workers=4, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader = TorchDataLoader(val_dset, num_workers=4, batch_size=BATCH_SIZE, persistent_workers=True)
-    test_dataloader = TorchDataLoader(test_dset, num_workers=4, batch_size=BATCH_SIZE, persistent_workers=True)
+    train_dataloader = TorchDataLoader(train_dset, num_workers=1, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
+    val_dataloader = TorchDataLoader(val_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
+    test_dataloader = TorchDataLoader(test_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
@@ -61,7 +59,7 @@ def fit_one(training_store, n_features, output_dir, embedding_size, num_layers, 
         embedding_dim=embedding_size,
     )
     rank_zero_info(model)
-
+    output_dir = output_dir / f"e{embedding_size}_n{num_layers}_h{hidden_size}"
     tensorboard_logger = TensorBoardLogger(
         output_dir,
         name="tensorboard_logs",
@@ -89,14 +87,16 @@ def fit_one(training_store, n_features, output_dir, embedding_size, num_layers, 
         enable_checkpointing=True,
         check_val_every_n_epoch=1,
         callbacks=callbacks,
+        strategy="ddp_spawn",  # required to make optuna work
     )
     trainer.fit(model, train_dataloader, val_dataloader)
     ckpt_path = trainer.checkpoint_callback.best_model_path
     print(f"Reloading best model from checkpoint file: {ckpt_path}")
+    trainer = Trainer(logger=tensorboard_logger, devices=[0])
     model = fastpropFoundation.load_from_checkpoint(ckpt_path, map_location="cpu")
     res = trainer.test(model, test_dataloader)[0]
-    torch.save(model, output_dir / "best.pt")
-    return res
+    torch.save(model, output_dir / f"e{embedding_size}_n{num_layers}_h{hidden_size}_best.pt")
+    return res["test/loss"]
 
 def main():
     # load the data
@@ -112,31 +112,17 @@ def main():
     n_features = z.shape[1]
     del z
 
-    algo = OptunaSearch(space=define_by_run_func, metric="test/loss", mode="min")
-    tuner = tune.Tuner(
-        tune.with_resources(
-            lambda trial: fit_one(
-                training_store,
-                n_features,
-                output_dir,
-                trial["embedding_size"], 
-                trial["num_layers"],
-                trial["hidden_size"],
-            ),
-            resources={"gpu": 8},
+    study = optuna.create_study(direction="minimize")
+    study.optimize(
+        lambda trial: fit_one(
+            trial,
+            training_store=training_store,
+            n_features=n_features,
+            output_dir=output_dir,
         ),
-        tune_config=tune.TuneConfig(
-            search_alg=algo,
-            max_concurrent_trials=1,
-            num_samples=NUM_HOPT_TRIALS,
-            metric="test/loss",
-            mode="min",
-        ),
+        n_trials=NUM_HOPT_TRIALS,
     )
-    results = tuner.fit()
-    results.get_dataframe().to_csv("hopt_results.csv")
-    best = results.get_best_result().config
-    print(f"Best hyperparameters identified: {', '.join([key + ': ' + str(val) for key, val in best.items()])}")
+    study.trials_dataframe().to_csv("hopt_results.csv")
 
 if __name__ == "__main__":
     main()
