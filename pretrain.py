@@ -107,7 +107,7 @@ if __name__ == "__main__":
             decoder_sizes=DECODER_SIZES,
             encoding_size=ENCODING_SIZE,
             learning_rate=LEARNING_RATE,
-            masking_ratio=0.80,
+            masking_ratio=0.15,
             embedding_dim=EMBEDDING_DIM,
         )
     else:
