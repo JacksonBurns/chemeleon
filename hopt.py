@@ -37,7 +37,7 @@ def fit_one(trial, training_store, n_features, output_dir):
     dataset = ZarrDataset(training_store)
     gen = torch.Generator().manual_seed(1701)
     train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = TorchDataLoader(train_dset, num_workers=1, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
+    train_dataloader = TorchDataLoader(train_dset, num_workers=3, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
     val_dataloader = TorchDataLoader(val_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
     test_dataloader = TorchDataLoader(test_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
 

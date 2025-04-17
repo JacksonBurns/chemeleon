@@ -72,9 +72,9 @@ if __name__ == "__main__":
     dataset = ZarrDataset(training_store)
     gen = torch.Generator().manual_seed(1701)
     train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = TorchDataLoader(train_dset, num_workers=4, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader = TorchDataLoader(val_dset, num_workers=4, batch_size=BATCH_SIZE, persistent_workers=True)
-    test_dataloader = TorchDataLoader(test_dset, num_workers=4, batch_size=BATCH_SIZE, persistent_workers=True)
+    train_dataloader = TorchDataLoader(train_dset, num_workers=3, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
+    val_dataloader = TorchDataLoader(val_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
+    test_dataloader = TorchDataLoader(test_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
