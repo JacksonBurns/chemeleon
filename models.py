@@ -8,8 +8,6 @@ from lightning import LightningModule
 from torch import distributed
 from rtdl_num_embeddings import PeriodicEmbeddings
 
-from utils.dyt import DynamicTanh
-
 
 # code for the SNN has been adapted from the author's demo notebook on GitHub:
 # https://github.com/bioinf-jku/SNNs/blob/master/Pytorch/SelfNormalizingNetworks_MLP_MNIST.ipynb
@@ -56,8 +54,8 @@ class fastpropFoundation(LightningModule):
         # encoder
         modules.append(torch.nn.Linear(num_features * embedding_dim, hidden_sizes[0]))
         modules.append(torch.nn.LeakyReLU())
-        for i in range(len(hidden_sizes)-1):
-            modules.append(torch.nn.Linear(hidden_sizes[i], hidden_sizes[i+1]))
+        for i in range(len(hidden_sizes) - 1):
+            modules.append(torch.nn.Linear(hidden_sizes[i], hidden_sizes[i + 1]))
             modules.append(torch.nn.LeakyReLU())
         modules.append(torch.nn.Linear(hidden_sizes[-1], encoding_size))
         self.encoder = torch.nn.Sequential(*modules)
@@ -66,8 +64,8 @@ class fastpropFoundation(LightningModule):
         if len(decoder_sizes) > 0:
             modules.append(torch.nn.Linear(encoding_size, decoder_sizes[0]))
             modules.append(torch.nn.LeakyReLU())
-            for i in range(len(decoder_sizes)-1):
-                modules.append(torch.nn.Linear(decoder_sizes[i], decoder_sizes[i+1]))
+            for i in range(len(decoder_sizes) - 1):
+                modules.append(torch.nn.Linear(decoder_sizes[i], decoder_sizes[i + 1]))
                 modules.append(torch.nn.LeakyReLU())
             modules.append(torch.nn.Linear(decoder_sizes[-1], num_features))
         else:
@@ -75,7 +73,7 @@ class fastpropFoundation(LightningModule):
         self.decoder = torch.nn.Sequential(*modules)
 
         self.save_hyperparameters()
-    
+
     def configure_optimizers(self):
         """See https://lightning.ai/docs/pytorch/stable/common/optimization.html
 
@@ -87,17 +85,17 @@ class fastpropFoundation(LightningModule):
     def log(self, name, value, **kwargs):
         """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
         return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
-    
+
     def _scale(self, x: torch.Tensor):
         x = standard_scale(x, self.feature_means, self.feature_vars)
         if not self.winsorize:
             return x
         else:
-            return self.winsorize(x) 
-    
+            return self.winsorize(x)
+
     def encode(self, descriptors: torch.Tensor):
         """Public facing encode function
-        
+
         Ensure model has been loaded from a pre-trained model and model is in eval mode
 
         Args:
@@ -144,6 +142,7 @@ class fastpropFoundation(LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self._step(batch, "test")
+
 
 if __name__ == "__main__":
     # test batch of 4
