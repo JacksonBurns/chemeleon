@@ -66,6 +66,9 @@ if __name__ == "__main__":
     valid_mols = list(p.map(_f, tqdm(smiles, desc="Generating RDKit mols"), chunksize=1_024))
 
     smiles = [s for (s, v) in zip(smiles, valid_mols) if v]
+    with open("cleaned_" + smiles_file, "w") as file:
+        for smi in tqdm(smiles, desc="Writing cleaned SMILES"):
+            file.write(smi + "\n")
     n_mols = len(smiles)
 
     # Define array dimensions
