@@ -16,7 +16,7 @@ import optuna
 
 from models import fastpropFoundation
 from pretrain import ZarrDataset
-from utils.torchford import Welford
+from torchford import Welford
 
 
 # training configuration

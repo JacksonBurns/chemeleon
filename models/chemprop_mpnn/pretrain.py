@@ -111,7 +111,7 @@ if __name__ == "__main__":
         output_dir = Path(sys.argv[2])
         smiles_file = Path(sys.argv[3])
     except:
-        print("usage: python chemprop_foundation.py TRAINING_STORE OUTPUT_DIR SMILES_FILE")
+        print("usage: python pretrain.py TRAINING_STORE OUTPUT_DIR SMILES_FILE")
         exit(1)
         
     z = zarr.open_array(training_store, mode='r')

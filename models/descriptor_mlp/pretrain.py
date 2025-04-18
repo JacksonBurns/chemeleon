@@ -22,7 +22,7 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
 from models import fastpropFoundation
-from utils.torchford import Welford
+from torchford import Welford
 
 
 # architecture
