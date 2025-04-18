@@ -178,7 +178,6 @@ timestamp: {datetime.datetime.now()}
             test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
             train_idxs, val_idxs = train_test_split(np.arange(train_desc.shape[0]), train_size=0.80, random_state=random_seed)
-            _, feature_means, feature_vars = standard_scale(train_desc[train_idxs])   # only used for skip connection
             if task_type == TargetType.REGRESSION:
                 _, target_means, target_vars = standard_scale(targets[train_idxs])
                 targets = standard_scale(targets, target_means, target_vars)
@@ -188,8 +187,14 @@ timestamp: {datetime.datetime.now()}
             train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=64, shuffle=True)
             val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=64, persistent_workers=True)
             test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=64, persistent_workers=True)
-            encoder: fastpropFoundation = torch.load(pretrain_pt, map_location="cpu", weights_only=False)
-            model = FineTuner(encoder, 4_096, task_type, (128, 128), learning_rate=1e-5)
+            if pretrain_pt is None:
+                _, feature_means, feature_vars = standard_scale(train_desc[train_idxs])
+                encoder = RescalingEncoder(feature_means, feature_vars)
+                input_size = feature_means.shape[0]
+            else:
+                encoder: fastpropFoundation = torch.load(pretrain_pt, map_location="cpu", weights_only=False)
+                input_size = encoder.encoder[-1].out_features
+            model = FineTuner(encoder, input_size, task_type, (128, 128), learning_rate=1e-5)
             tensorboard_logger = TensorBoardLogger(
                 seed_dir / _subdir,
                 name="tensorboard_logs",
