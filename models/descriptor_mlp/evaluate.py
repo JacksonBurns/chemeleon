@@ -191,10 +191,12 @@ timestamp: {datetime.datetime.now()}
                 _, feature_means, feature_vars = standard_scale(train_desc[train_idxs])
                 encoder = RescalingEncoder(feature_means, feature_vars)
                 input_size = feature_means.shape[0]
+                hidden_size = (1_800, 1_800)  # i.e. fastprop
             else:
                 encoder: fastpropFoundation = torch.load(pretrain_pt, map_location="cpu", weights_only=False)
                 input_size = encoder.encoder[-1].out_features
-            model = FineTuner(encoder, input_size, task_type, (128, 128), learning_rate=1e-5)
+                hidden_size = (256, 256)
+            model = FineTuner(encoder, input_size, task_type, hidden_size, learning_rate=1e-5)
             tensorboard_logger = TensorBoardLogger(
                 seed_dir / _subdir,
                 name="tensorboard_logs",

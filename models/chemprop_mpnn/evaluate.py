@@ -120,7 +120,7 @@ timestamp: {datetime.datetime.now()}
                 mp = pretrained.message_passing
                 agg = pretrained.agg
                 hidden_size = pretrained.message_passing.output_dim
-            fnn = RegressionFFN(output_transform=output_transform, input_dim=hidden_size) if task_type == TargetType.REGRESSION else BinaryClassificationFFN(output_transform=output_transform, input_dim=hidden_size)
+            fnn = RegressionFFN(output_transform=output_transform, input_dim=hidden_size, hidden_dim=256) if task_type == TargetType.REGRESSION else BinaryClassificationFFN(output_transform=output_transform, input_dim=hidden_size, hidden_dim=256)
             model = MPNN(mp, agg, fnn)
             
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
