@@ -10,6 +10,10 @@ Thought process for model comparison:
  - pretraining on multitask (MolE (mini version available here https://codeocean.com/capsule/2105466/tree/v1), Graphium 1B MPNN (https://openreview.net/forum?id=Zc2aIcucwc) and MolGPS (https://arxiv.org/abs/2404.11568)) - uunsupervised + supervised
  - pretraining on smiles (ChemBERTa-2 and MolFormer) - uunsupervised + supervised
 
+Note on code duplication:
+ - each directory under `models` contains all of the code needed to run _that_ model, i.e. you can copy the individual file and run it.
+ This, of course, leads to some code duplication.
+
 Other TODOs:
  - for finetuning, consider a two-stage strategy in which we first continue to train the masked reconstruction objective to ensure that the model is well-adapated for the chemical space of each problem and only _then_ attach a new task head for the actual regression target
 
