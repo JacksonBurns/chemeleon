@@ -167,7 +167,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
     
     # Define benchmarks list - moved up before it's used
     polaris_benchmarks = [
-        "polaris/pkis2-ret-wt-cls-v2",
+        # "polaris/pkis2-ret-wt-cls-v2",
         # "polaris/pkis2-ret-wt-reg-v2",
         # "polaris/pkis2-kit-wt-cls-v2",
         # "polaris/pkis2-kit-wt-reg-v2",
@@ -191,7 +191,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         # "tdcommons/cyp3a4-substrate-carbonmangels",
         # "tdcommons/pgp-broccatelli",
         # "tdcommons/caco2-wang",
-        # "tdcommons/herg",
+        "tdcommons/herg",
         # "tdcommons/bbb-martins",
         # "tdcommons/ames",
         # "tdcommons/ld50-zhu",
