@@ -34,13 +34,13 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Fit a PCA model on pretraining data")
     parser.add_argument("training_store", type=str, help="Path to zarr array with training data")
     parser.add_argument("output_path", type=str, help="Path to save the fitted PCA model")
-    parser.add_argument("--explained_variance", type=float, default=0.95,
+    parser.add_argument("--explained-variance", type=float, default=0.95,
                       help="Target explained variance ratio (0-1)")
-    parser.add_argument("--batch_size", type=int, default=1024, 
+    parser.add_argument("--batch-size", type=int, default=1024, 
                       help="Batch size for loading data")
-    parser.add_argument("--sample_size", type=int, default=None,
+    parser.add_argument("--sample-size", type=int, default=None,
                       help="Number of examples to use for fitting (default: all)")
-    parser.add_argument("--random_seed", type=int, default=42,
+    parser.add_argument("--random-seed", type=int, default=42,
                       help="Random seed for reproducibility")
     return parser.parse_args()
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         
         # Example of how to use this with evaluate.py
         print("\nTo use this PCA model with evaluate.py, run:")
-        print(f"python evaluate.py OUTPUT_DIR --pca_method pretrained --pca_model_path {output_path} --gpu")
+        print(f"python evaluate.py OUTPUT_DIR --pca-method pretrained --pca-model-path {output_path} --gpu")
     
     except Exception as e:
         print(f"Error during PCA fitting: {e}")

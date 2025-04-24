@@ -36,9 +36,9 @@ class PCAMLP(LightningModule):
         task_type: TargetType,
         hidden_sizes: Tuple[int, ...] = (1800, 1800),
         learning_rate: float = 1e-5,
-        feature_means=None,
-        feature_vars=None,
-        pca=None,
+        feature_means: torch.Tensor = None,
+        feature_vars: torch.Tensor = None,
+        pca: PCA = None,
     ):
         super().__init__()
         self.learning_rate = learning_rate
@@ -111,14 +111,21 @@ def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Train MLP with or without PCA dimensionality reduction")
     parser.add_argument("output_dir", type=str, help="Directory to save results")
-    parser.add_argument("--pca_method", type=str, choices=["none", "on_the_fly", "pretrained"], 
+    parser.add_argument("--pca-method", type=str, choices=["none", "on-the-fly", "pretrained"], 
                       default="none", help="PCA method to use")
-    parser.add_argument("--explained_variance", type=float, default=0.95, 
+    parser.add_argument("--explained-variance", type=float, default=0.95, 
                       help="Explained variance ratio for on-the-fly PCA (0-1)")
-    parser.add_argument("--pca_model_path", type=str, 
+    parser.add_argument("--pca-model-path", type=str, 
                       help="Path to pretrained PCA model (required for pretrained method)")
     parser.add_argument("--gpu", action="store_true", help="Use GPU if available")
-    return parser.parse_args()
+    args = parser.parse_args()
+    
+    # Convert hyphenated argument names to underscores for easy access
+    args.pca_method = args.pca_method
+    args.explained_variance = args.explained_variance
+    args.pca_model_path = args.pca_model_path
+    
+    return args
 
 
 if __name__ == "__main__":
@@ -144,7 +151,7 @@ if __name__ == "__main__":
     # Determine title based on PCA method
     if args.pca_method == "none":
         title = "Direct MLP on Descriptors Results"
-    elif args.pca_method == "on_the_fly":
+    elif args.pca_method == "on-the-fly":
         title = f"MLP on PCA-reduced Descriptors (On-the-fly, {args.explained_variance*100:.1f}% variance) Results"
     else:  # pretrained
         title = "MLP on PCA-reduced Descriptors (Pretrained PCA) Results"
@@ -160,14 +167,22 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         if not args.pca_model_path:
             raise ValueError("For pretrained PCA method, you must provide a PCA model path")
         try:
-            pretrained_pca = torch.load(args.pca_model_path)
+            # Allow loading of scikit-learn PCA objects with the new PyTorch 2.6 security restrictions
+            from sklearn.decomposition import PCA
+            import torch.serialization
+            
+            # Explicitly add PCA to the allowlist of safe globals for deserialization
+            with torch.serialization.safe_globals([PCA]):
+                pretrained_pca = torch.load(args.pca_model_path, weights_only=False)
+            
             output_file.write(f"Using pretrained PCA from {args.pca_model_path} with {pretrained_pca.n_components_} components\n\n")
+            
         except Exception as e:
             raise RuntimeError(f"Failed to load pretrained PCA model: {e}")
     
     # Define benchmarks list - moved up before it's used
     polaris_benchmarks = [
-        # "polaris/pkis2-ret-wt-cls-v2",
+        "polaris/pkis2-ret-wt-cls-v2",
         # "polaris/pkis2-ret-wt-reg-v2",
         # "polaris/pkis2-kit-wt-cls-v2",
         # "polaris/pkis2-kit-wt-reg-v2",
@@ -191,7 +206,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         # "tdcommons/cyp3a4-substrate-carbonmangels",
         # "tdcommons/pgp-broccatelli",
         # "tdcommons/caco2-wang",
-        "tdcommons/herg",
+        # "tdcommons/herg",
         # "tdcommons/bbb-martins",
         # "tdcommons/ames",
         # "tdcommons/ld50-zhu",
@@ -201,7 +216,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
     calc.config(timeout=1)
     
     # Process benchmarks and define global PCA models outside the random seed loop
-    if args.pca_method == "on_the_fly":
+    if args.pca_method == "on-the-fly":
         global_pca_models = {}
         for benchmark_name in polaris_benchmarks:
             # Load the benchmarking data first to fit PCA on entire dataset
@@ -305,7 +320,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             pca_model = None
             input_dim = train_desc.shape[1]  # Original descriptor dimension
             
-            if args.pca_method == "on_the_fly":
+            if args.pca_method == "on-the-fly":
                 # Use the global PCA model for this benchmark
                 pca_model = global_pca_models.get(benchmark_name)
                 if pca_model is not None:
@@ -363,16 +378,28 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             ]
             
             # Create and train the model with GPU support if available
-            trainer = Trainer(
-                max_epochs=50,
-                logger=tensorboard_logger,
-                log_every_n_steps=1,
-                enable_checkpointing=True,
-                check_val_every_n_epoch=1,
-                callbacks=callbacks,
-                accelerator="gpu" if use_gpu else "cpu",
-                devices=1 if use_gpu else None,
-            )
+            if use_gpu:
+                trainer = Trainer(
+                    max_epochs=50,
+                    logger=tensorboard_logger,
+                    log_every_n_steps=1,
+                    enable_checkpointing=True,
+                    check_val_every_n_epoch=1,
+                    callbacks=callbacks,
+                    accelerator="gpu",
+                    devices=1,
+                )
+            else:
+                trainer = Trainer(
+                    max_epochs=50,
+                    logger=tensorboard_logger,
+                    log_every_n_steps=1,
+                    enable_checkpointing=True,
+                    check_val_every_n_epoch=1,
+                    callbacks=callbacks,
+                    accelerator="cpu",
+                    # Don't specify devices for CPU, use default
+                )
             
             trainer.fit(model, train_dataloader, val_dataloader)
             
@@ -381,12 +408,19 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             print(f"Reloading best model from checkpoint file: {ckpt_path}")
             model = model.__class__.load_from_checkpoint(ckpt_path, map_location="cpu", pca=pca_model)
             
-            # Make predictions
-            trainer = Trainer(
-                logger=tensorboard_logger,
-                accelerator="gpu" if use_gpu else "cpu",
-                devices=1 if use_gpu else None,
-            )
+            # Make predictions with the same accelerator configuration
+            if use_gpu:
+                trainer = Trainer(
+                    logger=tensorboard_logger,
+                    accelerator="gpu",
+                    devices=1,
+                )
+            else:
+                trainer = Trainer(
+                    logger=tensorboard_logger,
+                    accelerator="cpu",
+                    # Don't specify devices for CPU
+                )
             predictions = torch.vstack(trainer.predict(model, test_dataloader))
             
             # Inverse transform predictions for regression tasks
