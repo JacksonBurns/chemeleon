@@ -16,7 +16,7 @@ from rdkit.Chem import MolFromSmiles, RemoveHs
 from tqdm import tqdm
 import zarr
 
-warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 # convert to mols, filtering invalid
@@ -30,6 +30,7 @@ def _f(smi):
         print("Skipping mol {smi} - failed RemoveHs")
         return False
     return True
+
 
 # convert to mols
 def _s(smi):
@@ -58,12 +59,21 @@ if __name__ == "__main__":
     # monomethyl auristatin E (one of the largest small molecule drugs) has a SMILES string
     # with 143 characters - let's filter out anything much larger than that
     cutoff = 150
-    smiles = list(filter(lambda s: len(s) < cutoff, tqdm(smiles, desc=f"Filtering SMILES > {cutoff} chars.")))
+    smiles = list(
+        filter(
+            lambda s: len(s) < cutoff,
+            tqdm(smiles, desc=f"Filtering SMILES > {cutoff} chars."),
+        )
+    )
 
     # filter out mixtures
-    smiles = list(filter(lambda s: "." not in s, tqdm(smiles, desc=f"Filtering mixture SMILES")))
+    smiles = list(
+        filter(lambda s: "." not in s, tqdm(smiles, desc=f"Filtering mixture SMILES"))
+    )
 
-    valid_mols = list(p.map(_f, tqdm(smiles, desc="Generating RDKit mols"), chunksize=1_024))
+    valid_mols = list(
+        p.map(_f, tqdm(smiles, desc="Generating RDKit mols"), chunksize=1_024)
+    )
 
     smiles = [s for (s, v) in zip(smiles, valid_mols) if v]
     with open("cleaned_" + smiles_file, "w") as file:
@@ -97,16 +107,32 @@ if __name__ == "__main__":
     i = 7_680_096
     with tqdm(total=n_mols, desc="Calculating features") as pbar:
         while i < n_mols:
-            mols = list(p.map(_s, smiles[i:i+chunk_rows], chunksize=chunk_rows // 64))
+            mols = list(
+                p.map(_s, smiles[i : i + chunk_rows], chunksize=chunk_rows // 64)
+            )
             for mol in mols:
-                mol.SetProp("_Name", "")  # prevent mordred from doing this in a rather expensive way
-            batch = calc.pandas(mols, quiet=True, nproc=64).fill_missing().to_numpy(dtype=np.float32)
-            z[i:i+chunk_rows, :] = batch
+                mol.SetProp(
+                    "_Name", ""
+                )  # prevent mordred from doing this in a rather expensive way
+            batch = (
+                calc.pandas(mols, quiet=True, nproc=64)
+                .fill_missing()
+                .to_numpy(dtype=np.float32)
+            )
+            z[i : i + chunk_rows, :] = batch
             pbar.update(chunk_rows)
             i += chunk_rows
-        mols = list(p.map(_s, smiles[i-chunk_rows:n_mols], chunksize=chunk_rows // 64))
+        mols = list(
+            p.map(_s, smiles[i - chunk_rows : n_mols], chunksize=chunk_rows // 64)
+        )
         for mol in mols:
-            mol.SetProp("_Name", "")  # prevent mordred from doing this in a rather expensive way
-        batch = calc.pandas(mols, quiet=True, nproc=64).fill_missing().to_numpy(dtype=np.float32)
-        z[i-chunk_rows:n_mols, :] = batch
-        pbar.update(n_mols - (i-chunk_rows))
+            mol.SetProp(
+                "_Name", ""
+            )  # prevent mordred from doing this in a rather expensive way
+        batch = (
+            calc.pandas(mols, quiet=True, nproc=64)
+            .fill_missing()
+            .to_numpy(dtype=np.float32)
+        )
+        z[i - chunk_rows : n_mols, :] = batch
+        pbar.update(n_mols - (i - chunk_rows))

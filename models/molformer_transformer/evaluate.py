@@ -9,13 +9,20 @@ from polaris.utils.types import TargetType
 import torch
 from datasets import Dataset
 from astartes import train_test_split
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, Trainer
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    TrainingArguments,
+    Trainer,
+)
 import numpy as np
 
 BASE_MODEL = "ibm-research/MoLFormer-XL-both-10pct"
 
+
 def tokenize_function(df, smiles_col, tokenizer):
     return tokenizer(df[smiles_col], padding="max_length", truncation=True)
+
 
 def preprocess_labels(example, target_col):
     example["labels"] = float(example[target_col])
@@ -23,17 +30,22 @@ def preprocess_labels(example, target_col):
 
 
 class RegressionTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+    def compute_loss(
+        self, model, inputs, return_outputs=False, num_items_in_batch=None
+    ):
         labels = inputs.pop("labels")  # Extract labels
         outputs = model(**inputs)
         logits = outputs.logits.squeeze(-1)  # Ensure shape compatibility
         loss_fct = torch.nn.MSELoss()  # Mean Squared Error for regression
-        loss = loss_fct(logits, labels)        
+        loss = loss_fct(logits, labels)
         return (loss, outputs) if return_outputs else loss
+
 
 def predict(model, smiles):
     model.eval()
-    inputs = tokenizer(smiles, return_tensors="pt", padding="max_length", truncation=True).to(model.device)
+    inputs = tokenizer(
+        smiles, return_tensors="pt", padding="max_length", truncation=True
+    ).to(model.device)
     with torch.no_grad():
         outputs = model(**inputs)
     return outputs.logits.item()
@@ -48,9 +60,11 @@ if __name__ == "__main__":
     if not output_dir.exists():
         output_dir.mkdir()
     output_file = open(output_dir / "train_results.md", "w")
-    output_file.write(f"""# {BASE_MODEL} Results
+    output_file.write(
+        f"""# {BASE_MODEL} Results
 timestamp: {datetime.datetime.now()}
-""")
+"""
+    )
     performance_dict = {}
     polaris_benchmarks = [
         "polaris/pkis2-ret-wt-cls-v2",
@@ -99,13 +113,26 @@ timestamp: {datetime.datetime.now()}
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
 
             # molformer fine tuning
-            train_idxs, val_idxs = train_test_split(np.arange(train_df.shape[0]), random_state=random_seed, train_size=0.80, test_size=0.20)
+            train_idxs, val_idxs = train_test_split(
+                np.arange(train_df.shape[0]),
+                random_state=random_seed,
+                train_size=0.80,
+                test_size=0.20,
+            )
             train_dataset = Dataset.from_pandas(train_df.iloc[train_idxs])
             val_dataset = Dataset.from_pandas(train_df.iloc[val_idxs])
-            tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True)
-            model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=1, trust_remote_code=True)
-            train_dataset = train_dataset.map(lambda x: tokenize_function(x, smiles_col, tokenizer), batched=True).map(lambda e: preprocess_labels(e, target_cols[0]))
-            val_dataset = val_dataset.map(lambda x: tokenize_function(x, smiles_col, tokenizer), batched=True).map(lambda e: preprocess_labels(e, target_cols[0]))
+            tokenizer = AutoTokenizer.from_pretrained(
+                BASE_MODEL, trust_remote_code=True
+            )
+            model = AutoModelForSequenceClassification.from_pretrained(
+                BASE_MODEL, num_labels=1, trust_remote_code=True
+            )
+            train_dataset = train_dataset.map(
+                lambda x: tokenize_function(x, smiles_col, tokenizer), batched=True
+            ).map(lambda e: preprocess_labels(e, target_cols[0]))
+            val_dataset = val_dataset.map(
+                lambda x: tokenize_function(x, smiles_col, tokenizer), batched=True
+            ).map(lambda e: preprocess_labels(e, target_cols[0]))
 
             training_args = TrainingArguments(
                 output_dir=seed_dir / _subdir,
@@ -137,14 +164,20 @@ timestamp: {datetime.datetime.now()}
                     eval_dataset=val_dataset,
                     processing_class=tokenizer,
                 )
-            
+
             trainer.train()
             trainer.save_model(seed_dir / _subdir)
             tokenizer.save_pretrained(seed_dir / _subdir)
-            tokenizer = AutoTokenizer.from_pretrained(seed_dir / _subdir, trust_remote_code=True)
-            model = AutoModelForSequenceClassification.from_pretrained(seed_dir / _subdir, num_labels=1, trust_remote_code=True)
+            tokenizer = AutoTokenizer.from_pretrained(
+                seed_dir / _subdir, trust_remote_code=True
+            )
+            model = AutoModelForSequenceClassification.from_pretrained(
+                seed_dir / _subdir, num_labels=1, trust_remote_code=True
+            )
 
-            predictions = test_df.apply(lambda row: predict(model, row[smiles_col]), axis=1)
+            predictions = test_df.apply(
+                lambda row: predict(model, row[smiles_col]), axis=1
+            )
 
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
@@ -153,19 +186,25 @@ timestamp: {datetime.datetime.now()}
                 # if len(target_cols) > 1:  # if there were multitask
                 #     predictions = {t: predictions[:, i] for i, t in enumerate(target_cols)}
                 results = benchmark.evaluate(predictions)
-            output_file.write(f"""
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.results.to_markdown()}
 
-""")
-            performance = results.results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+"""
+            )
+            performance = results.results.query(
+                f"Metric == '{benchmark.main_metric.label}'"
+            )["Score"].values[0]
             performance_dict[benchmark_name] = performance
-        
-        output_file.write(f"""
+
+        output_file.write(
+            f"""
 ### Summary
 
 ```
 results_dict = {json.dumps(performance_dict, indent=4)}
 ```
-""")
+"""
+        )

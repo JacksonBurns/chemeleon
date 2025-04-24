@@ -27,7 +27,8 @@ from fastprop.data import standard_scale, inverse_standard_scale
 from sklearn.decomposition import PCA
 
 
-warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 class PCAMLP(LightningModule):
     def __init__(
@@ -43,37 +44,43 @@ class PCAMLP(LightningModule):
         super().__init__()
         self.learning_rate = learning_rate
         self.task_type = task_type
-        
+
         # Store standardization parameters
         self.register_buffer("feature_means", feature_means)
         self.register_buffer("feature_vars", feature_vars)
-        
+
         # Save PCA transformer
         self.pca = pca
-        
+
         # Build the network
         modules = []
         for i in range(len(hidden_sizes)):
-            modules.append(torch.nn.Linear(input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]))
+            modules.append(
+                torch.nn.Linear(
+                    input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]
+                )
+            )
             modules.append(torch.nn.ReLU())
         modules.append(torch.nn.Linear(hidden_sizes[-1], 1))
         if task_type == TargetType.CLASSIFICATION:
             modules.append(torch.nn.Sigmoid())
-        
+
         self.model = torch.nn.Sequential(*modules)
         self.save_hyperparameters(ignore=["pca"])
-    
+
     def configure_optimizers(self):
         return {"optimizer": torch.optim.Adam(self.parameters(), lr=self.learning_rate)}
 
     def log(self, name, value, **kwargs):
         """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
-        return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
+        return super().log(
+            name, value, sync_dist=distributed.is_initialized(), **kwargs
+        )
 
     def forward(self, descriptors):
         # Apply standardization
         x = standard_scale(descriptors, self.feature_means, self.feature_vars)
-        
+
         # Apply PCA if available
         if self.pca is not None:
             # Convert to numpy, apply PCA, then back to tensor
@@ -81,7 +88,7 @@ class PCAMLP(LightningModule):
             x_np = x.cpu().numpy()
             x_pca = self.pca.transform(x_np)
             x = torch.tensor(x_pca, dtype=torch.float32, device=device)
-        
+
         return self.model(x)
 
     def _step(self, batch, name):
@@ -109,45 +116,59 @@ class PCAMLP(LightningModule):
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Train MLP with or without PCA dimensionality reduction")
+    parser = argparse.ArgumentParser(
+        description="Train MLP with or without PCA dimensionality reduction"
+    )
     parser.add_argument("output_dir", type=str, help="Directory to save results")
-    parser.add_argument("--pca-method", type=str, choices=["none", "on-the-fly", "pretrained"], 
-                      default="none", help="PCA method to use")
-    parser.add_argument("--explained-variance", type=float, default=0.95, 
-                      help="Explained variance ratio for on-the-fly PCA (0-1)")
-    parser.add_argument("--pca-model-path", type=str, 
-                      help="Path to pretrained PCA model (required for pretrained method)")
+    parser.add_argument(
+        "--pca-method",
+        type=str,
+        choices=["none", "on-the-fly", "pretrained"],
+        default="none",
+        help="PCA method to use",
+    )
+    parser.add_argument(
+        "--explained-variance",
+        type=float,
+        default=0.95,
+        help="Explained variance ratio for on-the-fly PCA (0-1)",
+    )
+    parser.add_argument(
+        "--pca-model-path",
+        type=str,
+        help="Path to pretrained PCA model (required for pretrained method)",
+    )
     parser.add_argument("--gpu", action="store_true", help="Use GPU if available")
     args = parser.parse_args()
-    
+
     # Convert hyphenated argument names to underscores for easy access
     args.pca_method = args.pca_method
     args.explained_variance = args.explained_variance
     args.pca_model_path = args.pca_model_path
-    
+
     return args
 
 
 if __name__ == "__main__":
     args = parse_args()
     output_dir = Path(args.output_dir)
-    
+
     # Check for GPU availability and CUDA_VISIBLE_DEVICES
     gpu_available = torch.cuda.is_available()
-    cuda_devices = os.environ.get('CUDA_VISIBLE_DEVICES')
+    cuda_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
     gpu_count = torch.cuda.device_count() if gpu_available else 0
     use_gpu = args.gpu and gpu_available
-    
+
     print(f"GPU available: {gpu_available}")
     print(f"CUDA_VISIBLE_DEVICES: {cuda_devices}")
     print(f"GPU count: {gpu_count}")
     print(f"Using GPU: {use_gpu}")
-    
+
     if not output_dir.exists():
         output_dir.mkdir(parents=True)
-    
+
     output_file = open(output_dir / "train_results.md", "w")
-    
+
     # Determine title based on PCA method
     if args.pca_method == "none":
         title = "Direct MLP on Descriptors Results"
@@ -155,31 +176,37 @@ if __name__ == "__main__":
         title = f"MLP on PCA-reduced Descriptors (On-the-fly, {args.explained_variance*100:.1f}% variance) Results"
     else:  # pretrained
         title = "MLP on PCA-reduced Descriptors (Pretrained PCA) Results"
-    
-    output_file.write(f"""# {title}
+
+    output_file.write(
+        f"""# {title}
 timestamp: {datetime.datetime.now()}
 GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
-""")
-    
+"""
+    )
+
     # Load pretrained PCA if needed
     pretrained_pca = None
     if args.pca_method == "pretrained":
         if not args.pca_model_path:
-            raise ValueError("For pretrained PCA method, you must provide a PCA model path")
+            raise ValueError(
+                "For pretrained PCA method, you must provide a PCA model path"
+            )
         try:
             # Allow loading of scikit-learn PCA objects with the new PyTorch 2.6 security restrictions
             from sklearn.decomposition import PCA
             import torch.serialization
-            
+
             # Explicitly add PCA to the allowlist of safe globals for deserialization
             with torch.serialization.safe_globals([PCA]):
                 pretrained_pca = torch.load(args.pca_model_path, weights_only=False)
-            
-            output_file.write(f"Using pretrained PCA from {args.pca_model_path} with {pretrained_pca.n_components_} components\n\n")
-            
+
+            output_file.write(
+                f"Using pretrained PCA from {args.pca_model_path} with {pretrained_pca.n_components_} components\n\n"
+            )
+
         except Exception as e:
             raise RuntimeError(f"Failed to load pretrained PCA model: {e}")
-    
+
     # Define benchmarks list - moved up before it's used
     polaris_benchmarks = [
         "polaris/pkis2-ret-wt-cls-v2",
@@ -211,10 +238,10 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         "tdcommons/ames",
         "tdcommons/ld50-zhu",
     ]
-    
+
     calc = Calculator(descriptors, ignore_3D=True)
     calc.config(timeout=1)
-    
+
     # Process benchmarks and define global PCA models outside the random seed loop
     if args.pca_method == "on-the-fly":
         global_pca_models = {}
@@ -224,35 +251,40 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             smiles_col = list(benchmark.input_cols)[0]
             train, test = benchmark.get_train_test_split()
             train_df, test_df = train.as_dataframe(), test.as_dataframe()
-            
+
             # Process all molecules from both train and test
-            all_smiles = pd.concat([train_df[smiles_col], test_df[smiles_col]]).reset_index(drop=True)
+            all_smiles = pd.concat(
+                [train_df[smiles_col], test_df[smiles_col]]
+            ).reset_index(drop=True)
             all_mols = list(map(MolFromSmiles, all_smiles))
             for mol in all_mols:
                 mol.SetProp("_Name", "")
-            
+
             # Calculate descriptors for all molecules
-            all_desc = torch.tensor(calc.pandas(all_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
-            
+            all_desc = torch.tensor(
+                calc.pandas(all_mols).fill_missing().to_numpy(dtype=np.float32),
+                dtype=torch.float32,
+            )
+
             # Calculate global stats for standardization on all data
             global_desc_std, global_means, global_vars = standard_scale(all_desc)
-            
+
             # Handle the special case of explained_variance = 1.0
             pca_components = args.explained_variance
             if pca_components == 1.0:
                 # Use None to keep all components
                 pca_components = None
                 print(f"Using all components for PCA (explained_variance=1.0)")
-            
+
             # Fit PCA on all data
             try:
-                pca_model = PCA(n_components=pca_components, svd_solver='full')
+                pca_model = PCA(n_components=pca_components, svd_solver="full")
                 global_desc_std_np = global_desc_std.cpu().numpy()
                 pca_model.fit(global_desc_std_np)
-                
+
                 # Get the number of components that explain the requested variance
                 n_components = pca_model.n_components_
-                
+
                 # Log PCA details
                 pca_info = f"""
 ### Global PCA Details for {benchmark_name}
@@ -263,14 +295,16 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
 """
                 output_file.write(pca_info)
                 print(pca_info)
-                
+
                 # Save the PCA model for this benchmark
                 global_pca_models[benchmark_name] = pca_model
-                
+
             except Exception as e:
                 print(f"Error fitting global PCA for {benchmark_name}: {e}")
                 print("Will fall back to direct MLP without PCA")
-                output_file.write(f"\nError fitting global PCA for {benchmark_name}: {e}\nWill fall back to direct MLP without PCA\n")
+                output_file.write(
+                    f"\nError fitting global PCA for {benchmark_name}: {e}\nWill fall back to direct MLP without PCA\n"
+                )
                 global_pca_models[benchmark_name] = None
 
     performance_dict = {}
@@ -291,7 +325,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             targets = train_df[target_cols]
             targets = targets.fillna(targets.mean(axis=0)).to_numpy()
             targets = torch.tensor(targets, dtype=torch.float32)
-            
+
             # Create molecules from SMILES and calculate descriptors
             train_mols = list(map(MolFromSmiles, train_df[smiles_col]))
             for mol in train_mols:
@@ -299,51 +333,78 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             test_mols = list(map(MolFromSmiles, test_df[smiles_col]))
             for mol in test_mols:
                 mol.SetProp("_Name", "")
-            
+
             # Calculate descriptors
-            train_desc = torch.tensor(calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
-            test_desc = torch.tensor(calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32), dtype=torch.float32)
-            
+            train_desc = torch.tensor(
+                calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32),
+                dtype=torch.float32,
+            )
+            test_desc = torch.tensor(
+                calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32),
+                dtype=torch.float32,
+            )
+
             # Create directory for benchmark results
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
             benchmark_dir = seed_dir / _subdir
             if not benchmark_dir.exists():
                 benchmark_dir.mkdir(parents=True)
-            
+
             # Split data for training and validation
-            train_idxs, val_idxs = train_test_split(np.arange(train_desc.shape[0]), train_size=0.80, random_state=random_seed)
-            
+            train_idxs, val_idxs = train_test_split(
+                np.arange(train_desc.shape[0]),
+                train_size=0.80,
+                random_state=random_seed,
+            )
+
             # Standardize features
             _, feature_means, feature_vars = standard_scale(train_desc[train_idxs])
-            
+
             # Apply PCA if requested
             pca_model = None
             input_dim = train_desc.shape[1]  # Original descriptor dimension
-            
+
             if args.pca_method == "on-the-fly":
                 # Use the global PCA model for this benchmark
                 pca_model = global_pca_models.get(benchmark_name)
                 if pca_model is not None:
                     input_dim = pca_model.n_components_
-                
+
             elif args.pca_method == "pretrained":
                 pca_model = pretrained_pca
                 input_dim = pca_model.n_components_
-            
+
             # Standardize targets for regression tasks
             if task_type == TargetType.REGRESSION:
                 _, target_means, target_vars = standard_scale(targets[train_idxs])
                 targets = standard_scale(targets, target_means, target_vars)
-            
+
             # Create datasets and dataloaders
-            train_dataset = torch.utils.data.TensorDataset(train_desc[train_idxs], targets[train_idxs])
-            validation_dataset = torch.utils.data.TensorDataset(train_desc[val_idxs], targets[val_idxs])
+            train_dataset = torch.utils.data.TensorDataset(
+                train_desc[train_idxs], targets[train_idxs]
+            )
+            validation_dataset = torch.utils.data.TensorDataset(
+                train_desc[val_idxs], targets[val_idxs]
+            )
             test_dataset = torch.utils.data.TensorDataset(test_desc)
-            
-            train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers=1, persistent_workers=True, batch_size=64, shuffle=True)
-            val_dataloader = torch.utils.data.DataLoader(validation_dataset, num_workers=1, batch_size=64, persistent_workers=True)
-            test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=1, batch_size=64, persistent_workers=True)
-            
+
+            train_dataloader = torch.utils.data.DataLoader(
+                train_dataset,
+                num_workers=1,
+                persistent_workers=True,
+                batch_size=64,
+                shuffle=True,
+            )
+            val_dataloader = torch.utils.data.DataLoader(
+                validation_dataset,
+                num_workers=1,
+                batch_size=64,
+                persistent_workers=True,
+            )
+            test_dataloader = torch.utils.data.DataLoader(
+                test_dataset, num_workers=1, batch_size=64, persistent_workers=True
+            )
+
             # Create the model
             model = PCAMLP(
                 input_dim=input_dim,
@@ -352,16 +413,16 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                 learning_rate=1e-5,
                 feature_means=feature_means,
                 feature_vars=feature_vars,
-                pca=pca_model
+                pca=pca_model,
             )
-            
+
             # Set up logger and callbacks
             tensorboard_logger = TensorBoardLogger(
                 benchmark_dir,
                 name="tensorboard_logs",
                 default_hp_metric=False,
             )
-            
+
             callbacks = [
                 EarlyStopping(
                     monitor="validation/loss",
@@ -376,7 +437,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                     dirpath=benchmark_dir / "checkpoints",
                 ),
             ]
-            
+
             # Create and train the model with GPU support if available
             if use_gpu:
                 trainer = Trainer(
@@ -400,14 +461,16 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                     accelerator="cpu",
                     # Don't specify devices for CPU, use default
                 )
-            
+
             trainer.fit(model, train_dataloader, val_dataloader)
-            
+
             # Load the best model for prediction
             ckpt_path = trainer.checkpoint_callback.best_model_path
             print(f"Reloading best model from checkpoint file: {ckpt_path}")
-            model = model.__class__.load_from_checkpoint(ckpt_path, map_location="cpu", pca=pca_model)
-            
+            model = model.__class__.load_from_checkpoint(
+                ckpt_path, map_location="cpu", pca=pca_model
+            )
+
             # Make predictions with the same accelerator configuration
             if use_gpu:
                 trainer = Trainer(
@@ -422,37 +485,45 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                     # Don't specify devices for CPU
                 )
             predictions = torch.vstack(trainer.predict(model, test_dataloader))
-            
+
             # Inverse transform predictions for regression tasks
             if task_type == TargetType.REGRESSION:
-                predictions = inverse_standard_scale(predictions, target_means, target_vars)
-            
+                predictions = inverse_standard_scale(
+                    predictions, target_means, target_vars
+                )
+
             predictions = predictions.numpy(force=True).flatten()
-            
+
             # Evaluate the model
             if task_type == TargetType.CLASSIFICATION:
                 results = benchmark.evaluate(predictions > 0.5, predictions)
             elif task_type == TargetType.REGRESSION:
                 results = benchmark.evaluate(predictions)
-            
+
             # Write results
-            output_file.write(f"""
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.results.to_markdown()}
 
-""")
-            performance = results.results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+"""
+            )
+            performance = results.results.query(
+                f"Metric == '{benchmark.main_metric.label}'"
+            )["Score"].values[0]
             performance_dict[benchmark_name] = performance
 
             # Free memory
             del model, test_dataloader, test_dataset
             torch.cuda.empty_cache()
-        
-        output_file.write(f"""
+
+        output_file.write(
+            f"""
 ### Summary
 
 ```
 results_dict = {json.dumps(performance_dict, indent=4)}
 ```
-""")
+"""
+        )
