@@ -11,8 +11,14 @@ Thought process for model comparison:
  - pretraining on smiles (ChemBERTa-2 and MolFormer) - uunsupervised + supervised
 
 Note on code duplication:
- - each directory under `models` contains all of the code needed to run _that_ model, i.e. you can copy the individual file and run it.
+ - each directory under `models` contains all of the code needed to run _that_ model.
+ Wherever possible, you can copy the individual file and run it without anything else.
  This, of course, leads to some code duplication.
+
+Broadly speaking all of the `evaluate` scripts look like this:
+```python
+
+```
 
 Other TODOs:
  - for finetuning, consider a two-stage strategy in which we first continue to train the masked reconstruction objective to ensure that the model is well-adapated for the chemical space of each problem and only _then_ attach a new task head for the actual regression target

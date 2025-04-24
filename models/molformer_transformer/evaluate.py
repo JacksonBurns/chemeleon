@@ -11,8 +11,11 @@ from datasets import Dataset
 from astartes import train_test_split
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, Trainer
 import numpy as np
+import pandas as pd
+from sklearn.metrics import root_mean_squared_error
 
 BASE_MODEL = "ibm-research/MoLFormer-XL-both-10pct"
+BENCHMARK_SET = "moleculeace"  # polaris
 
 def tokenize_function(df, smiles_col, tokenizer):
     return tokenizer(df[smiles_col], padding="max_length", truncation=True)
@@ -52,7 +55,7 @@ if __name__ == "__main__":
 timestamp: {datetime.datetime.now()}
 """)
     performance_dict = {}
-    polaris_benchmarks = [
+    polaris_benchmarks = (
         "polaris/pkis2-ret-wt-cls-v2",
         "polaris/pkis2-ret-wt-reg-v2",
         "polaris/pkis2-kit-wt-cls-v2",
@@ -81,21 +84,60 @@ timestamp: {datetime.datetime.now()}
         "tdcommons/bbb-martins",
         "tdcommons/ames",
         "tdcommons/ld50-zhu",
-    ]
+    )
+    moleculeace_benchmarks = (
+        "CHEMBL1862_Ki",
+        "CHEMBL1871_Ki",
+        "CHEMBL2034_Ki",
+        "CHEMBL2047_EC50",
+        "CHEMBL204_Ki",
+        "CHEMBL2147_Ki",
+        "CHEMBL214_Ki",
+        "CHEMBL218_EC50",
+        "CHEMBL219_Ki",
+        "CHEMBL228_Ki",
+        "CHEMBL231_Ki",
+        "CHEMBL233_Ki",
+        "CHEMBL234_Ki",
+        "CHEMBL235_EC50",
+        "CHEMBL236_Ki",
+        "CHEMBL237_EC50",
+        "CHEMBL237_Ki",
+        "CHEMBL238_Ki",
+        "CHEMBL239_EC50",
+        "CHEMBL244_Ki",
+        "CHEMBL262_Ki",
+        "CHEMBL264_Ki",
+        "CHEMBL2835_Ki",
+        "CHEMBL287_Ki",
+        "CHEMBL2971_Ki",
+        "CHEMBL3979_EC50",
+        "CHEMBL4005_Ki",
+        "CHEMBL4203_Ki",
+        "CHEMBL4616_EC50",
+        "CHEMBL4792_Ki",
+    )
 
     for random_seed in (42, 117, 709, 1701, 9001):
         output_file.write(f"## Random Seed {random_seed}\n")
         seed_dir = output_dir / f"seed_{random_seed}"
-        for benchmark_name in polaris_benchmarks:
-            # load the benchmarking data
-            benchmark = po.load_benchmark(benchmark_name)
-            smiles_col = list(benchmark.input_cols)[0]
-            target_cols = list(benchmark.target_cols)
-            train, test = benchmark.get_train_test_split()
-            train_df, test_df = train.as_dataframe(), test.as_dataframe()
+        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
+            if BENCHMARK_SET == "polaris":
+                # load the benchmarking data
+                benchmark = po.load_benchmark(benchmark_name)
+                smiles_col = list(benchmark.input_cols)[0]
+                target_cols = list(benchmark.target_cols)
+                train, test = benchmark.get_train_test_split()
+                train_df, test_df = train.as_dataframe(), test.as_dataframe()
+                task_type = benchmark.target_types[target_cols[0]]
+            else:
+                smiles_col = "smiles"
+                target_cols = "y"
+                df = pd.read_csv(f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv")
+                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
+                task_type = TargetType.REGRESSION
 
             # extract metadata
-            task_type = benchmark.target_types[target_cols[0]]
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
 
             # molformer fine tuning
@@ -150,16 +192,23 @@ timestamp: {datetime.datetime.now()}
             if task_type == TargetType.CLASSIFICATION:
                 results = benchmark.evaluate(predictions > 0.5, predictions)
             elif task_type == TargetType.REGRESSION:
-                # if len(target_cols) > 1:  # if there were multitask
-                #     predictions = {t: predictions[:, i] for i, t in enumerate(target_cols)}
-                results = benchmark.evaluate(predictions)
+                if BENCHMARK_SET == "polaris":
+                    results = benchmark.evaluate(predictions).results
+                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                else:
+                    results = pd.DataFrame.from_records([
+                        dict(metric="overall test rmse", value=root_mean_squared_error(predictions, test_df["y"])),
+                        dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
+                        dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
+                    ], index="metric")
+                    performance = results.at["noncliff test rmse", "value"] - results.at["cliff test rmse", "value"]
             output_file.write(f"""
 ### `{benchmark_name}`
 
-{results.results.to_markdown()}
+{results.to_markdown()}
 
 """)
-            performance = results.results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+            
             performance_dict[benchmark_name] = performance
         
         output_file.write(f"""
