@@ -45,7 +45,7 @@ class Welford:
         return self.__getvars(ddof=0)
 
     def add(self, element, backup_flg=True):
-        """ add
+        """add
 
         add one data sample.
 
@@ -78,7 +78,7 @@ class Welford:
         self.__s[nan_mask] += delta * (element[nan_mask] - self.__m[nan_mask])
 
     def add_all(self, elements, backup_flg=True):
-        """ add_all
+        """add_all
 
         add multiple data samples.
 
@@ -118,7 +118,9 @@ class Welford:
     def __getvars(self, ddof):
         nonzero_mask = (self.__count > ddof).bool()
         result = torch.full(self.__shape, torch.nan).to(nonzero_mask.device)
-        result[nonzero_mask] = self.__s[nonzero_mask] / (self.__count[nonzero_mask] - ddof)
+        result[nonzero_mask] = self.__s[nonzero_mask] / (
+            self.__count[nonzero_mask] - ddof
+        )
         return result
 
     def __backup_attrs(self):

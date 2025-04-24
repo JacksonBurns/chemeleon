@@ -36,10 +36,10 @@ class ChemPropZarrDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self.len
-    
+
     def __getitem__(self, idx: int):
         mg = self.molgraph_generator(MolFromSmiles(self.smiles[idx]))
-        return Datum(mg, None, None, self.z[idx, :], 1.0, None, None)     
+        return Datum(mg, None, None, self.z[idx, :], 1.0, None, None)
 
 
 class MaskedDescriptorsMPNN(MPNN):
@@ -60,17 +60,21 @@ class MaskedDescriptorsMPNN(MPNN):
         self.register_buffer("feature_vars", feature_vars)
         self.winsorization = WinsorizeStdevN(winsorization_factor)
 
-    def validation_step(self, batch, batch_idx = 0):
+    def validation_step(self, batch, batch_idx=0):
         bmg, V_d, X_d, targets, weights, lt_mask, gt_mask = batch
         targets = standard_scale(targets, self.feature_means, self.feature_vars)
         targets = self.winsorization(targets)
-        return super().validation_step((bmg, V_d, X_d, targets, weights, lt_mask, gt_mask), batch_idx)
+        return super().validation_step(
+            (bmg, V_d, X_d, targets, weights, lt_mask, gt_mask), batch_idx
+        )
 
-    def test_step(self, batch, batch_idx = 0):
+    def test_step(self, batch, batch_idx=0):
         bmg, V_d, X_d, targets, weights, lt_mask, gt_mask = batch
         targets = standard_scale(targets, self.feature_means, self.feature_vars)
         targets = self.winsorization(targets)
-        return super().test_step((bmg, V_d, X_d, targets, weights, lt_mask, gt_mask), batch_idx)
+        return super().test_step(
+            (bmg, V_d, X_d, targets, weights, lt_mask, gt_mask), batch_idx
+        )
 
     def training_step(self, batch, batch_idx):
         # overrides parent method to ranomly mask (evaluate only masked descriptors) during training
@@ -82,14 +86,21 @@ class MaskedDescriptorsMPNN(MPNN):
         Z = self.fingerprint(bmg, V_d, X_d)
         preds = self.predictor.train_step(Z)
         l = self.criterion(preds, targets, mask, weights, lt_mask, gt_mask)
-        self.log("train/masked_loss", self.criterion, batch_size=batch_size, prog_bar=True, on_epoch=True, sync_dist=distributed.is_initialized())
+        self.log(
+            "train/masked_loss",
+            self.criterion,
+            batch_size=batch_size,
+            prog_bar=True,
+            on_epoch=True,
+            sync_dist=distributed.is_initialized(),
+        )
         return l
 
 
 if __name__ == "__main__":
     import sys
     from pathlib import Path
-    
+
     from tqdm import tqdm
     from chemprop.nn import MeanAggregation, BondMessagePassing, RegressionFFN, metrics
     from chemprop.data import build_dataloader
@@ -98,14 +109,13 @@ if __name__ == "__main__":
     from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
     from lightning.pytorch.callbacks.early_stopping import EarlyStopping
     from lightning.pytorch.loggers import TensorBoardLogger
-    
-    
+
     BATCH_SIZE = 128
     NUM_EPOCHS = 500
     PATIENCE = 50
     HIDDEN_SIZE = 2_048
     DEPTH = 6
-    
+
     try:
         training_store = Path(sys.argv[1])
         output_dir = Path(sys.argv[2])
@@ -113,32 +123,52 @@ if __name__ == "__main__":
     except:
         print("usage: python pretrain.py TRAINING_STORE OUTPUT_DIR SMILES_FILE")
         exit(1)
-        
-    z = zarr.open_array(training_store, mode='r')
+
+    z = zarr.open_array(training_store, mode="r")
     n_features = z.shape[1]
     del z
 
     with open(smiles_file, "r") as file:
         smiles = [i.strip() for i in tqdm(file.readlines(), "Reading SMILES")]
-    
-    
-    # lightning training code from other script    
+
+    # lightning training code from other script
     dataset = ChemPropZarrDataset(
         smiles,
         training_store,
     )
     gen = torch.Generator().manual_seed(1701)
-    train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = build_dataloader(train_dset, num_workers=4, batch_size=BATCH_SIZE, shuffle=True, persistent_workers=True)
-    val_dataloader = build_dataloader(val_dset, num_workers=4, batch_size=BATCH_SIZE, shuffle=False, persistent_workers=True)
-    test_dataloader = build_dataloader(test_dset, num_workers=4, batch_size=BATCH_SIZE, shuffle=False, persistent_workers=True)
+    train_dset, val_dset, test_dset = torch.utils.data.random_split(
+        dataset, [0.7, 0.2, 0.1], gen
+    )
+    train_dataloader = build_dataloader(
+        train_dset,
+        num_workers=4,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        persistent_workers=True,
+    )
+    val_dataloader = build_dataloader(
+        val_dset,
+        num_workers=4,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        persistent_workers=True,
+    )
+    test_dataloader = build_dataloader(
+        test_dset,
+        num_workers=4,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        persistent_workers=True,
+    )
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
-    feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
+    feature_means = torch.load(
+        cached_means_fpath, weights_only=True, map_location="cpu"
+    )
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
-    
     model = MaskedDescriptorsMPNN(
         BondMessagePassing(d_h=HIDDEN_SIZE, depth=DEPTH),
         MeanAggregation(),
@@ -189,4 +219,3 @@ if __name__ == "__main__":
     model = model.__class__.load_from_checkpoint(ckpt_path, map_location="cpu")
     trainer.test(model, test_dataloader)
     torch.save(model, output_dir / "best.pt")
-

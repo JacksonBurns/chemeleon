@@ -18,7 +18,6 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 
-
 if __name__ == "__main__":
     try:
         output_dir = Path(sys.argv[1])
@@ -28,9 +27,11 @@ if __name__ == "__main__":
     if not output_dir.exists():
         output_dir.mkdir()
     output_file = open(output_dir / "train_results.md", "w")
-    output_file.write(f"""# Random Forest Baseline Results
+    output_file.write(
+        f"""# Random Forest Baseline Results
 timestamp: {datetime.datetime.now()}
-""")
+"""
+    )
     performance_dict = {}
     polaris_benchmarks = [
         "polaris/pkis2-ret-wt-cls-v2",
@@ -83,18 +84,21 @@ timestamp: {datetime.datetime.now()}
 
             # typical scikit-mol training
             if task_type == TargetType.REGRESSION:
-                model = TransformedTargetRegressor(regressor=RandomForestRegressor(random_state=random_seed), transformer=StandardScaler())
+                model = TransformedTargetRegressor(
+                    regressor=RandomForestRegressor(random_state=random_seed),
+                    transformer=StandardScaler(),
+                )
             else:
                 model = RandomForestClassifier(random_state=random_seed)
             pipe = Pipeline(
                 [
-                    ('smiles2mol', SmilesToMolTransformer()),
-                    ('mol2fp', MorganFingerprintTransformer()),
-                    ('model', model),
+                    ("smiles2mol", SmilesToMolTransformer()),
+                    ("mol2fp", MorganFingerprintTransformer()),
+                    ("model", model),
                 ]
             )
             pipe.fit(train_smiles, targets)
-            
+
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
                 predictions = pipe.predict_proba(test_smiles)[:, 1].flatten()
@@ -104,19 +108,25 @@ timestamp: {datetime.datetime.now()}
                 # if len(target_cols) > 1:  # if there were multitask
                 #     predictions = {t: predictions[:, i] for i, t in enumerate(target_cols)}
                 results = benchmark.evaluate(predictions)
-            output_file.write(f"""
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.results.to_markdown()}
 
-""")
-            performance = results.results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+"""
+            )
+            performance = results.results.query(
+                f"Metric == '{benchmark.main_metric.label}'"
+            )["Score"].values[0]
             performance_dict[benchmark_name] = performance
-        
-        output_file.write(f"""
+
+        output_file.write(
+            f"""
 ### Summary
 
 ```
 results_dict = {json.dumps(performance_dict, indent=4)}
 ```
-""")
+"""
+        )

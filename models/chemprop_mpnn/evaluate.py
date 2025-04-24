@@ -21,7 +21,12 @@ from astartes import train_test_split
 from chemprop.data import MoleculeDatapoint, MoleculeDataset, build_dataloader
 from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
 from chemprop.conf import DEFAULT_HIDDEN_DIM
-from chemprop.nn import BondMessagePassing, BinaryClassificationFFN, RegressionFFN, UnscaleTransform
+from chemprop.nn import (
+    BondMessagePassing,
+    BinaryClassificationFFN,
+    RegressionFFN,
+    UnscaleTransform,
+)
 from chemprop.models import MPNN
 from chemprop.nn.agg import MeanAggregation
 
@@ -40,9 +45,11 @@ if __name__ == "__main__":
     if not output_dir.exists():
         output_dir.mkdir()
     output_file = open(output_dir / "train_results.md", "w")
-    output_file.write(f"""# ChemProp Baseline Results
+    output_file.write(
+        f"""# ChemProp Baseline Results
 timestamp: {datetime.datetime.now()}
-""")
+"""
+    )
     performance_dict = {}
     polaris_benchmarks = [
         "polaris/pkis2-ret-wt-cls-v2",
@@ -92,9 +99,20 @@ timestamp: {datetime.datetime.now()}
             targets = targets.fillna(targets.mean(axis=0)).to_numpy()
 
             # typical chemprop training
-            train_idxs, val_idxs = train_test_split(range(len(targets)), train_size=0.80, test_size=0.20, random_state=random_seed)
-            train_data = [MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(train_df[smiles_col][train_idxs], targets[train_idxs])]
-            val_data = [MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(train_df[smiles_col][val_idxs], targets[val_idxs])]
+            train_idxs, val_idxs = train_test_split(
+                range(len(targets)),
+                train_size=0.80,
+                test_size=0.20,
+                random_state=random_seed,
+            )
+            train_data = [
+                MoleculeDatapoint.from_smi(smi, y)
+                for smi, y in zip(train_df[smiles_col][train_idxs], targets[train_idxs])
+            ]
+            val_data = [
+                MoleculeDatapoint.from_smi(smi, y)
+                for smi, y in zip(train_df[smiles_col][val_idxs], targets[val_idxs])
+            ]
             test_data = list(map(MoleculeDatapoint.from_smi, test_df[smiles_col]))
             featurizer = SimpleMoleculeMolGraphFeaturizer()
             train_dataset = MoleculeDataset(train_data, featurizer)
@@ -106,20 +124,40 @@ timestamp: {datetime.datetime.now()}
                 val_dataset.normalize_targets(scaler)
             train_dataloader = build_dataloader(train_dataset, num_workers=1)
             val_dataloader = build_dataloader(val_dataset, num_workers=1, shuffle=False)
-            test_dataloader = build_dataloader(test_dataset, num_workers=1, shuffle=False)
-            output_transform = UnscaleTransform.from_standard_scaler(scaler) if scaler is not None else torch.nn.Identity()
+            test_dataloader = build_dataloader(
+                test_dataset, num_workers=1, shuffle=False
+            )
+            output_transform = (
+                UnscaleTransform.from_standard_scaler(scaler)
+                if scaler is not None
+                else torch.nn.Identity()
+            )
             if pretrain_pt is None:
                 mp = BondMessagePassing()
                 agg = MeanAggregation()
                 hidden_size = DEFAULT_HIDDEN_DIM
             else:
-                pretrained: MaskedDescriptorsMPNN = torch.load(pretrain_pt, map_location="cpu", weights_only=False)
+                pretrained: MaskedDescriptorsMPNN = torch.load(
+                    pretrain_pt, map_location="cpu", weights_only=False
+                )
                 mp = pretrained.message_passing
                 agg = pretrained.agg
                 hidden_size = pretrained.message_passing.output_dim
-            fnn = RegressionFFN(output_transform=output_transform, input_dim=hidden_size, hidden_dim=256) if task_type == TargetType.REGRESSION else BinaryClassificationFFN(output_transform=output_transform, input_dim=hidden_size, hidden_dim=256)
+            fnn = (
+                RegressionFFN(
+                    output_transform=output_transform,
+                    input_dim=hidden_size,
+                    hidden_dim=256,
+                )
+                if task_type == TargetType.REGRESSION
+                else BinaryClassificationFFN(
+                    output_transform=output_transform,
+                    input_dim=hidden_size,
+                    hidden_dim=256,
+                )
+            )
             model = MPNN(mp, agg, fnn)
-            
+
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
             tensorboard_logger = TensorBoardLogger(
                 seed_dir / _subdir,
@@ -137,7 +175,7 @@ timestamp: {datetime.datetime.now()}
                     monitor="val_loss",
                     save_top_k=2,
                     mode="min",
-                    dirpath=seed_dir  / _subdir / "checkpoints",
+                    dirpath=seed_dir / _subdir / "checkpoints",
                 ),
             ]
             trainer = Trainer(
@@ -155,8 +193,12 @@ timestamp: {datetime.datetime.now()}
             torch.cuda.empty_cache()
             model = MPNN.load_from_checkpoint(ckpt_path)
             trainer = Trainer(logger=tensorboard_logger)
-            predictions = torch.vstack(trainer.predict(model, test_dataloader)).numpy(force=True).flatten()
-            
+            predictions = (
+                torch.vstack(trainer.predict(model, test_dataloader))
+                .numpy(force=True)
+                .flatten()
+            )
+
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
                 results = benchmark.evaluate(predictions > 0.5, predictions)
@@ -164,23 +206,29 @@ timestamp: {datetime.datetime.now()}
                 # if len(target_cols) > 1:  # if there were multitask
                 #     predictions = {t: predictions[:, i] for i, t in enumerate(target_cols)}
                 results = benchmark.evaluate(predictions)
-            output_file.write(f"""
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.results.to_markdown()}
 
-""")
-            performance = results.results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+"""
+            )
+            performance = results.results.query(
+                f"Metric == '{benchmark.main_metric.label}'"
+            )["Score"].values[0]
             performance_dict[benchmark_name] = performance
 
             # actually free the memory
             del model, test_dataloader, test_dataset
             torch.cuda.empty_cache()
-        
-        output_file.write(f"""
+
+        output_file.write(
+            f"""
 ### Summary
 
 ```
 results_dict = {json.dumps(performance_dict, indent=4)}
 ```
-""")
+"""
+        )
