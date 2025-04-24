@@ -33,17 +33,31 @@ def fit_one(trial, training_store, n_features, output_dir):
     embedding_size = trial.suggest_categorical("embedding_size", (4, 8, 12, 16))
     num_layers = trial.suggest_categorical("num_layers", (2, 3, 4))
     hidden_size = trial.suggest_categorical("hidden_size", (1024, 2048, 4096))
-    
+
     dataset = ZarrDataset(training_store)
     gen = torch.Generator().manual_seed(1701)
-    train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = TorchDataLoader(train_dset, num_workers=3, persistent_workers=True, batch_size=BATCH_SIZE, shuffle=True)
-    val_dataloader = TorchDataLoader(val_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
-    test_dataloader = TorchDataLoader(test_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True)
+    train_dset, val_dset, test_dset = torch.utils.data.random_split(
+        dataset, [0.7, 0.2, 0.1], gen
+    )
+    train_dataloader = TorchDataLoader(
+        train_dset,
+        num_workers=3,
+        persistent_workers=True,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+    )
+    val_dataloader = TorchDataLoader(
+        val_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True
+    )
+    test_dataloader = TorchDataLoader(
+        test_dset, num_workers=1, batch_size=BATCH_SIZE, persistent_workers=True
+    )
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
-    feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
+    feature_means = torch.load(
+        cached_means_fpath, weights_only=True, map_location="cpu"
+    )
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
     model = fastpropFoundation(
@@ -51,7 +65,7 @@ def fit_one(trial, training_store, n_features, output_dir):
         feature_vars=feature_vars,
         num_features=n_features,
         winsorization_factor=6,
-        hidden_sizes=[hidden_size]*num_layers,
+        hidden_sizes=[hidden_size] * num_layers,
         decoder_sizes=tuple(),
         encoding_size=hidden_size,
         learning_rate=LEARNING_RATE,
@@ -95,8 +109,11 @@ def fit_one(trial, training_store, n_features, output_dir):
     trainer = Trainer(logger=tensorboard_logger, devices=[0])
     model = fastpropFoundation.load_from_checkpoint(ckpt_path, map_location="cpu")
     res = trainer.test(model, test_dataloader)[0]
-    torch.save(model, output_dir / f"e{embedding_size}_n{num_layers}_h{hidden_size}_best.pt")
+    torch.save(
+        model, output_dir / f"e{embedding_size}_n{num_layers}_h{hidden_size}_best.pt"
+    )
     return res["test/loss"]
+
 
 def main():
     # load the data
@@ -108,7 +125,7 @@ def main():
         exit(1)
     output_dir.mkdir(exist_ok=True)
 
-    z = zarr.open_array(training_store, mode='r')
+    z = zarr.open_array(training_store, mode="r")
     n_features = z.shape[1]
     del z
 
@@ -123,6 +140,7 @@ def main():
         n_trials=NUM_HOPT_TRIALS,
     )
     study.trials_dataframe().to_csv("hopt_results.csv")
+
 
 if __name__ == "__main__":
     main()

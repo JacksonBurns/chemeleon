@@ -49,7 +49,9 @@ class fastpropFoundation(LightningModule):
             self.winsorize = WinsorizeStdevN(winsorization_factor)
         modules = []
         # embeddings
-        modules.append(PeriodicEmbeddings(num_features, d_embedding=embedding_dim, lite=False))
+        modules.append(
+            PeriodicEmbeddings(num_features, d_embedding=embedding_dim, lite=False)
+        )
         modules.append(torch.nn.Flatten())
         # encoder
         modules.append(torch.nn.Linear(num_features * embedding_dim, hidden_sizes[0]))
@@ -80,11 +82,15 @@ class fastpropFoundation(LightningModule):
         Returns:
             dict: Optimizer name and instance.
         """
-        return {"optimizer": torch.optim.AdamW(self.parameters(), lr=self.learning_rate)}
+        return {
+            "optimizer": torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+        }
 
     def log(self, name, value, **kwargs):
         """Wrap the parent PyTorch Lightning log function to automatically detect DDP."""
-        return super().log(name, value, sync_dist=distributed.is_initialized(), **kwargs)
+        return super().log(
+            name, value, sync_dist=distributed.is_initialized(), **kwargs
+        )
 
     def _scale(self, x: torch.Tensor):
         x = standard_scale(x, self.feature_means, self.feature_vars)
@@ -119,7 +125,9 @@ class fastpropFoundation(LightningModule):
     def _step(self, descriptors, name):
         descriptors = self._scale(descriptors)
         reconstruction = self(descriptors)
-        loss = torch.nn.functional.mse_loss(reconstruction, descriptors, reduction="mean")
+        loss = torch.nn.functional.mse_loss(
+            reconstruction, descriptors, reduction="mean"
+        )
         self.log(f"{name}/loss", loss)
         return loss
 
