@@ -201,7 +201,7 @@ timestamp: {datetime.datetime.now()}
                         dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
                         dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
                     ], index="metric")
-                    performance = results.at["noncliff test rmse", "value"] - results.at["cliff test rmse", "value"]
+                    performance = results.at["cliff test rmse", "value"] - results.at["noncliff test rmse", "value"]
             output_file.write(f"""
 ### `{benchmark_name}`
 
