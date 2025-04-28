@@ -41,7 +41,7 @@ class RescalingEncoder(torch.nn.Module):
         self.register_buffer("feature_vars", feature_vars)
 
     def encode(self, x):
-        return standard_scale(x, self.feature_means, self.feature_vars)
+        return standard_scale(x, self.feature_means, self.feature_vars).clamp(min=-6, max=6)
 
 
 class FineTuner(LightningModule):
