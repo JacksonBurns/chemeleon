@@ -2,6 +2,8 @@ from pathlib import Path
 import sys
 import datetime
 import json
+import os
+import shutil
 
 import polaris as po
 from polaris.utils.types import TargetType
@@ -20,7 +22,8 @@ import pandas as pd
 from sklearn.metrics import root_mean_squared_error
 
 BASE_MODEL = "ibm-research/MoLFormer-XL-both-10pct"
-BENCHMARK_SET = "moleculeace"  # polaris
+BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
+print(f"Running benchmark set {BENCHMARK_SET}")
 
 
 def tokenize_function(df, smiles_col, tokenizer):
@@ -223,7 +226,8 @@ timestamp: {datetime.datetime.now()}
 
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
-                results = benchmark.evaluate(predictions > 0.5, predictions)
+                results = benchmark.evaluate(predictions > 0.5, predictions).results
+                performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
             elif task_type == TargetType.REGRESSION:
                 if BENCHMARK_SET == "polaris":
                     results = benchmark.evaluate(predictions).results
@@ -234,7 +238,7 @@ timestamp: {datetime.datetime.now()}
                         dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
                         dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
                     ], index="metric")
-                    performance = results.at["cliff test rmse", "value"] - results.at["noncliff test rmse", "value"]
+                    performance = {"cliff": results.at["cliff test rmse", "value"], "noncliff": results.at["noncliff test rmse", "value"]}
             output_file.write(f"""
 ### `{benchmark_name}`
 
@@ -243,6 +247,10 @@ timestamp: {datetime.datetime.now()}
 """)
             
             performance_dict[benchmark_name] = performance
+
+            # free up the disk space
+            for ckpt_dir in (seed_dir / _subdir).glob("checkpoint-*"):
+                shutil.rmtree(ckpt_dir)
 
         output_file.write(
             f"""

@@ -3,6 +3,7 @@ import sys
 import datetime
 import json
 import warnings
+import os
 
 import polaris as po
 from polaris.utils.types import TargetType
@@ -19,7 +20,8 @@ import pandas as pd
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-BENCHMARK_SET = "moleculeace"  # polaris
+BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
+print(f"Running benchmark set {BENCHMARK_SET}")
 
 if __name__ == "__main__":
     try:
@@ -147,7 +149,8 @@ timestamp: {datetime.datetime.now()}
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
                 predictions = pipe.predict_proba(test_smiles)[:, 1].flatten()
-                results = benchmark.evaluate(predictions > 0.5, predictions)
+                results = benchmark.evaluate(predictions > 0.5, predictions).results
+                performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
             elif task_type == TargetType.REGRESSION:
                 predictions = pipe.predict(test_smiles).flatten()
                 # if len(target_cols) > 1:  # if there were multitask
@@ -161,7 +164,7 @@ timestamp: {datetime.datetime.now()}
                         dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
                         dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
                     ], index="metric")
-                    performance = results.at["cliff test rmse", "value"] - results.at["noncliff test rmse", "value"]
+                    performance = {"cliff": results.at["cliff test rmse", "value"], "noncliff": results.at["noncliff test rmse", "value"]}
             output_file.write(f"""
 ### `{benchmark_name}`
 
