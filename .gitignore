@@ -6,3 +6,4 @@ output
 screen.log
 *.ckpt
 *.log
+minimol_features
