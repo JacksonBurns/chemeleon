@@ -28,3 +28,5 @@ Deps (formalize into reqs):
  - chemprop 2.1+
  - zarr 3 for training < 3 for finetuning
  - polaris 0.11.6+ 
+
+Load the chemprop pretrained model which is actually a MaskedDescriptorsMPNN and then dump it straight back to a file as a normal chemprop model so it can be easily loaded.
