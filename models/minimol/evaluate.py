@@ -1,61 +1,102 @@
-"""
-fit a chemprop model directly on the smiles
-
-note that polaris requires zarr<3 but the feature generator requires
-zarr>=3 so two separate python environments are needed
-"""
 from pathlib import Path
 import sys
 import datetime
+import warnings
 import json
 import shutil
+from typing import Tuple
+from statistics import mean
 import os
 
 import torch
+from astartes import train_test_split
 from mordred import Calculator, descriptors
+import numpy as np
+import pandas as pd
+from rdkit.Chem import MolFromSmiles
 import polaris as po
+from torch import distributed
 from polaris.utils.types import TargetType
-from lightning import Trainer
+from lightning import Trainer, LightningModule
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
-from astartes import train_test_split
+from fastprop.data import standard_scale, inverse_standard_scale
 from sklearn.metrics import root_mean_squared_error
-import pandas as pd
-import numpy as np
 
-from chemprop.data import MoleculeDatapoint, MoleculeDataset, build_dataloader
-from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
-from chemprop.conf import DEFAULT_HIDDEN_DIM
-from chemprop.nn import (
-    BondMessagePassing,
-    BinaryClassificationFFN,
-    RegressionFFN,
-    UnscaleTransform,
-)
-from chemprop.models import MPNN
-from chemprop.nn.agg import MeanAggregation
-
-from pretrain import MaskedDescriptorsMPNN, WinsorizeStdevN
 
 BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
 
 
+class minimolTaskHead(LightningModule):
+    def __init__(
+        self,
+        task_type: TargetType,
+        learning_rate: float = 0.0003,
+    ):
+        super().__init__()
+        self.task_type = task_type
+        self.learning_rate = learning_rate
+        self.mlp = torch.nn.Sequential(
+            torch.nn.Linear(512, 512),
+            torch.nn.BatchNorm1d(512),
+            torch.nn.ReLU(),
+            torch.nn.Dropout(0.10),
+            torch.nn.Linear(512, 512),
+            torch.nn.BatchNorm1d(512),
+            torch.nn.ReLU(),
+            torch.nn.Dropout(0.10),
+        )
+        _readout_modules = [
+            torch.nn.Linear(1024, 1),
+        ]
+        if task_type == TargetType.CLASSIFICATION:
+            _readout_modules.append(torch.nn.Sigmoid())
+        self.readout = torch.nn.Sequential(*_readout_modules)
+        self.save_hyperparameters()
+
+    def configure_optimizers(self):
+        return {"optimizer": torch.optim.Adam(self.parameters(), lr=self.learning_rate)}
+
+    def forward(self, x):
+        return self.readout(torch.cat((x, self.mlp(x)), dim=1))
+
+    def _step(self, batch, name):
+        x, y = batch
+        y_hat = self(x)
+        if self.task_type == TargetType.CLASSIFICATION:
+            loss = torch.nn.functional.binary_cross_entropy(y_hat, y, reduction="mean")
+        else:
+            loss = torch.nn.functional.mse_loss(y_hat, y, reduction="mean")
+        self.log(f"{name}/loss", loss)
+        return loss
+
+    def training_step(self, batch, batch_idx):
+        return self._step(batch, "train")
+
+    def validation_step(self, batch, batch_idx):
+        return self._step(batch, "validation")
+
+    def test_step(self, batch, batch_idx):
+        return self._step(batch, "test")
+
+    def predict_step(self, batch, batch_idx):
+        return self(batch[0])
+
+
 if __name__ == "__main__":
     try:
         output_dir = Path(sys.argv[1])
-        pretrain_pt = None
-        if len(sys.argv) == 3:
-            pretrain_pt = Path(sys.argv[2])
     except:
-        print("usage: python evaluate.py OUTPUT_DIR [PRETRAIN_PT]")
+        print("usage: python evaluate.py OUTPUT_DIR")
         exit(1)
     if not output_dir.exists():
         output_dir.mkdir()
     output_file = open(output_dir / "train_results.md", "w")
     output_file.write(
-        f"""# ChemProp Baseline Results
+        f"""# `minimol` MLP Results
 timestamp: {datetime.datetime.now()}
+
 """
     )
     performance_dict = {}
@@ -133,77 +174,68 @@ timestamp: {datetime.datetime.now()}
                 train, test = benchmark.get_train_test_split()
                 train_df, test_df = train.as_dataframe(), test.as_dataframe()
                 task_type = benchmark.target_types[target_cols[0]]
+                outname = benchmark_name.split("/")[1]
             else:
                 smiles_col = "smiles"
                 target_cols = ["y"]
                 df = pd.read_csv(f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv")
                 train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
                 task_type = TargetType.REGRESSION
+                outname = benchmark_name
+            targets = train_df[target_cols]
 
+            # task head training
             targets = train_df[target_cols]
             targets = targets.fillna(targets.mean(axis=0)).to_numpy()
+            targets = torch.tensor(targets, dtype=torch.float32)
+            
+            # load the data from parquet and then look up the embeddings using smiles
+            embedding_df = pd.read_parquet(Path("minimol_features") / (outname + ".parquet"))
+            train_desc = torch.tensor(
+               embedding_df[embedding_df.index.isin(train_df[smiles_col])].to_numpy(dtype=np.float32),
+                dtype=torch.float32,
+            )
+            test_desc = torch.tensor(
+                embedding_df[embedding_df.index.isin(test_df[smiles_col])].to_numpy(dtype=np.float32),
+                dtype=torch.float32,
+            )
 
-            # typical chemprop training
-            train_idxs, val_idxs = train_test_split(
-                np.arange(len(targets)),
-                train_size=0.80,
-                test_size=0.20,
-                random_state=random_seed,
-            )
-            train_data = [
-                MoleculeDatapoint.from_smi(smi, y)
-                for smi, y in zip(train_df[smiles_col].iloc[train_idxs], targets[train_idxs])
-            ]
-            val_data = [
-                MoleculeDatapoint.from_smi(smi, y)
-                for smi, y in zip(train_df[smiles_col].iloc[val_idxs], targets[val_idxs])
-            ]
-            test_data = list(map(MoleculeDatapoint.from_smi, test_df[smiles_col]))
-            featurizer = SimpleMoleculeMolGraphFeaturizer()
-            train_dataset = MoleculeDataset(train_data, featurizer)
-            val_dataset = MoleculeDataset(val_data, featurizer)
-            test_dataset = MoleculeDataset(test_data, featurizer)
-            scaler = None
-            if task_type == TargetType.REGRESSION:
-                scaler = train_dataset.normalize_targets()
-                val_dataset.normalize_targets(scaler)
-            train_dataloader = build_dataloader(train_dataset, num_workers=1)
-            val_dataloader = build_dataloader(val_dataset, num_workers=1, shuffle=False)
-            test_dataloader = build_dataloader(
-                test_dataset, num_workers=1, shuffle=False
-            )
-            output_transform = (
-                UnscaleTransform.from_standard_scaler(scaler)
-                if scaler is not None
-                else torch.nn.Identity()
-            )
-            if pretrain_pt is None:
-                mp = BondMessagePassing()
-                agg = MeanAggregation()
-                hidden_size = DEFAULT_HIDDEN_DIM
-            else:
-                pretrained: MaskedDescriptorsMPNN = torch.load(
-                    pretrain_pt, map_location="cpu", weights_only=False
-                )
-                mp = pretrained.message_passing
-                agg = pretrained.agg
-                hidden_size = pretrained.message_passing.output_dim
-            fnn = (
-                RegressionFFN(
-                    output_transform=output_transform,
-                    input_dim=hidden_size,
-                    hidden_dim=256,
-                )
-                if task_type == TargetType.REGRESSION
-                else BinaryClassificationFFN(
-                    output_transform=output_transform,
-                    input_dim=hidden_size,
-                    hidden_dim=256,
-                )
-            )
-            model = MPNN(mp, agg, fnn)
 
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
+            train_idxs, val_idxs = train_test_split(
+                np.arange(train_desc.shape[0]),
+                train_size=0.80,
+                random_state=random_seed,
+            )
+            if task_type == TargetType.REGRESSION:
+                _, target_means, target_vars = standard_scale(targets[train_idxs])
+                targets = standard_scale(targets, target_means, target_vars)
+            train_dataset = torch.utils.data.TensorDataset(
+                train_desc[train_idxs], targets[train_idxs]
+            )
+            validation_dataset = torch.utils.data.TensorDataset(
+                train_desc[val_idxs], targets[val_idxs]
+            )
+            test_dataset = torch.utils.data.TensorDataset(test_desc)
+            train_dataloader = torch.utils.data.DataLoader(
+                train_dataset,
+                num_workers=1,
+                persistent_workers=True,
+                batch_size=64,
+                shuffle=True,
+                drop_last=True,
+            )
+            val_dataloader = torch.utils.data.DataLoader(
+                validation_dataset,
+                num_workers=1,
+                batch_size=64,
+                persistent_workers=True,
+            )
+            test_dataloader = torch.utils.data.DataLoader(
+                test_dataset, num_workers=1, batch_size=64, persistent_workers=True
+            )
+            
+            model = minimolTaskHead(task_type)
             tensorboard_logger = TensorBoardLogger(
                 seed_dir / _subdir,
                 name="tensorboard_logs",
@@ -211,13 +243,13 @@ timestamp: {datetime.datetime.now()}
             )
             callbacks = [
                 EarlyStopping(
-                    monitor="val_loss",
+                    monitor="validation/loss",
                     mode="min",
                     verbose=False,
                     patience=5,
                 ),
                 ModelCheckpoint(
-                    monitor="val_loss",
+                    monitor="validation/loss",
                     save_top_k=2,
                     mode="min",
                     dirpath=seed_dir / _subdir / "checkpoints",
@@ -234,15 +266,14 @@ timestamp: {datetime.datetime.now()}
             trainer.fit(model, train_dataloader, val_dataloader)
             ckpt_path = trainer.checkpoint_callback.best_model_path
             print(f"Reloading best model from checkpoint file: {ckpt_path}")
-            del model, train_dataloader, train_dataset, val_dataloader, val_dataset
-            torch.cuda.empty_cache()
-            model = MPNN.load_from_checkpoint(ckpt_path)
+            model = model.__class__.load_from_checkpoint(ckpt_path, map_location="cpu")
             trainer = Trainer(logger=tensorboard_logger)
-            predictions = (
-                torch.vstack(trainer.predict(model, test_dataloader))
-                .numpy(force=True)
-                .flatten()
-            )
+            predictions = torch.vstack(trainer.predict(model, test_dataloader))
+            if task_type == TargetType.REGRESSION:
+                predictions = inverse_standard_scale(
+                    predictions, target_means, target_vars
+                )
+            predictions = predictions.numpy(force=True).flatten()
 
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
@@ -265,6 +296,7 @@ timestamp: {datetime.datetime.now()}
 {results.to_markdown()}
 
 """)
+            
             performance_dict[benchmark_name] = performance
 
             # free up the disk space
