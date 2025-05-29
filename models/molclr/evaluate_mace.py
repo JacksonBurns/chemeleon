@@ -445,6 +445,7 @@ timestamp: {datetime.datetime.now()}
         np.random.seed(random_seed)
 
         output_file.write(f"## Random Seed {random_seed}\n\n")
+        performance_dict = {}
         seed_dir = output_dir / f"seed_{random_seed}"
         if not seed_dir.exists():
             seed_dir.mkdir(parents=True)
@@ -559,6 +560,24 @@ timestamp: {datetime.datetime.now()}
             output_file.write(f"| overall test rmse  | {test_rmse:.6f} |\n")
             output_file.write(f"| noncliff test rmse | {noncliff_rmse:.6f} |\n")
             output_file.write(f"| cliff test rmse    | {cliff_rmse:.6f} |\n\n\n")
+            
+            # Store performance metrics in dictionary
+            performance = {
+                "cliff": cliff_rmse,
+                "noncliff": noncliff_rmse
+            }
+            performance_dict[benchmark_name] = performance
+
+        # After processing all benchmarks for this seed, write the summary with results_dict
+        output_file.write(
+            f"""
+### Summary
+
+```
+results_dict = {json.dumps(performance_dict, indent=4)}
+```
+"""
+        )
 
     output_file.close()
     print(
