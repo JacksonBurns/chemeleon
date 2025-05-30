@@ -560,12 +560,9 @@ timestamp: {datetime.datetime.now()}
             output_file.write(f"| overall test rmse  | {test_rmse:.6f} |\n")
             output_file.write(f"| noncliff test rmse | {noncliff_rmse:.6f} |\n")
             output_file.write(f"| cliff test rmse    | {cliff_rmse:.6f} |\n\n\n")
-            
+
             # Store performance metrics in dictionary
-            performance = {
-                "cliff": cliff_rmse,
-                "noncliff": noncliff_rmse
-            }
+            performance = {"cliff": cliff_rmse, "noncliff": noncliff_rmse}
             performance_dict[benchmark_name] = performance
 
         # After processing all benchmarks for this seed, write the summary with results_dict
