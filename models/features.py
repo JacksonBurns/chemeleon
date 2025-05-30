@@ -93,18 +93,18 @@ if __name__ == "__main__":
     print(f"Number of rows per chunk: {chunk_rows}")
 
     # Create the dataset with compression and concurrency settings
-    # z = zarr.create_array(
-    #     store=out_file,
-    #     shape=shape,
-    #     chunks=chunk_shape,
-    #     dtype=dtype,
-    #     compressors=None,  # disable compression
-    #     fill_value=np.nan,
-    # )
+    z = zarr.create_array(
+        store=out_file,
+        shape=shape,
+        chunks=chunk_shape,
+        dtype=dtype,
+        compressors=None,  # disable compression
+        fill_value=np.nan,
+    )
     z = zarr.open_array(out_file)
 
-    # restarting from previous - otherwise start at i = 0
-    i = 7_680_096
+    # restarting from previous
+    i = 0
     with tqdm(total=n_mols, desc="Calculating features") as pbar:
         while i < n_mols:
             mols = list(
