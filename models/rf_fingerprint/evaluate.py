@@ -20,7 +20,7 @@ import pandas as pd
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
+BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
 
 if __name__ == "__main__":
@@ -104,7 +104,9 @@ timestamp: {datetime.datetime.now()}
     for random_seed in (42, 117, 709, 1701, 9001):
         output_file.write(f"## Random Seed {random_seed}\n")
         seed_dir = output_dir / f"seed_{random_seed}"
-        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
+        for benchmark_name in (
+            polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks
+        ):
             if BENCHMARK_SET == "polaris":
                 # load the benchmarking data
                 benchmark = po.load_benchmark(benchmark_name)
@@ -120,8 +122,13 @@ timestamp: {datetime.datetime.now()}
                 train_smiles = train_df[smiles_col]
                 test_smiles = test_df[smiles_col]
             else:
-                df = pd.read_csv(f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv")
-                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
+                df = pd.read_csv(
+                    f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
+                )
+                train_df, test_df = (
+                    df[df["split"] == "train"],
+                    df[df["split"] == "test"],
+                )
 
                 # extract metadata, targets, and inputs
                 task_type = TargetType.REGRESSION
@@ -150,27 +157,56 @@ timestamp: {datetime.datetime.now()}
             if task_type == TargetType.CLASSIFICATION:
                 predictions = pipe.predict_proba(test_smiles)[:, 1].flatten()
                 results = benchmark.evaluate(predictions > 0.5, predictions).results
-                performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                performance = results.query(
+                    f"Metric == '{benchmark.main_metric.label}'"
+                )["Score"].values[0]
             elif task_type == TargetType.REGRESSION:
                 predictions = pipe.predict(test_smiles).flatten()
                 # if len(target_cols) > 1:  # if there were multitask
                 #     predictions = {t: predictions[:, i] for i, t in enumerate(target_cols)}
                 if BENCHMARK_SET == "polaris":
                     results = benchmark.evaluate(predictions).results
-                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                    performance = results.query(
+                        f"Metric == '{benchmark.main_metric.label}'"
+                    )["Score"].values[0]
                 else:
-                    results = pd.DataFrame.from_records([
-                        dict(metric="overall test rmse", value=root_mean_squared_error(predictions, test_df["y"])),
-                        dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
-                        dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
-                    ], index="metric")
-                    performance = {"cliff": results.at["cliff test rmse", "value"], "noncliff": results.at["noncliff test rmse", "value"]}
-            output_file.write(f"""
+                    results = pd.DataFrame.from_records(
+                        [
+                            dict(
+                                metric="overall test rmse",
+                                value=root_mean_squared_error(
+                                    predictions, test_df["y"]
+                                ),
+                            ),
+                            dict(
+                                metric="noncliff test rmse",
+                                value=root_mean_squared_error(
+                                    predictions[test_df["cliff_mol"] == 0],
+                                    test_df[test_df["cliff_mol"] == 0]["y"],
+                                ),
+                            ),
+                            dict(
+                                metric="cliff test rmse",
+                                value=root_mean_squared_error(
+                                    predictions[test_df["cliff_mol"] == 1],
+                                    test_df[test_df["cliff_mol"] == 1]["y"],
+                                ),
+                            ),
+                        ],
+                        index="metric",
+                    )
+                    performance = {
+                        "cliff": results.at["cliff test rmse", "value"],
+                        "noncliff": results.at["noncliff test rmse", "value"],
+                    }
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.to_markdown()}
 
-""")
+"""
+            )
             performance_dict[benchmark_name] = performance
 
         output_file.write(

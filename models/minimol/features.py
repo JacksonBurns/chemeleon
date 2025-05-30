@@ -81,11 +81,15 @@ if __name__ == "__main__":
             outname = benchmark_name.split("/")[1]
         else:
             smiles_col = "smiles"
-            df = pd.read_csv(f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv")
+            df = pd.read_csv(
+                f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
+            )
             smiles = df["smiles"].to_list()
             outname = benchmark_name
         # calculate the features with model(smiles) -> may need to batch, or just run individually?
         features = [t.tolist() for t in model(smiles)]
         # save df of SMILES and features into a df, write to parquet
-        df = pd.DataFrame(data=features, columns=[f'feature_{i}' for i in range(512)], index=smiles)
+        df = pd.DataFrame(
+            data=features, columns=[f"feature_{i}" for i in range(512)], index=smiles
+        )
         df.to_parquet(outdir / (outname + ".parquet"))
