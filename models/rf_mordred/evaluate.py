@@ -21,7 +21,7 @@ from sklearn.metrics import root_mean_squared_error
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
+BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
 
 # Initialize the Mordred calculator once for efficiency
@@ -111,8 +111,10 @@ timestamp: {datetime.datetime.now()}
         seed_dir = output_dir / f"seed_{random_seed}"
         if not seed_dir.exists():
             seed_dir.mkdir()
-        
-        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
+
+        for benchmark_name in (
+            polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks
+        ):
             if BENCHMARK_SET == "polaris":
                 # load the benchmarking data
                 benchmark = po.load_benchmark(benchmark_name)
@@ -128,8 +130,13 @@ timestamp: {datetime.datetime.now()}
                 train_smiles = train_df[smiles_col]
                 test_smiles = test_df[smiles_col]
             else:
-                df = pd.read_csv(f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv")
-                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
+                df = pd.read_csv(
+                    f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
+                )
+                train_df, test_df = (
+                    df[df["split"] == "train"],
+                    df[df["split"] == "test"],
+                )
 
                 # extract metadata, targets, and inputs
                 task_type = TargetType.REGRESSION
@@ -140,75 +147,132 @@ timestamp: {datetime.datetime.now()}
             # Convert molecules to descriptors first, matching how the MLP script processes data
             train_mols = list(map(MolFromSmiles, train_smiles))
             test_mols = list(map(MolFromSmiles, test_smiles))
-            
+
             # Set molecule names to empty strings as in the MLP script
             for mol in train_mols:
                 mol.SetProp("_Name", "")
             for mol in test_mols:
                 mol.SetProp("_Name", "")
-            
+
             # Calculate descriptors using the global calculator
-            train_desc = descriptor_calculator.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32)
-            test_desc = descriptor_calculator.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32)
-            
+            train_desc = (
+                descriptor_calculator.pandas(train_mols)
+                .fill_missing()
+                .to_numpy(dtype=np.float32)
+            )
+            test_desc = (
+                descriptor_calculator.pandas(test_mols)
+                .fill_missing()
+                .to_numpy(dtype=np.float32)
+            )
+
             # Convert to torch tensors for use with standard_scale
             train_desc_tensor = torch.tensor(train_desc, dtype=torch.float32)
             targets_tensor = torch.tensor(targets, dtype=torch.float32).reshape(-1, 1)
-            
+
             # Scale features and targets as in the MLP script
             if task_type == TargetType.REGRESSION:
                 _, target_means, target_vars = standard_scale(targets_tensor)
-                targets_scaled = standard_scale(targets_tensor, target_means, target_vars).numpy().ravel()
+                targets_scaled = (
+                    standard_scale(targets_tensor, target_means, target_vars)
+                    .numpy()
+                    .ravel()
+                )
                 targets = targets_scaled
-                
+
             # Feature scaling - exactly as in the MLP script with clamping as in RescalingEncoder
             _, feature_means, feature_vars = standard_scale(train_desc_tensor)
-            train_desc = standard_scale(train_desc_tensor, feature_means, feature_vars).clamp(min=-6, max=6).numpy()
+            train_desc = (
+                standard_scale(train_desc_tensor, feature_means, feature_vars)
+                .clamp(min=-6, max=6)
+                .numpy()
+            )
             test_desc_tensor = torch.tensor(test_desc, dtype=torch.float32)
-            test_desc = standard_scale(test_desc_tensor, feature_means, feature_vars).clamp(min=-6, max=6).numpy()
-            
+            test_desc = (
+                standard_scale(test_desc_tensor, feature_means, feature_vars)
+                .clamp(min=-6, max=6)
+                .numpy()
+            )
+
             # Create and train model
             if task_type == TargetType.REGRESSION:
                 model = RandomForestRegressor(random_state=random_seed)
             else:
                 model = RandomForestClassifier(random_state=random_seed)
-            
+
             # Train model directly on the descriptors
             model.fit(train_desc, targets)
 
             # generate predictions and evaluate performance
             print(f"Evaluating benchmark: {benchmark_name}")
-            
+
             if task_type == TargetType.CLASSIFICATION:
                 # Get probability predictions for classification tasks
                 predictions = model.predict_proba(test_desc)[:, 1].flatten()
                 results = benchmark.evaluate(predictions > 0.5, predictions).results
-                performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                performance = results.query(
+                    f"Metric == '{benchmark.main_metric.label}'"
+                )["Score"].values[0]
             elif task_type == TargetType.REGRESSION:
                 # Get value predictions for regression tasks
                 predictions = model.predict(test_desc).flatten()
                 # Inverse transform the predictions using the same scaling approach as in the MLP script
-                predictions_tensor = torch.tensor(predictions, dtype=torch.float32).reshape(-1, 1)
-                predictions = inverse_standard_scale(predictions_tensor, target_means, target_vars).numpy().ravel()
-                
+                predictions_tensor = torch.tensor(
+                    predictions, dtype=torch.float32
+                ).reshape(-1, 1)
+                predictions = (
+                    inverse_standard_scale(
+                        predictions_tensor, target_means, target_vars
+                    )
+                    .numpy()
+                    .ravel()
+                )
+
                 if BENCHMARK_SET == "polaris":
                     results = benchmark.evaluate(predictions).results
-                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                    performance = results.query(
+                        f"Metric == '{benchmark.main_metric.label}'"
+                    )["Score"].values[0]
                 else:
                     # MoleculeACE evaluation metrics
-                    results = pd.DataFrame.from_records([
-                        dict(metric="overall test rmse", value=root_mean_squared_error(predictions, test_df["y"])),
-                        dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
-                        dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
-                    ], index="metric")
-                    performance = {"cliff": results.at["cliff test rmse", "value"], "noncliff": results.at["noncliff test rmse", "value"]}
-            
-            output_file.write(f"""
+                    results = pd.DataFrame.from_records(
+                        [
+                            dict(
+                                metric="overall test rmse",
+                                value=root_mean_squared_error(
+                                    predictions, test_df["y"]
+                                ),
+                            ),
+                            dict(
+                                metric="noncliff test rmse",
+                                value=root_mean_squared_error(
+                                    predictions[test_df["cliff_mol"] == 0],
+                                    test_df[test_df["cliff_mol"] == 0]["y"],
+                                ),
+                            ),
+                            dict(
+                                metric="cliff test rmse",
+                                value=root_mean_squared_error(
+                                    predictions[test_df["cliff_mol"] == 1],
+                                    test_df[test_df["cliff_mol"] == 1]["y"],
+                                ),
+                            ),
+                        ],
+                        index="metric",
+                    )
+                    performance = {
+                        "cliff": results.at["cliff test rmse", "value"],
+                        "noncliff": results.at["noncliff test rmse", "value"],
+                    }
+
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.to_markdown()}
 
-""")
+"""
+            )
             performance_dict[benchmark_name] = performance
 
         output_file.write(

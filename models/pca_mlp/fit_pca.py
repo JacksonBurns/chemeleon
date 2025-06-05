@@ -117,7 +117,9 @@ if __name__ == "__main__":
     for batch in tqdm(dataloader):
         # Standardize the batch using precomputed statistics
         # standard_scale will handle NaN values automatically
-        batch_std = standard_scale(batch, feature_means, feature_vars).clamp(min=-6, max=6)
+        batch_std = standard_scale(batch, feature_means, feature_vars).clamp(
+            min=-6, max=6
+        )
         all_data.append(batch_std.cpu().numpy())
 
     # Concatenate all batches

@@ -27,7 +27,7 @@ from fastprop.data import standard_scale, inverse_standard_scale
 from sklearn.decomposition import PCA
 from sklearn.metrics import root_mean_squared_error
 
-BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
+BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
 
 
@@ -61,7 +61,7 @@ class PCAMLP(LightningModule):
         for i in range(len(hidden_sizes)):
             modules.append(
                 torch.nn.Linear(
-                    input_dim if i == 0 else hidden_sizes[i-1], hidden_sizes[i]
+                    input_dim if i == 0 else hidden_sizes[i - 1], hidden_sizes[i]
                 )
             )
             modules.append(torch.nn.ReLU())
@@ -83,7 +83,9 @@ class PCAMLP(LightningModule):
 
     def forward(self, descriptors):
         # Apply standardization
-        x = standard_scale(descriptors, self.feature_means, self.feature_vars).clamp(min=-6, max=6)
+        x = standard_scale(descriptors, self.feature_means, self.feature_vars).clamp(
+            min=-6, max=6
+        )
 
         # Apply PCA if available
         if self.pca is not None:
@@ -242,7 +244,7 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         "tdcommons/ames",
         "tdcommons/ld50-zhu",
     )
-    
+
     moleculeace_benchmarks = (
         "CHEMBL1862_Ki",
         "CHEMBL1871_Ki",
@@ -282,7 +284,9 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
     # Process benchmarks and define global PCA models outside the random seed loop
     if args.pca_method == "on-the-fly":
         global_pca_models = {}
-        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
+        for benchmark_name in (
+            polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks
+        ):
             # Load the benchmarking data first to fit PCA on entire dataset
             if BENCHMARK_SET == "polaris":
                 benchmark = po.load_benchmark(benchmark_name)
@@ -294,7 +298,10 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                 df = pd.read_csv(
                     f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
                 )
-                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
+                train_df, test_df = (
+                    df[df["split"] == "train"],
+                    df[df["split"] == "test"],
+                )
 
             # Process all molecules from both train and test
             all_smiles = pd.concat(
@@ -358,7 +365,9 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
     for random_seed in (42, 117, 709, 1701, 9001):
         output_file.write(f"## Random Seed {random_seed}\n")
         seed_dir = output_dir / f"seed_{random_seed}"
-        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
+        for benchmark_name in (
+            polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks
+        ):
             # load the benchmarking data
             if BENCHMARK_SET == "polaris":
                 benchmark = po.load_benchmark(benchmark_name)
@@ -373,7 +382,10 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                 df = pd.read_csv(
                     f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
                 )
-                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
+                train_df, test_df = (
+                    df[df["split"] == "train"],
+                    df[df["split"] == "test"],
+                )
                 task_type = TargetType.REGRESSION
 
             # extract metadata, targets, and inputs
@@ -551,26 +563,53 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             if BENCHMARK_SET == "polaris":
                 if task_type == TargetType.CLASSIFICATION:
                     results = benchmark.evaluate(predictions > 0.5, predictions).results
-                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                    performance = results.query(
+                        f"Metric == '{benchmark.main_metric.label}'"
+                    )["Score"].values[0]
                 else:
                     results = benchmark.evaluate(predictions).results
-                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                    performance = results.query(
+                        f"Metric == '{benchmark.main_metric.label}'"
+                    )["Score"].values[0]
             else:
                 # For MoleculeACE benchmarks, use the same format as in descriptor_mlp/evaluate.py
-                results = pd.DataFrame.from_records([
-                    dict(metric="overall test rmse", value=root_mean_squared_error(predictions, test_df["y"])),
-                    dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
-                    dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
-                ], index="metric")
-                performance = {"cliff": results.at["cliff test rmse", "value"], "noncliff": results.at["noncliff test rmse", "value"]}
+                results = pd.DataFrame.from_records(
+                    [
+                        dict(
+                            metric="overall test rmse",
+                            value=root_mean_squared_error(predictions, test_df["y"]),
+                        ),
+                        dict(
+                            metric="noncliff test rmse",
+                            value=root_mean_squared_error(
+                                predictions[test_df["cliff_mol"] == 0],
+                                test_df[test_df["cliff_mol"] == 0]["y"],
+                            ),
+                        ),
+                        dict(
+                            metric="cliff test rmse",
+                            value=root_mean_squared_error(
+                                predictions[test_df["cliff_mol"] == 1],
+                                test_df[test_df["cliff_mol"] == 1]["y"],
+                            ),
+                        ),
+                    ],
+                    index="metric",
+                )
+                performance = {
+                    "cliff": results.at["cliff test rmse", "value"],
+                    "noncliff": results.at["noncliff test rmse", "value"],
+                }
 
             # Write results
-            output_file.write(f"""
+            output_file.write(
+                f"""
 ### `{benchmark_name}`
 
 {results.to_markdown()}
 
-""")
+"""
+            )
             performance_dict[benchmark_name] = performance
 
         output_file.write(
