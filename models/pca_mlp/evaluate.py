@@ -25,6 +25,10 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 from fastprop.data import standard_scale, inverse_standard_scale
 from sklearn.decomposition import PCA
+from sklearn.metrics import root_mean_squared_error
+
+BENCHMARK_SET = os.getenv('BENCHMARK_SET', "polaris")
+print(f"Running benchmark set {BENCHMARK_SET}")
 
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -57,7 +61,7 @@ class PCAMLP(LightningModule):
         for i in range(len(hidden_sizes)):
             modules.append(
                 torch.nn.Linear(
-                    input_dim if i == 0 else hidden_sizes[i], hidden_sizes[i]
+                    input_dim if i == 0 else hidden_sizes[i-1], hidden_sizes[i]
                 )
             )
             modules.append(torch.nn.ReLU())
@@ -79,7 +83,7 @@ class PCAMLP(LightningModule):
 
     def forward(self, descriptors):
         # Apply standardization
-        x = standard_scale(descriptors, self.feature_means, self.feature_vars)
+        x = standard_scale(descriptors, self.feature_means, self.feature_vars).clamp(min=-6, max=6)
 
         # Apply PCA if available
         if self.pca is not None:
@@ -171,7 +175,7 @@ if __name__ == "__main__":
 
     # Determine title based on PCA method
     if args.pca_method == "none":
-        title = "Direct MLP on Descriptors Results"
+        title = "Descriptor MLP Results"
     elif args.pca_method == "on-the-fly":
         title = f"MLP on PCA-reduced Descriptors (On-the-fly, {args.explained_variance*100:.1f}% variance) Results"
     else:  # pretrained
@@ -207,8 +211,8 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         except Exception as e:
             raise RuntimeError(f"Failed to load pretrained PCA model: {e}")
 
-    # Define benchmarks list - moved up before it's used
-    polaris_benchmarks = [
+    # Define benchmarks lists
+    polaris_benchmarks = (
         "polaris/pkis2-ret-wt-cls-v2",
         "polaris/pkis2-ret-wt-reg-v2",
         "polaris/pkis2-kit-wt-cls-v2",
@@ -237,7 +241,40 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
         "tdcommons/bbb-martins",
         "tdcommons/ames",
         "tdcommons/ld50-zhu",
-    ]
+    )
+    
+    moleculeace_benchmarks = (
+        "CHEMBL1862_Ki",
+        "CHEMBL1871_Ki",
+        "CHEMBL2034_Ki",
+        "CHEMBL2047_EC50",
+        "CHEMBL204_Ki",
+        "CHEMBL2147_Ki",
+        "CHEMBL214_Ki",
+        "CHEMBL218_EC50",
+        "CHEMBL219_Ki",
+        "CHEMBL228_Ki",
+        "CHEMBL231_Ki",
+        "CHEMBL233_Ki",
+        "CHEMBL234_Ki",
+        "CHEMBL235_EC50",
+        "CHEMBL236_Ki",
+        "CHEMBL237_EC50",
+        "CHEMBL237_Ki",
+        "CHEMBL238_Ki",
+        "CHEMBL239_EC50",
+        "CHEMBL244_Ki",
+        "CHEMBL262_Ki",
+        "CHEMBL264_Ki",
+        "CHEMBL2835_Ki",
+        "CHEMBL287_Ki",
+        "CHEMBL2971_Ki",
+        "CHEMBL3979_EC50",
+        "CHEMBL4005_Ki",
+        "CHEMBL4203_Ki",
+        "CHEMBL4616_EC50",
+        "CHEMBL4792_Ki",
+    )
 
     calc = Calculator(descriptors, ignore_3D=True)
     calc.config(timeout=1)
@@ -245,12 +282,19 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
     # Process benchmarks and define global PCA models outside the random seed loop
     if args.pca_method == "on-the-fly":
         global_pca_models = {}
-        for benchmark_name in polaris_benchmarks:
+        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
             # Load the benchmarking data first to fit PCA on entire dataset
-            benchmark = po.load_benchmark(benchmark_name)
-            smiles_col = list(benchmark.input_cols)[0]
-            train, test = benchmark.get_train_test_split()
-            train_df, test_df = train.as_dataframe(), test.as_dataframe()
+            if BENCHMARK_SET == "polaris":
+                benchmark = po.load_benchmark(benchmark_name)
+                smiles_col = list(benchmark.input_cols)[0]
+                train, test = benchmark.get_train_test_split()
+                train_df, test_df = train.as_dataframe(), test.as_dataframe()
+            else:
+                smiles_col = "smiles"
+                df = pd.read_csv(
+                    f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
+                )
+                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
 
             # Process all molecules from both train and test
             all_smiles = pd.concat(
@@ -280,6 +324,8 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             try:
                 pca_model = PCA(n_components=pca_components, svd_solver="full")
                 global_desc_std_np = global_desc_std.cpu().numpy()
+                # Apply clamp before PCA fit, like in the forward() method
+                global_desc_std_np = np.clip(global_desc_std_np, -6, 6)
                 pca_model.fit(global_desc_std_np)
 
                 # Get the number of components that explain the requested variance
@@ -312,16 +358,25 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
     for random_seed in (42, 117, 709, 1701, 9001):
         output_file.write(f"## Random Seed {random_seed}\n")
         seed_dir = output_dir / f"seed_{random_seed}"
-        for benchmark_name in polaris_benchmarks:
+        for benchmark_name in (polaris_benchmarks if BENCHMARK_SET == "polaris" else moleculeace_benchmarks):
             # load the benchmarking data
-            benchmark = po.load_benchmark(benchmark_name)
-            smiles_col = list(benchmark.input_cols)[0]
-            target_cols = list(benchmark.target_cols)
-            train, test = benchmark.get_train_test_split()
-            train_df, test_df = train.as_dataframe(), test.as_dataframe()
+            if BENCHMARK_SET == "polaris":
+                benchmark = po.load_benchmark(benchmark_name)
+                smiles_col = list(benchmark.input_cols)[0]
+                target_cols = list(benchmark.target_cols)
+                train, test = benchmark.get_train_test_split()
+                train_df, test_df = train.as_dataframe(), test.as_dataframe()
+                task_type = benchmark.target_types[target_cols[0]]
+            else:
+                smiles_col = "smiles"
+                target_cols = ["y"]
+                df = pd.read_csv(
+                    f"https://raw.githubusercontent.com/molML/MoleculeACE/7e6de0bd2968c56589c580f2a397f01c531ede26/MoleculeACE/Data/benchmark_data/{benchmark_name}.csv"
+                )
+                train_df, test_df = df[df["split"] == "train"], df[df["split"] == "test"]
+                task_type = TargetType.REGRESSION
 
             # extract metadata, targets, and inputs
-            task_type = benchmark.target_types[target_cols[0]]
             targets = train_df[target_cols]
             targets = targets.fillna(targets.mean(axis=0)).to_numpy()
             targets = torch.tensor(targets, dtype=torch.float32)
@@ -459,7 +514,6 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                     check_val_every_n_epoch=1,
                     callbacks=callbacks,
                     accelerator="cpu",
-                    # Don't specify devices for CPU, use default
                 )
 
             trainer.fit(model, train_dataloader, val_dataloader)
@@ -482,7 +536,6 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
                 trainer = Trainer(
                     logger=tensorboard_logger,
                     accelerator="cpu",
-                    # Don't specify devices for CPU
                 )
             predictions = torch.vstack(trainer.predict(model, test_dataloader))
 
@@ -495,28 +548,30 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             predictions = predictions.numpy(force=True).flatten()
 
             # Evaluate the model
-            if task_type == TargetType.CLASSIFICATION:
-                results = benchmark.evaluate(predictions > 0.5, predictions)
-            elif task_type == TargetType.REGRESSION:
-                results = benchmark.evaluate(predictions)
+            if BENCHMARK_SET == "polaris":
+                if task_type == TargetType.CLASSIFICATION:
+                    results = benchmark.evaluate(predictions > 0.5, predictions).results
+                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+                else:
+                    results = benchmark.evaluate(predictions).results
+                    performance = results.query(f"Metric == '{benchmark.main_metric.label}'")['Score'].values[0]
+            else:
+                # For MoleculeACE benchmarks, use the same format as in descriptor_mlp/evaluate.py
+                results = pd.DataFrame.from_records([
+                    dict(metric="overall test rmse", value=root_mean_squared_error(predictions, test_df["y"])),
+                    dict(metric="noncliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 0], test_df[test_df["cliff_mol"] == 0]["y"])),
+                    dict(metric="cliff test rmse", value=root_mean_squared_error(predictions[test_df["cliff_mol"] == 1], test_df[test_df["cliff_mol"] == 1]["y"])),
+                ], index="metric")
+                performance = {"cliff": results.at["cliff test rmse", "value"], "noncliff": results.at["noncliff test rmse", "value"]}
 
             # Write results
-            output_file.write(
-                f"""
+            output_file.write(f"""
 ### `{benchmark_name}`
 
-{results.results.to_markdown()}
+{results.to_markdown()}
 
-"""
-            )
-            performance = results.results.query(
-                f"Metric == '{benchmark.main_metric.label}'"
-            )["Score"].values[0]
+""")
             performance_dict[benchmark_name] = performance
-
-            # Free memory
-            del model, test_dataloader, test_dataset
-            torch.cuda.empty_cache()
 
         output_file.write(
             f"""
