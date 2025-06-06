@@ -41,3 +41,10 @@ BENCHMARK_SET=polaris python evaluate.py output/direct_polaris --gpu --pca-metho
 python fit_pca.py /path/to/training_data.zarr  prefitted_pca_model.pt
 BENCHMARK_SET=moleculeace python evaluate.py output/direct_moleculeace --gpu --pca-method pretrained --pca-model-path prefitted_pca_model.pt
 BENCHMARK_SET=polaris python evaluate.py output/direct_polaris --gpu --pca-method pretrained --pca-model-path prefitted_pca_model.pt
+
+cd ../molclr
+mkdir -p output
+python evaluate_moleculeace.py output/moleculeace
+python create_benchmark_csv.py
+python train_models_polaris.py output/polaris_training
+python evaluate_polaris.py output/polaris_evaluation
