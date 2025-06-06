@@ -112,7 +112,7 @@ git clone https://github.com/yuyangw/MolCLR.git
 cd MolCLR
 ```
 
-**Note**
+**Note:**
 
 Due to the Python version mismatch, the full pipeline is split across three stages:
 
