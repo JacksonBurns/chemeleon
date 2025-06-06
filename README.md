@@ -92,7 +92,7 @@ pip install 'scipy==1.12.*'
 
 ### MolCLR
 
-[MolCLR](https://github.com/yuyangw/MolCLR) has a distinct set of dependencies that must be installed in a separate environment. It specifically requires Python 3.7, which is incompatible with the Python ≥3.10 requirement of the Polaris benchmark suite (See the note below).
+MolCLR has a distinct set of dependencies that must be installed in a separate environment. It specifically requires Python 3.7, which is incompatible with the Python ≥3.10 requirement of the Polaris benchmark suite (See the note below).
 
 ```bash
 # Create a Python 3.7 conda environment
