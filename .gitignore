@@ -2,6 +2,9 @@ __pycache__
 *.zarr
 *.smiles
 output
+output_mace
+finetune_outputs
+polaris_benchmarks
 *.pt
 screen.log
 *.ckpt
