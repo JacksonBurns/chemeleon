@@ -112,9 +112,7 @@ git clone https://github.com/yuyangw/MolCLR.git
 cd MolCLR
 ```
 
-**Note:**
-
-Due to the Python version mismatch, the full pipeline is split across three stages:
+**Note:** Due to the Python version mismatch, the full pipeline is split across three stages:
 
 1. **Benchmark Preparation** (Python ≥3.10):  
    Run `create_benchmark_csv.py` to convert Polaris datasets into train/test CSVs and save accompanying metadata.
