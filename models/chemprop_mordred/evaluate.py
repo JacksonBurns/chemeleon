@@ -1,6 +1,9 @@
 """
 fit a chemprop model directly on the smiles, with additional Mordred descriptors as molecule features
 
+This version includes clamping of descriptor values to ±6 standard deviations after scaling
+to handle extreme outliers and prevent numerical instability.
+
 note that polaris requires zarr<3 but the feature generator requires
 zarr>=3 so two separate python environments are needed
 """
@@ -209,6 +212,10 @@ timestamp: {datetime.datetime.now()}
             descriptor_scaler = train_dataset.normalize_inputs("X_d")
             val_dataset.normalize_inputs("X_d", descriptor_scaler)
             
+            # Clamp descriptor values to ±6 standard deviations to handle extreme outliers
+            train_dataset.X_d = np.clip(train_dataset.X_d, -6.0, 6.0)
+            val_dataset.X_d = np.clip(val_dataset.X_d, -6.0, 6.0)
+            
             train_dataloader = build_dataloader(train_dataset, num_workers=1)
             val_dataloader = build_dataloader(val_dataset, num_workers=1, shuffle=False)
             test_dataloader = build_dataloader(
@@ -220,7 +227,19 @@ timestamp: {datetime.datetime.now()}
                 else torch.nn.Identity()
             )
             # Create transform for extra datapoint descriptors (Mordred descriptors)
-            X_d_transform = ScaleTransform.from_standard_scaler(descriptor_scaler)
+            # This combines scaling with clamping to handle extreme outliers during inference
+            class ScaleAndClampTransform(torch.nn.Module):
+                def __init__(self, scaler, clamp_min=-6.0, clamp_max=6.0):
+                    super().__init__()
+                    self.scale_transform = ScaleTransform.from_standard_scaler(scaler)
+                    self.clamp_min = clamp_min
+                    self.clamp_max = clamp_max
+                
+                def forward(self, x):
+                    x = self.scale_transform(x)
+                    return torch.clamp(x, self.clamp_min, self.clamp_max)
+            
+            X_d_transform = ScaleAndClampTransform(descriptor_scaler)
             
             # Training from scratch (no pretraining)
             mp = BondMessagePassing()
@@ -235,13 +254,13 @@ timestamp: {datetime.datetime.now()}
                 RegressionFFN(
                     output_transform=output_transform,
                     input_dim=ffn_input_dim,
-                    hidden_dim=1_800,
+                    hidden_dim=hidden_size,
                 )
                 if task_type == TargetType.REGRESSION
                 else BinaryClassificationFFN(
                     output_transform=output_transform,
                     input_dim=ffn_input_dim,
-                    hidden_dim=1_800,
+                    hidden_dim=hidden_size,
                 )
             )
             model = MPNN(mp, agg, fnn, X_d_transform=X_d_transform)
