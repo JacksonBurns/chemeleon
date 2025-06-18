@@ -38,9 +38,9 @@ cd ../pca_mlp
 mkdir -p output
 BENCHMARK_SET=moleculeace python evaluate.py output/direct_moleculeace --gpu --pca-method on-the-fly --explained-variance 0.95
 BENCHMARK_SET=polaris python evaluate.py output/direct_polaris --gpu --pca-method on-the-fly --explained-variance 0.95
-python fit_pca.py /path/to/training_data.zarr  prefitted_pca_model.pt
-BENCHMARK_SET=moleculeace python evaluate.py output/direct_moleculeace --gpu --pca-method pretrained --pca-model-path prefitted_pca_model.pt
-BENCHMARK_SET=polaris python evaluate.py output/direct_polaris --gpu --pca-method pretrained --pca-model-path prefitted_pca_model.pt
+python fit_pca.py pubchem_1MM.zarr  prefitted_pca_model.pt
+BENCHMARK_SET=moleculeace python evaluate.py output/pretrained_moleculeace --gpu --pca-method pretrained --pca-model-path prefitted_pca_model.pt
+BENCHMARK_SET=polaris python evaluate.py output/pretrained_polaris --gpu --pca-method pretrained --pca-model-path prefitted_pca_model.pt
 
 cd ../molclr
 mkdir -p output
