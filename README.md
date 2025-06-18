@@ -4,7 +4,7 @@
 
 Supporting code for "Descriptor-based Foundation Models for Molecular Property Prediction".
 
-To finetune your own models using `CheMeleon` simply install [ChemProp 2.2.0 or newer](https://chemprop.readthedocs.io/en/latest/installation.html) (i.e. `pip install 'chemprop>=2.2.0'`) and use the `--from-pretrained CheMeleon` flag in the Command Line Interface.
+To finetune your own models using `CheMeleon` simply install [ChemProp 2.2.0 or newer](https://chemprop.readthedocs.io/en/latest/installation.html) (i.e. `pip install 'chemprop>=2.2.0'`) and use the `--from-foundation CheMeleon` flag in the Command Line Interface.
 To finetune models from a Python script, see [`finetuning_demo.ipynb`](./finetuning_demo.ipynb).
 
 The code in this repository is primarily intended to aid in reproducing the results of the original study, but it may also be used to train other foundation models or finetune on new targets.
@@ -89,6 +89,39 @@ pip install minimol 'torch==2.6.0' 'numpy<2' 'scipy==1.12.*' # force minimol to 
 pip install polaris-lib
 pip install 'scipy==1.12.*'
 ```
+
+### MolCLR
+
+MolCLR has a distinct set of dependencies that must be installed in a separate environment. It specifically requires Python 3.7, which is incompatible with the Python ≥3.10 requirement of the Polaris benchmark suite (See the note below).
+
+```bash
+# Create a Python 3.7 conda environment
+conda create --name molclr python=3.7
+conda activate molclr
+
+# Install PyTorch and PyTorch Geometric (CUDA 11.0)
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch-geometric==1.6.3 torch-sparse==0.6.9 torch-scatter==2.0.6 -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html
+
+# Additional dependencies
+pip install PyYAML
+conda install -c conda-forge rdkit=2020.09.1.0 tensorboard nvidia-apex
+
+# Clone the MolCLR repository
+git clone https://github.com/yuyangw/MolCLR.git
+cd MolCLR
+```
+
+**Note:** Due to the Python version mismatch, the full pipeline is split across three stages:
+
+1. **Benchmark Preparation** (Python ≥3.10):  
+   Run `create_benchmark_csv.py` to convert Polaris datasets into train/test CSVs and save accompanying metadata.
+
+2. **MolCLR Training** (Python 3.7):  
+   Use `train_models_polaris.py` inside the `molclr` environment to train models and generate test predictions.
+
+3. **Evaluation** (Python ≥3.10):  
+   Execute `evaluate_polaris.py` to compute final evaluation metrics and summarize the results in a markdown report.
 
 ### Exact Versions
 
@@ -585,25 +618,25 @@ zarr==2.18.3
 Every notebook in this repository can be executed by running all cells from the top within the appropriate environment.
 Python scripts which take command line arguments to specify inputs and outputs will print their usage upon running `python <script_name>.py`.
 
-Recreating the results of the original study requries significant computational resources.
+Recreating the results of the original study requires significant computational resources.
 Feature calculation for 1MM SMILES from PubChem took roughly 500 CPU hours.
 Pretraining of the MLP-PLR took roughly 500 GPU hours and pretraining the `CheMeleon` model took about 1,000 GPU hours.
-Finetuning a single `CheMeleon`-based model requires <<1 GPU hour, though running all finetuning for all models and all repeitions will take around 100 GPU hours.
+Finetuning a single `CheMeleon`-based model requires <<1 GPU hour, though running all finetuning for all models and all repetitions will take around 100 GPU hours.
 
-Storage of all preatrining and finetuning model checkpoints requries 1+ terabytes of storage - for this reason, intermediate training checkpoints and finetuned models are _not_ retained during finetuning for this study.
+Storage of all pretraining and finetuning model checkpoints requires 1+ terabytes of storage - for this reason, intermediate training checkpoints and finetuned models are _not_ retained during finetuning for this study.
 This can be easily modified in the provided scripts to facilitate actual deployment and reuse of the finetuned models.
 Storage of pretraining features requires ~40 GB of disk space.
 
 ### `analysis`
 
-This directory contains Jupyter notebooks which perform the anslysis of modeling results as shown in the original study.
+This directory contains Jupyter notebooks which perform the analysis of modeling results as shown in the original study.
 These may be run in VSCode or with whatever notebook application you prefer.
 The input data needed to generate the results is saved in the corresponding `_results` subdirectory.
 The outputs from running the notebooks, including both the generated figures and the collated results, and shown in the `cliffs` and `hsd` subdirectories.
 
 ### `models`
 
-Within this directory there are subdictories for each of the models tested in the original study.
+Within this directory there are subdirectories for each of the models tested in the original study.
 Each subdirectory contains, at minimum, an `evaluate.py` script that generates the results needed for analysis.
 Some subdirectories contain additional files needed to pretrain models, where applicable, as well as model definitions and helper functions.
 Where models can be pretrained, there is a `pretrain.py` script.
@@ -615,7 +648,7 @@ This script ingests a text file of only SMILES strings and emits a cleaned versi
 
 ### `scripts`
 
-This directory contains a few convenience scripts used in the oroginal study that others may find useful (execute them with `bash <script_name>.sh`):
+This directory contains a few convenience scripts used in the original study that others may find useful (execute them with `bash <script_name>.sh`):
  - `get_pubchem.sh` - downloads and converts the complete set of SMILES from PubChem and turns them into a `.smiles` file (i.e. a text file with only SMILES in it)
  - `gpus.sh` - adjusts power settings on our hardware to prevent crashes
  - `run_experiments.sh` - after manually performing pretraining, this script (with appropriately named model files provided) will execute all experiments performed in the original study
