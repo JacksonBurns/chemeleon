@@ -117,7 +117,73 @@ if __name__ == "__main__":
     for batch in tqdm(dataloader):
         # Standardize the batch using precomputed statistics
         # standard_scale will handle NaN values automatically
-        batch_std = standard_scale(batch, feature_means, feature_vars)
+        batch_std = standard_scale(batch, feature_means, feature_vars).clamp(
+            min=-6, max=6
+        )
+        all_data.append(batch_std.cpu().numpy())
+
+    # Concatenate all batches
+    X = np.concatenate(all_data, axis=0)
+    print(f"Collected {X.shape[0]} samples for PCA fitting")
+
+    # Apply PCA
+    try:
+        print(
+            f"Fitting PCA with target explained variance of {args.explained_variance}"
+        )
+        pca = PCA(
+            n_components=args.explained_variance,
+            svd_solver="full",
+            random_state=args.random_seed,
+        )
+        pca.fit(X)
+
+        # Get results
+        n_components = pca.n_components_
+        explained_variance = pca.explained_variance_ratio_.sum()
+        print(f"PCA fit complete:")
+        print(f"- Original dimensions: {n_features}")
+        print(f"- Reduced dimensions: {n_components}")
+        print(
+            f"- Dimension reduction: {n_features - n_components} ({(1 - n_components/n_features)*100:.1f}%)"
+        )
+        print(f"- Total variance explained: {explained_variance*100:.2f}%")
+
+        # Save the model
+        torch.save(pca, output_path)
+        print(f"PCA model saved to {output_path}")
+
+        # Example of how to use this with evaluate.py
+        print("\nTo use this PCA model with evaluate.py, run:")
+        print(
+            f"python evaluate.py OUTPUT_DIR --pca-method pretrained --pca-model-path {output_path} --gpu"
+        )
+
+    except Exception as e:
+        print(f"Error during PCA fitting: {e}")
+        print("PCA model could not be created.")
+        sys.exit(1)
+    if args.sample_size and args.sample_size < len(dataset):
+        print(f"Sampling {args.sample_size} examples from dataset")
+        np.random.seed(args.random_seed)
+        indices = np.random.choice(len(dataset), size=args.sample_size, replace=False)
+        sampler = torch.utils.data.SubsetRandomSampler(indices)
+        dataloader = TorchDataLoader(
+            dataset, batch_size=args.batch_size, sampler=sampler
+        )
+    else:
+        print(f"Using all {len(dataset)} examples from dataset")
+        dataloader = TorchDataLoader(dataset, batch_size=args.batch_size, shuffle=False)
+
+    # Collect standardized data for PCA
+    print("Loading and standardizing data for PCA fitting...")
+    all_data = []
+    for batch in tqdm(dataloader):
+        # Standardize the batch using precomputed statistics
+        # standard_scale will handle NaN values automatically
+        batch_std = standard_scale(batch, feature_means, feature_vars).clamp(
+            min=-6, max=6
+        )
         all_data.append(batch_std.cpu().numpy())
 
     # Concatenate all batches
