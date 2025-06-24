@@ -2,12 +2,14 @@
 
 ![`CheMeleon` logo](./chemeleon_logo_with_background.png)
 
-Supporting code for "Descriptor-based Foundation Models for Molecular Property Prediction".
+This repository provides the supporting code associated with our paper, "Descriptor-based Foundation Models for Molecular Property Prediction."
 
-To finetune your own models using `CheMeleon` simply install [ChemProp 2.2.0 or newer](https://chemprop.readthedocs.io/en/latest/installation.html) (i.e. `pip install 'chemprop>=2.2.0'`) and use the `--from-foundation CheMeleon` flag in the Command Line Interface.
-To finetune models from a Python script, see [`finetuning_demo.ipynb`](./finetuning_demo.ipynb).
+Paper: [arXiv](https://doi.org/10.48550/arXiv.2506.15792) / [alphaXiv](https://www.alphaxiv.org/abs/2506.15792) 
 
-The code in this repository is primarily intended to aid in reproducing the results of the original study, but it may also be used to train other foundation models or finetune on new targets.
+To fine-tune your own models using `CheMeleon`, simply install [ChemProp 2.2.0 or newer](https://chemprop.readthedocs.io/en/latest/installation.html) (i.e., `pip install 'chemprop>=2.2.0'`) and use the `--from-foundation CheMeleon` flag in the Command Line Interface.
+To fine-tune models from a Python script, see [`finetuning_demo.ipynb`](./finetuning_demo.ipynb).
+
+The code in this repository is primarily intended to aid in reproducing the results of the original study, but it may also be used to train other foundation models or fine-tune on new targets.
 It is laid out as follows:
  - `analysis` - Jupyter notebooks and their required input data (results from pretraining and finetuning) to generate the facts and figures referenced in the study
  - `models` - Python code for feature calculation, pretraining, and finetuning with each unique model sorted into its own subdirectory
@@ -24,7 +26,7 @@ Ubuntu 24 was used for initial development, though the required dependencies sho
 
 The first sections below lay out the 'general' dependencies needed for each part of the code.
 They are intended to only provide minimum package versions to avoid errors, allowing users to extend the code more easily by allowing for easy addition of other dependencies.
-For exact versions used to generate the results of the initial study see [Exact Versions](#exact-versions).
+For exact versions used to generate the results of the initial study, see [Exact Versions](#exact-versions).
 
 To execute the respective part of the study one must create a virtual environment containing the listed dependencies.
 Due to compatibility conflicts, three separate environments are needed - users wishing to execute only some subpart of the code can setup only the corresponding environments.
@@ -616,7 +618,7 @@ zarr==2.18.3
 ## Usage
 
 Every notebook in this repository can be executed by running all cells from the top within the appropriate environment.
-Python scripts which take command line arguments to specify inputs and outputs will print their usage upon running `python <script_name>.py`.
+Python scripts that take command line arguments to specify inputs and outputs will print their usage upon running `python <script_name>.py`.
 
 Recreating the results of the original study requires significant computational resources.
 Feature calculation for 1MM SMILES from PubChem took roughly 500 CPU hours.
@@ -624,12 +626,12 @@ Pretraining of the MLP-PLR took roughly 500 GPU hours and pretraining the `CheMe
 Finetuning a single `CheMeleon`-based model requires <<1 GPU hour, though running all finetuning for all models and all repetitions will take around 100 GPU hours.
 
 Storage of all pretraining and finetuning model checkpoints requires 1+ terabytes of storage - for this reason, intermediate training checkpoints and finetuned models are _not_ retained during finetuning for this study.
-This can be easily modified in the provided scripts to facilitate actual deployment and reuse of the finetuned models.
+This can be easily modified in the provided scripts to facilitate actual deployment and reuse of the fine-tuned models.
 Storage of pretraining features requires ~40 GB of disk space.
 
 ### `analysis`
 
-This directory contains Jupyter notebooks which perform the analysis of modeling results as shown in the original study.
+This directory contains Jupyter notebooks that perform the analysis of modeling results as shown in the original study.
 These may be run in VSCode or with whatever notebook application you prefer.
 The input data needed to generate the results is saved in the corresponding `_results` subdirectory.
 The outputs from running the notebooks, including both the generated figures and the collated results, and shown in the `cliffs` and `hsd` subdirectories.
