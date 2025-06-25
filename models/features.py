@@ -27,7 +27,7 @@ def _f(smi):
     try:
         _ = RemoveHs(mol, updateExplicitCount=True)
     except:
-        print("Skipping mol {smi} - failed RemoveHs")
+        print(f"Skipping mol {smi} - failed RemoveHs")
         return False
     return True
 
@@ -101,9 +101,7 @@ if __name__ == "__main__":
         compressors=None,  # disable compression
         fill_value=np.nan,
     )
-    z = zarr.open_array(out_file)
 
-    # restarting from previous
     i = 0
     with tqdm(total=n_mols, desc="Calculating features") as pbar:
         while i < n_mols:
