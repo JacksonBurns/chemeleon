@@ -9,6 +9,10 @@ Paper: [arXiv](https://doi.org/10.48550/arXiv.2506.15792) / [alphaXiv](https://w
 To fine-tune your own models using `CheMeleon`, simply install [ChemProp 2.2.0 or newer](https://chemprop.readthedocs.io/en/latest/installation.html) (i.e., `pip install 'chemprop>=2.2.0'`) and use the `--from-foundation CheMeleon` flag in the Command Line Interface.
 To fine-tune models from a Python script, see [`finetuning_demo.ipynb`](./finetuning_demo.ipynb).
 
+To generate fingerprints from `CheMeleon` _without_ fine-tuning, see the [`chemeleon_fingerprint.py`](./chemeleon_fingerprint.py) script in this repository.
+It contains the class `CheMeleonFingerprint` which can be instantiated and called to generate CheMeleon fingerprints for SMILES strings and RDKit mols.
+See the top of that file for more information.
+
 The code in this repository is primarily intended to aid in reproducing the results of the original study, but it may also be used to train other foundation models or fine-tune on new targets.
 It is laid out as follows:
  - `analysis` - Jupyter notebooks and their required input data (results from pretraining and finetuning) to generate the facts and figures referenced in the study
