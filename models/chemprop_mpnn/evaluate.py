@@ -35,6 +35,7 @@ from chemprop.nn import (
 from chemprop.models import MPNN
 from chemprop.nn.agg import MeanAggregation
 
+from aswa import ASWA
 from pretrain import MaskedDescriptorsMPNN, WinsorizeStdevN
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
@@ -245,6 +246,8 @@ timestamp: {datetime.datetime.now()}
                     decay = 0.99
                     return decay * averaged_model_parameter + (1.0 - decay) * model_parameter
                 callbacks.append(StochasticWeightAveraging(1e-2, avg_fn=ema_average_fn, swa_epoch_start=2))
+            if WEIGHT_TECHNIQUE == "aswa":
+                callbacks.append(ASWA(monitor="val_loss", mode="min"))
             trainer = Trainer(
                 max_epochs=50,
                 logger=tensorboard_logger,
