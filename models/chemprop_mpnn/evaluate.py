@@ -16,7 +16,7 @@ from mordred import Calculator, descriptors
 import polaris as po
 from polaris.utils.types import TargetType
 from lightning import Trainer
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping, StochasticWeightAveraging
 from lightning.pytorch.loggers import TensorBoardLogger
 from astartes import train_test_split
 from sklearn.metrics import root_mean_squared_error
@@ -39,6 +39,10 @@ from pretrain import MaskedDescriptorsMPNN, WinsorizeStdevN
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
+
+WEIGHT_TECHNIQUE = os.getenv("WEIGHT_TECHNIQUE", "").lower()
+if WEIGHT_TECHNIQUE:
+    print(f"Training with weight technique '{WEIGHT_TECHNIQUE}'")
 
 
 if __name__ == "__main__":
@@ -234,6 +238,13 @@ timestamp: {datetime.datetime.now()}
                     dirpath=seed_dir / _subdir / "checkpoints",
                 ),
             ]
+            if WEIGHT_TECHNIQUE == "swa":
+                callbacks.append(StochasticWeightAveraging(swa_lrs=1e-2, swa_epoch_start=2))
+            if WEIGHT_TECHNIQUE == "ema":
+                def ema_average_fn(averaged_model_parameter, model_parameter, num_averaged):
+                    decay = 0.99
+                    return decay * averaged_model_parameter + (1.0 - decay) * model_parameter
+                callbacks.append(StochasticWeightAveraging(1e-2, avg_fn=ema_average_fn, swa_epoch_start=2))
             trainer = Trainer(
                 max_epochs=50,
                 logger=tensorboard_logger,
