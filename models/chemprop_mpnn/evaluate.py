@@ -35,15 +35,14 @@ from chemprop.nn import (
 from chemprop.models import MPNN
 from chemprop.nn.agg import MeanAggregation
 
-from aswa import ASWA
 from pretrain import MaskedDescriptorsMPNN, WinsorizeStdevN
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
 
-WEIGHT_TECHNIQUE = os.getenv("WEIGHT_TECHNIQUE", "").lower()
-if WEIGHT_TECHNIQUE:
-    print(f"Training with weight technique '{WEIGHT_TECHNIQUE}'")
+ENABLE_SWA = "ENABLE_SWA" in os.environ
+if ENABLE_SWA:
+    print("Training with Stochastic Weight Averaging (found ENABLE_SWA in environment)")
 
 
 if __name__ == "__main__":
@@ -239,15 +238,6 @@ timestamp: {datetime.datetime.now()}
                     dirpath=seed_dir / _subdir / "checkpoints",
                 ),
             ]
-            if WEIGHT_TECHNIQUE == "swa":
-                callbacks.append(StochasticWeightAveraging(swa_lrs=1e-2, swa_epoch_start=2))
-            if WEIGHT_TECHNIQUE == "ema":
-                def ema_average_fn(averaged_model_parameter, model_parameter, num_averaged):
-                    decay = 0.99
-                    return decay * averaged_model_parameter + (1.0 - decay) * model_parameter
-                callbacks.append(StochasticWeightAveraging(1e-2, avg_fn=ema_average_fn, swa_epoch_start=2))
-            if WEIGHT_TECHNIQUE == "aswa":
-                callbacks.append(ASWA(monitor="val_loss", mode="min"))
             trainer = Trainer(
                 max_epochs=50,
                 logger=tensorboard_logger,
@@ -258,9 +248,36 @@ timestamp: {datetime.datetime.now()}
             )
             trainer.fit(model, train_dataloader, val_dataloader)
             ckpt_path = trainer.checkpoint_callback.best_model_path
-            print(f"Reloading best model from checkpoint file: {ckpt_path}")
+            if ENABLE_SWA:
+                tensorboard_logger = TensorBoardLogger(
+                    seed_dir / _subdir / "swa",
+                    name="tensorboard_logs",
+                    default_hp_metric=False,
+                )
+                callbacks = [
+                    ModelCheckpoint(
+                        monitor="train_loss",
+                        save_top_k=2,
+                        mode="min",
+                        dirpath=seed_dir / _subdir / "checkpoints" / "swa",
+                    ),
+                    StochasticWeightAveraging(
+                        swa_lrs=1e-4,
+                        swa_epoch_start=1,
+                        annealing_epochs=0,
+                    )
+                ]
+                trainer = Trainer(
+                    max_epochs=10,
+                    logger=tensorboard_logger,
+                    log_every_n_steps=1,
+                    callbacks=callbacks,
+                )
+                trainer.fit(model, train_dataloader)
+                ckpt_path = trainer.checkpoint_callback.best_model_path
             del model, train_dataloader, train_dataset, val_dataloader, val_dataset
             torch.cuda.empty_cache()
+            print(f"Reloading best SWA model from checkpoint file: {ckpt_path}")
             model = MPNN.load_from_checkpoint(ckpt_path)
             trainer = Trainer(logger=tensorboard_logger)
             predictions = (
