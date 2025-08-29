@@ -9,8 +9,12 @@ from rdkit.Chem import MolFromSmiles
 from chemprop.nn import Aggregation, ChempropMetric, MessagePassing, Predictor
 from fastprop.data import standard_scale
 from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
+from chemprop.featurizers.atom import RIGRAtomFeaturizer
+from chemprop.featurizers.bond import RIGRBondFeaturizer
 from chemprop.data import Datum
 from chemprop.models import MPNN
+
+from sigmoid_step import SigmoidStep
 
 
 class WinsorizeStdevN(torch.nn.Module):
@@ -32,7 +36,10 @@ class ChemPropZarrDataset(torch.utils.data.Dataset):
         self.len = len(smiles)
         self.z = zarr.open_array(zarr_store)
         assert self.z.shape[0] == len(smiles), "Mismatched smiles and feature sizes"
-        self.molgraph_generator = SimpleMoleculeMolGraphFeaturizer()
+        self.molgraph_generator = SimpleMoleculeMolGraphFeaturizer(
+            atom_featurizer=RIGRAtomFeaturizer(),
+            bond_featurizer=RIGRBondFeaturizer(),
+        )
 
     def __len__(self):
         return self.len
@@ -59,6 +66,7 @@ class MaskedDescriptorsMPNN(MPNN):
         self.register_buffer("feature_means", feature_means)
         self.register_buffer("feature_vars", feature_vars)
         self.winsorization = WinsorizeStdevN(winsorization_factor)
+        self.bn = SigmoidStep()
 
     def validation_step(self, batch, batch_idx = 0):
         bmg, V_d, X_d, targets, weights, lt_mask, gt_mask = batch
@@ -91,7 +99,7 @@ if __name__ == "__main__":
     from pathlib import Path
     
     from tqdm import tqdm
-    from chemprop.nn import MeanAggregation, BondMessagePassing, RegressionFFN, metrics
+    from chemprop.nn import NormAggregation, BondMessagePassing, RegressionFFN, metrics
     from chemprop.data import build_dataloader
     from lightning.pytorch.utilities import rank_zero_info
     from lightning.pytorch import Trainer
@@ -101,7 +109,7 @@ if __name__ == "__main__":
     
     
     BATCH_SIZE = 128
-    NUM_EPOCHS = 500
+    NUM_EPOCHS = 5000
     PATIENCE = 50
     HIDDEN_SIZE = 2_048
     DEPTH = 6
@@ -138,10 +146,18 @@ if __name__ == "__main__":
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
-    
+    rigr_atom_featurizer = RIGRAtomFeaturizer()
+    rigr_bond_featurizer = RIGRBondFeaturizer()
+    featurizer = SimpleMoleculeMolGraphFeaturizer(atom_featurizer=rigr_atom_featurizer, bond_featurizer=rigr_bond_featurizer)
+
     model = MaskedDescriptorsMPNN(
-        BondMessagePassing(d_h=HIDDEN_SIZE, depth=DEPTH),
-        MeanAggregation(),
+        BondMessagePassing(
+            d_v=featurizer.atom_fdim,
+            d_e=featurizer.bond_fdim,
+            d_h=HIDDEN_SIZE,
+            depth=DEPTH,
+        ),
+        NormAggregation(),
         predictor=RegressionFFN(
             n_tasks=n_features,
             input_dim=HIDDEN_SIZE,

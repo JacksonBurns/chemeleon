@@ -27,7 +27,7 @@ def _f(smi):
     try:
         _ = RemoveHs(mol, updateExplicitCount=True)
     except:
-        print("Skipping mol {smi} - failed RemoveHs")
+        print(f"Skipping mol {smi} - failed RemoveHs")
         return False
     return True
 
@@ -83,18 +83,16 @@ if __name__ == "__main__":
     print(f"Number of rows per chunk: {chunk_rows}")
 
     # Create the dataset with compression and concurrency settings
-    # z = zarr.create_array(
-    #     store=out_file,
-    #     shape=shape,
-    #     chunks=chunk_shape,
-    #     dtype=dtype,
-    #     compressors=None,  # disable compression
-    #     fill_value=np.nan,
-    # )
-    z = zarr.open_array(out_file)
+    z = zarr.create_array(
+        store=out_file,
+        shape=shape,
+        chunks=chunk_shape,
+        dtype=dtype,
+        compressors=None,  # disable compression
+        fill_value=np.nan,
+    )
 
-    # restarting from previous - otherwise start at i = 0
-    i = 7_680_096
+    i = 0
     with tqdm(total=n_mols, desc="Calculating features") as pbar:
         while i < n_mols:
             mols = list(p.map(_s, smiles[i:i+chunk_rows], chunksize=chunk_rows // 64))
