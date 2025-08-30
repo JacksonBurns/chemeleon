@@ -49,7 +49,8 @@ class CheMeleonFingerprint:
     def __call__(self, molecules: list[str | Mol]) -> np.ndarray:
         bmg = BatchMolGraph([self.featurizer(MolFromSmiles(m) if isinstance(m, str) else m) for m in molecules])
         bmg.to(device=self.model.device)
-        return self.model.fingerprint(bmg).numpy(force=True)
+        with torch.no_grad():
+            return self.model.fingerprint(bmg).numpy(force=True)
 
 
 if __name__ == "__main__":
