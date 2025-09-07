@@ -16,7 +16,7 @@ from mordred import Calculator, descriptors
 import polaris as po
 from polaris.utils.types import TargetType
 from lightning import Trainer
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping, StochasticWeightAveraging
 from lightning.pytorch.loggers import TensorBoardLogger
 from astartes import train_test_split
 from sklearn.metrics import root_mean_squared_error
@@ -39,6 +39,10 @@ from pretrain import MaskedDescriptorsMPNN, WinsorizeStdevN
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
+
+ENABLE_SWA = "ENABLE_SWA" in os.environ
+if ENABLE_SWA:
+    print("Training with Stochastic Weight Averaging (found ENABLE_SWA in environment)")
 
 
 if __name__ == "__main__":
@@ -244,9 +248,36 @@ timestamp: {datetime.datetime.now()}
             )
             trainer.fit(model, train_dataloader, val_dataloader)
             ckpt_path = trainer.checkpoint_callback.best_model_path
-            print(f"Reloading best model from checkpoint file: {ckpt_path}")
+            if ENABLE_SWA:
+                tensorboard_logger = TensorBoardLogger(
+                    seed_dir / _subdir / "swa",
+                    name="tensorboard_logs",
+                    default_hp_metric=False,
+                )
+                callbacks = [
+                    ModelCheckpoint(
+                        monitor="train_loss",
+                        save_top_k=2,
+                        mode="min",
+                        dirpath=seed_dir / _subdir / "checkpoints" / "swa",
+                    ),
+                    StochasticWeightAveraging(
+                        swa_lrs=1e-4,
+                        swa_epoch_start=1,
+                        annealing_epochs=0,
+                    )
+                ]
+                trainer = Trainer(
+                    max_epochs=10,
+                    logger=tensorboard_logger,
+                    log_every_n_steps=1,
+                    callbacks=callbacks,
+                )
+                trainer.fit(model, train_dataloader)
+                ckpt_path = trainer.checkpoint_callback.best_model_path
             del model, train_dataloader, train_dataset, val_dataloader, val_dataset
             torch.cuda.empty_cache()
+            print(f"Reloading best SWA model from checkpoint file: {ckpt_path}")
             model = MPNN.load_from_checkpoint(ckpt_path)
             trainer = Trainer(logger=tensorboard_logger)
             predictions = (
