@@ -79,6 +79,7 @@ scikit-learn
 datasets
 scikit-mol
 ipykernel
+molpipeline
 ```
 
 One can further simplify this environment to perform just the finetuning or analysis by omitting the packages which are not `import`-ed at the top of the corresponding file the user wishes to execute, though this was not done in the original study.
