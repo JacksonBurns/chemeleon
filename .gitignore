@@ -10,4 +10,4 @@ screen.log
 *.ckpt
 *.log
 minimol_features
-fastprop_foundation/analysis/moleculenet_results/**/_results/
+**/moleculenet_results/**/_results/
