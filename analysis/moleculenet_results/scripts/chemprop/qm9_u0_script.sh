@@ -1,8 +1,7 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
+results_dir="qm9_u0_results"
 data_path="/home/akshatz/bond_order_free/qm9/dataset/qm9_data.csv"
 splits_path="/home/akshatz/bond_order_free/qm9/dataset/splits.json"
 
@@ -14,7 +13,7 @@ chemprop train \
 --epochs 50 \
 --pytorch-seed 42 \
 --accelerator gpu \
---devices 1 \
+--devices "1," \
 --save-dir $results_dir \
 --ensemble-size 5 \
 --metrics mae rmse \

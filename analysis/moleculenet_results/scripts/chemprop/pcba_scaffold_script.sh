@@ -1,8 +1,7 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
+results_dir="pcba_scaffold_results"
 data_path="/home/akshatz/bond_order_free/pcba_scaffold/dataset/pcba_scaffold_data_filtered.csv"
 splits_path="/home/akshatz/bond_order_free/pcba_scaffold/dataset/splits_filtered.json"
 

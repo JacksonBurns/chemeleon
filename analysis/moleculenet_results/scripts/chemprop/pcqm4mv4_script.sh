@@ -1,8 +1,7 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
+results_dir="pcqm4mv4_results"
 data_path="/home/akshatz/bond_order_free/pcqm4mv2/dataset/pcqm4mv2_data_filtered.csv"
 splits_path="/home/akshatz/bond_order_free/pcqm4mv2/dataset/splits_filtered.json"
 
@@ -17,6 +16,6 @@ chemprop train \
 --ensemble-size 5 \
 --metrics mae r2 \
 --accelerator gpu \
---devices "1," \
+--devices 1 \
 
 echo 'date: ' $(date)

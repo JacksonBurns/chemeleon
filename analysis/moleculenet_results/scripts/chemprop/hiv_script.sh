@@ -1,8 +1,7 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
+results_dir="hiv_results"
 data_path="/home/akshatz/bond_order_free/hiv/dataset/hiv_data_filtered.csv"
 splits_path="/home/akshatz/bond_order_free/hiv/dataset/splits_filtered.json"
 
@@ -16,4 +15,4 @@ chemprop train \
 --save-dir $results_dir \
 --ensemble-size 5 \
 --accelerator gpu \
---devices 1 \
+--devices "1," \
