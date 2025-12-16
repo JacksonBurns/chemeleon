@@ -13,7 +13,7 @@ chemprop train \
 --epochs 50 \
 --pytorch-seed 42 \
 --accelerator gpu \
---devices 1 \
+--devices "1," \
 --save-dir $results_dir \
 --ensemble-size 5 \
 --metrics mae rmse \

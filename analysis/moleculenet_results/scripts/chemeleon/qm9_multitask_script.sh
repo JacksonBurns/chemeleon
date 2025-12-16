@@ -17,6 +17,6 @@ chemprop train \
 --metrics mae rmse \
 --from-foundation chemeleon \
 --accelerator gpu \
---devices 1 \
+--devices "1," \
 
 echo 'date: ' $(date)
