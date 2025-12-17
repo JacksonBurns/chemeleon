@@ -1,37 +1,67 @@
 """
-fine-tune chemeleon with temporarily frozen message passing weights
+fine-tune chemeleon
 
 note that polaris requires zarr<3 but the feature generator requires
 zarr>=3 so two separate python environments are needed
 """
 
-from pathlib import Path
-import sys
+import argparse
 import pathlib
+from pathlib import Path
 
-import torch
-import polaris as po
-from polaris.utils.types import TargetType
-from lightning import Trainer, Callback
-from lightning.pytorch.callbacks import ModelCheckpoint
-from lightning.pytorch.loggers import CSVLogger
-from astartes import train_test_split
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
+import polaris as po
+import torch
+from astartes import train_test_split
 from chemprop.data import MoleculeDatapoint, MoleculeDataset, build_dataloader
 from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
+from chemprop.models import MPNN
 from chemprop.nn import (
-    BondMessagePassing,
     BinaryClassificationFFN,
+    BondMessagePassing,
     RegressionFFN,
     UnscaleTransform,
 )
-from chemprop.models import MPNN
 from chemprop.nn.agg import MeanAggregation
+from lightning import Callback, Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.loggers import CSVLogger
+from polaris.utils.types import TargetType
 
 NUM_WORKERS = 4
+RNG_SEEDS = (42, 117, 709, 1701, 9001)
+POLARIS_BENCHMARKS = (
+    "polaris/pkis2-ret-wt-cls-v2",
+    "polaris/pkis2-ret-wt-reg-v2",
+    "polaris/pkis2-kit-wt-cls-v2",
+    "polaris/pkis2-kit-wt-reg-v2",
+    "polaris/pkis2-egfr-wt-reg-v2",
+    "polaris/adme-fang-solu-1",
+    "polaris/adme-fang-rppb-1",
+    "polaris/adme-fang-hppb-1",
+    "polaris/adme-fang-perm-1",
+    "polaris/adme-fang-rclint-1",
+    "polaris/adme-fang-hclint-1",
+    "tdcommons/lipophilicity-astrazeneca",
+    "tdcommons/ppbr-az",
+    "tdcommons/clearance-hepatocyte-az",
+    "tdcommons/cyp2d6-substrate-carbonmangels",
+    "tdcommons/half-life-obach",
+    "tdcommons/cyp2c9-substrate-carbonmangels",
+    "tdcommons/clearance-microsome-az",
+    "tdcommons/dili",
+    "tdcommons/bioavailability-ma",
+    "tdcommons/vdss-lombardo",
+    "tdcommons/cyp3a4-substrate-carbonmangels",
+    "tdcommons/pgp-broccatelli",
+    "tdcommons/caco2-wang",
+    "tdcommons/herg",
+    "tdcommons/bbb-martins",
+    "tdcommons/ames",
+    "tdcommons/ld50-zhu",
+)
 
 
 class FreezeMessagePassingCallback(Callback):
@@ -100,50 +130,25 @@ def plot_loss(log_path: pathlib.Path, title: str):
     plt.close()
 
 
-if __name__ == "__main__":
-    try:
-        output_dir = Path(sys.argv[1])
-        chemeleon_path = Path(sys.argv[2])
-        freeze_epochs = int(sys.argv[3])
-    except (IndexError, ValueError):
-        print(f"usage: python {sys.argv[0]} OUTPUT_DIR CHEMELEON_PATH FREEZE_EPOCHS")
-        exit(1)
-    if not output_dir.exists():
-        output_dir.mkdir()
-    polaris_benchmarks = (
-        "polaris/pkis2-ret-wt-cls-v2",
-        "polaris/pkis2-ret-wt-reg-v2",
-        "polaris/pkis2-kit-wt-cls-v2",
-        "polaris/pkis2-kit-wt-reg-v2",
-        "polaris/pkis2-egfr-wt-reg-v2",
-        "polaris/adme-fang-solu-1",
-        "polaris/adme-fang-rppb-1",
-        "polaris/adme-fang-hppb-1",
-        "polaris/adme-fang-perm-1",
-        "polaris/adme-fang-rclint-1",
-        "polaris/adme-fang-hclint-1",
-        "tdcommons/lipophilicity-astrazeneca",
-        "tdcommons/ppbr-az",
-        "tdcommons/clearance-hepatocyte-az",
-        "tdcommons/cyp2d6-substrate-carbonmangels",
-        "tdcommons/half-life-obach",
-        "tdcommons/cyp2c9-substrate-carbonmangels",
-        "tdcommons/clearance-microsome-az",
-        "tdcommons/dili",
-        "tdcommons/bioavailability-ma",
-        "tdcommons/vdss-lombardo",
-        "tdcommons/cyp3a4-substrate-carbonmangels",
-        "tdcommons/pgp-broccatelli",
-        "tdcommons/caco2-wang",
-        "tdcommons/herg",
-        "tdcommons/bbb-martins",
-        "tdcommons/ames",
-        "tdcommons/ld50-zhu",
+def parse_args():
+    parser = argparse.ArgumentParser(description="Fine-tuning analysis.")
+    parser.add_argument("output_dir", type=Path, help="Output directory.")
+    parser.add_argument("pretrain_path", type=Path, help="Pretrained model path.")
+    parser.add_argument(
+        "--freeze-epochs", type=int, default=0, help="Epochs to freeze MPNN."
     )
-    moleculeace_benchmarks = ()
-    for random_seed in (42, 117, 709, 1701, 9001):
+    parser.add_argument("--verbose", action="store_true", help="Verbose output.")
+    args = parser.parse_args()
+    return args.output_dir, args.pretrain_path, args.freeze_epochs, args.verbose
+
+
+if __name__ == "__main__":
+    output_dir, pretrain_path, freeze_epochs, verbose = parse_args()
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for random_seed in RNG_SEEDS:
         seed_dir = output_dir / f"seed_{random_seed}"
-        for benchmark_name in polaris_benchmarks:
+        for benchmark_name in POLARIS_BENCHMARKS:
             # load the benchmarking data
             benchmark = po.load_benchmark(benchmark_name)
             smiles_col = list(benchmark.input_cols)[0]
@@ -195,9 +200,9 @@ if __name__ == "__main__":
                 if scaler is not None
                 else torch.nn.Identity()
             )
-            chemeleon_mp = torch.load(chemeleon_path, weights_only=True)
-            mp = BondMessagePassing(**chemeleon_mp["hyper_parameters"])
-            mp.load_state_dict(chemeleon_mp["state_dict"])
+            pretrained_mp = torch.load(pretrain_path, weights_only=True)
+            mp = BondMessagePassing(**pretrained_mp["hyper_parameters"])
+            mp.load_state_dict(pretrained_mp["state_dict"])
             agg = MeanAggregation()
             hidden_size = mp.output_dim
             fnn = (
@@ -216,7 +221,7 @@ if __name__ == "__main__":
             model = MPNN(mp, agg, fnn)
 
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
-            trainer = create_trainer(seed_dir / _subdir, freeze_epochs, verbose=False)
+            trainer = create_trainer(seed_dir / _subdir, freeze_epochs, verbose=verbose)
             trainer.fit(model, train_dataloader, val_dataloader)
             log_path = (
                 seed_dir
