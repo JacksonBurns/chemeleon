@@ -137,13 +137,20 @@ def parse_args():
     parser.add_argument(
         "--freeze-epochs", type=int, default=0, help="Epochs to freeze MPNN."
     )
+    parser.add_argument("--dropout", type=float, default=0.0, help="Dropout rate.")
     parser.add_argument("--verbose", action="store_true", help="Verbose output.")
     args = parser.parse_args()
-    return args.output_dir, args.pretrain_path, args.freeze_epochs, args.verbose
+    return (
+        args.output_dir,
+        args.pretrain_path,
+        args.freeze_epochs,
+        args.dropout,
+        args.verbose,
+    )
 
 
 if __name__ == "__main__":
-    output_dir, pretrain_path, freeze_epochs, verbose = parse_args()
+    output_dir, pretrain_path, freeze_epochs, dropout, verbose = parse_args()
 
     output_dir.mkdir(parents=True, exist_ok=True)
     for random_seed in RNG_SEEDS:
@@ -160,11 +167,10 @@ if __name__ == "__main__":
             targets = train_df[target_cols]
             targets = targets.fillna(targets.mean(axis=0)).to_numpy()
 
-            # typical chemprop training
             train_idxs, val_idxs = train_test_split(
                 np.arange(len(targets)),
-                train_size=0.80,
-                test_size=0.20,
+                train_size=0.8,
+                test_size=0.2,
                 random_state=random_seed,
             )
             train_data = [
@@ -201,6 +207,7 @@ if __name__ == "__main__":
                 else torch.nn.Identity()
             )
             pretrained_mp = torch.load(pretrain_path, weights_only=True)
+            pretrained_mp["hyper_parameters"]["dropout"] = dropout
             mp = BondMessagePassing(**pretrained_mp["hyper_parameters"])
             mp.load_state_dict(pretrained_mp["state_dict"])
             agg = MeanAggregation()
@@ -210,12 +217,14 @@ if __name__ == "__main__":
                     output_transform=output_transform,
                     input_dim=hidden_size,
                     hidden_dim=256,
+                    dropout=dropout,
                 )
                 if task_type == TargetType.REGRESSION
                 else BinaryClassificationFFN(
                     output_transform=output_transform,
                     input_dim=hidden_size,
                     hidden_dim=256,
+                    dropout=dropout,
                 )
             )
             model = MPNN(mp, agg, fnn)
