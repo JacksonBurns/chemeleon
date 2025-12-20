@@ -54,7 +54,7 @@ if __name__ == "__main__":
         output_dir.mkdir()
     output_file = open(output_dir / "train_results.md", "w")
     output_file.write(
-        f"""# Chemprop Baseline Results
+        f"""# ChemProp Baseline Results
 timestamp: {datetime.datetime.now()}
 """
     )

@@ -1,4 +1,4 @@
-# Chemprop Baseline Results
+# ChemProp Baseline Results
 timestamp: 2025-04-28 18:01:37.398716
 ## Random Seed 42
 

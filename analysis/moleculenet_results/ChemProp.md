@@ -1,4 +1,4 @@
-# Chemprop Benchmark Results
+# ChemProp Benchmark Results
 
 
 ## QM9 Gap
@@ -152,14 +152,6 @@
 | prc-auc | 0.4722 |
 | ap | 0.4722 |
 | roc-auc | 0.4722 |
-
-## PCQM4MV2
-
-| Metric | Value |
-|:--|--:|
-| mae | 0.0992 |
-| rmse | 0.1582 |
-| r2 | 0.9815 |
 
 ## SAMPL 6
 

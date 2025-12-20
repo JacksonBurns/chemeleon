@@ -1,4 +1,4 @@
-# Chemprop-Mordred Baseline Results
+# ChemProp Baseline Results
 timestamp: 2025-06-06 23:23:24.152446
 ## Random Seed 42
 
