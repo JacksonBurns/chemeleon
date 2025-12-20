@@ -153,6 +153,14 @@
 | ap | 0.4894 |
 | roc-auc | 0.4894 |
 
+## PCQM4MV2
+
+| Metric | Value |
+|:--|--:|
+| mae | 0.0929 |
+| rmse | 0.1544 |
+| r2 | 0.9824 |
+
 ## SAMPL 6
 
 | Metric | Value |
