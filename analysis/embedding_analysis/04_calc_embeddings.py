@@ -12,12 +12,13 @@ from chemprop.data import (BatchMolGraph, MoleculeDatapoint, MoleculeDataset,
 from chemprop.models import MPNN
 from chemprop.nn import (BinaryClassificationFFN, BondMessagePassing,
                          MeanAggregation)
-from common import parse_endpoint_input
 from lightning import Trainer, seed_everything
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger
 from loguru import logger
 from sklearn.model_selection import PredefinedSplit, train_test_split
+
+from common import parse_endpoint_input
 
 
 def from_chemeleon(no_weights: bool = False) -> BondMessagePassing:

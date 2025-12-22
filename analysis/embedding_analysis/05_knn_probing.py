@@ -6,8 +6,6 @@ from pathlib import Path
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-from common import (REPRESENTATION_INFOS, RepresentationInfo,
-                    parse_endpoint_input)
 from loguru import logger
 from sklearn.metrics import (average_precision_score, balanced_accuracy_score,
                              f1_score, precision_score, recall_score,
@@ -15,6 +13,9 @@ from sklearn.metrics import (average_precision_score, balanced_accuracy_score,
 from sklearn.model_selection import PredefinedSplit
 from sklearn.neighbors import KNeighborsClassifier, NearestNeighbors
 from sklearn.preprocessing import StandardScaler
+
+from common import (REPRESENTATION_INFOS, RepresentationInfo,
+                    parse_endpoint_input)
 
 
 def prepare_feat_for_knn(
