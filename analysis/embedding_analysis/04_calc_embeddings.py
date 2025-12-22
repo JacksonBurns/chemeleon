@@ -126,8 +126,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
         Endpoint to train on. Can be a single endpoint or a path to a YAML file
         containing a list of endpoints.
     model_name : str
-        Name of base architecture. One of ["chemprop", "chemeleon",
-        "chemeleon_no_pretraining"].
+        Name of base architecture. One of ["chemprop", "chemeleon_finetuned", "chemeleon_frozen", "chemeleon_no_pretraining"].
     random_state : int | None
         Random seed for all randomizations (default: None)
     """
@@ -205,7 +204,9 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                     test_dataset, num_workers=n_jobs, shuffle=False
                 )
 
-                if model_name == "chemeleon":
+                if model_name == "chemeleon_finetuned":
+                    mp = from_chemeleon()
+                elif model_name == "chemeleon_frozen":
                     mp = from_chemeleon()
                 elif model_name == "chemeleon_no_pretraining":
                     mp = from_chemeleon(no_weights=True)
@@ -239,7 +240,13 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                     check_val_every_n_epoch=1,
                     deterministic=deterministic,
                 )
-                trainer.fit(model, train_dataloader, val_dataloaders=None)
+
+                if model_name == "chemeleon_frozen":
+                    # Freeze all model parameters
+                    for param in model.parameters():
+                        param.requires_grad = False
+                else:
+                    trainer.fit(model, train_dataloader, val_dataloaders=None)
 
                 # save test set predictions
                 predictions = (
@@ -315,7 +322,7 @@ if __name__ == "__main__":
         "--model-name",
         required=True,
         type=str,
-        choices=["chemprop", "chemeleon", "chemeleon_no_pretraining"],
+        choices=["chemprop", "chemeleon_finetuned", "chemeleon_frozen", "chemeleon_no_pretraining"],
         help="Name of base architecture.",
     )
     argument_parser.add_argument(

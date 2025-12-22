@@ -311,7 +311,7 @@ def main(n_jobs: int, endpoint: str) -> None:
     ]
 
     classical_representations = {"morgan", "morgan_count", "rdkit_physchem", "mordred"}
-    learned_representations = {"chemeleon", "chemprop", "chemeleon_no_pretraining"}
+    learned_representations = {"chemeleon_finetuned", "chemeleon_frozen", "chemprop", "chemeleon_no_pretraining"}
     representation_list = [*classical_representations, *learned_representations]
 
     metrics_df_list = []

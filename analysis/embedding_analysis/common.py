@@ -41,8 +41,13 @@ REPRESENTATION_INFOS = {
         need_standardization=True,
         distance_measure="euclidean",
     ),
-    "chemeleon": RepresentationInfo(
-        representation_type="chemeleon",
+    "chemeleon_finetuned": RepresentationInfo(
+        representation_type="chemeleon_finetuned",
+        need_standardization=False,
+        distance_measure="euclidean",
+    ),
+    "chemeleon_frozen": RepresentationInfo(
+        representation_type="chemeleon_frozen",
         need_standardization=False,
         distance_measure="euclidean",
     ),
