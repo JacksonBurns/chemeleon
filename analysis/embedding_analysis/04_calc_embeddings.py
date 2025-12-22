@@ -113,13 +113,15 @@ def smiles_table_to_chemprop_molecule_dataset(
     )
 
 
-def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) -> None:
+def main(
+    n_workers: int, endpoint: str, model_name: str, random_state: int | None
+) -> None:
     """Calculate embeddings for on datasets using different encodings.
 
     Parameters
     ----------
-    n_jobs : int
-        Number of jobs to use for data loading.
+    n_workers : int
+        Number of workers to use for data loading.
     endpoint : str
         Endpoint to train on. Can be a single endpoint or a path to a YAML file
         containing a list of endpoints.
@@ -136,7 +138,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
     epochs = 50
 
     logger.info(f"random_state: {random_state}")
-    logger.info(f"n_jobs: {n_jobs}")
+    logger.info(f"n_workers: {n_workers}")
     logger.info(f"model_name: {model_name}")
     logger.info(f"epochs: {epochs}")
 
@@ -208,7 +210,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                         label_cols=["label"],
                     )
                     val_dataloader = build_dataloader(
-                        val_dataset, num_workers=n_jobs, shuffle=False
+                        val_dataset, num_workers=n_workers, shuffle=False
                     )
                 else:
                     val_dataloader = None
@@ -220,10 +222,10 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                 )
 
                 train_dataloader = build_dataloader(
-                    train_dataset, num_workers=n_jobs, shuffle=True
+                    train_dataset, num_workers=n_workers, shuffle=True
                 )
                 test_dataloader = build_dataloader(
-                    test_dataset, num_workers=n_jobs, shuffle=False
+                    test_dataset, num_workers=n_workers, shuffle=False
                 )
 
                 if model_name == "chemeleon_finetuned":
@@ -290,6 +292,21 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                 else:
                     trainer.fit(model, train_dataloader, val_dataloaders=val_dataloader)
 
+                # After training, reload the best model checkpoint if validation was used
+                ckpt_path = None
+                if val_dataloader is not None and hasattr(trainer, "checkpoint_callback") and hasattr(trainer.checkpoint_callback, "best_model_path"):
+                    ckpt_path = trainer.checkpoint_callback.best_model_path
+                elif hasattr(trainer, "checkpoints") and hasattr(trainer.checkpoints, "best_model_path"):
+                    ckpt_path = trainer.checkpoints.best_model_path
+                if ckpt_path and ckpt_path != "":
+                    print(f"Reloading best model from checkpoint file: {ckpt_path}")
+                    del model, train_dataloader, train_dataset
+                    if val_dataloader is not None:
+                        del val_dataloader, val_dataset
+                    torch.cuda.empty_cache()
+                    model = MPNN.load_from_checkpoint(ckpt_path)
+                    trainer = Trainer(logger=tensorboard_logger)
+
                 # save test set predictions
                 predictions = (
                     torch.vstack(trainer.predict(model, test_dataloader))
@@ -350,10 +367,10 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
 if __name__ == "__main__":
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument(
-        "--n_jobs",
+        "--n_workers",
         type=int,
         default=1,
-        help="Number of jobs to use for training.",
+        help="Number of workers to use for dataloading.",
     )
     argument_parser.add_argument(
         "--endpoint",
@@ -375,8 +392,8 @@ if __name__ == "__main__":
     argument_parser.add_argument(
         "--seed",
         type=int,
-        default=None,
-        help="Random seed for all randomizations (default: None)",
+        default=23,
+        help="Random seed for all randomizations (default: 23)",
     )
     args = argument_parser.parse_args()
-    main(args.n_jobs, args.endpoint, args.model_name, args.seed)
+    main(args.n_workers, args.endpoint, args.model_name, args.seed)
