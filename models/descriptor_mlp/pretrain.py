@@ -12,18 +12,16 @@ from pathlib import Path
 
 import torch
 import zarr
-from tqdm import tqdm
+from lightning import Trainer
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
+from lightning.pytorch.loggers import TensorBoardLogger
+from lightning.pytorch.utilities.rank_zero import rank_zero_info
 from torch.utils.data import DataLoader as TorchDataLoader
 from torch.utils.data import Dataset as TorchDataset
-
-from lightning import Trainer
-from lightning.pytorch.utilities.rank_zero import rank_zero_info
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
-from lightning.pytorch.loggers import TensorBoardLogger
+from torchford import Welford
+from tqdm import tqdm
 
 from models import fastpropFoundation
-from torchford import Welford
-
 
 # architecture
 EMBEDDING_DIM = 8

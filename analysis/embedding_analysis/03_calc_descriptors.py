@@ -7,21 +7,19 @@ from pathlib import Path
 from typing import Any, Self
 
 import numpy as np
-import pandas as pd
 import numpy.typing as npt
+import pandas as pd
+from common import parse_endpoint_input
 from loguru import logger
 from molpipeline import Pipeline
 from molpipeline.abstract_pipeline_elements.core import InvalidInstance
-from molpipeline.abstract_pipeline_elements.mol2any import (
-    MolToDescriptorPipelineElement,
-)
+from molpipeline.abstract_pipeline_elements.mol2any import \
+    MolToDescriptorPipelineElement
 from molpipeline.any2mol import SmilesToMol
 from molpipeline.mol2any import MolToMorganFP, MolToRDKitPhysChem
 from molpipeline.utils.molpipeline_types import AnyTransformer, RDKitMol
 from mordred import Calculator, descriptors
 from sklearn.preprocessing import StandardScaler
-
-from common import parse_endpoint_input
 
 
 def get_morgan_pipeline(counted: bool, n_jobs: int = 1) -> Pipeline:

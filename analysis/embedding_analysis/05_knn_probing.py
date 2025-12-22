@@ -6,20 +6,15 @@ from pathlib import Path
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from common import (REPRESENTATION_INFOS, RepresentationInfo,
+                    parse_endpoint_input)
 from loguru import logger
-from sklearn.metrics import (
-    balanced_accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    roc_auc_score,
-    average_precision_score,
-)
+from sklearn.metrics import (average_precision_score, balanced_accuracy_score,
+                             f1_score, precision_score, recall_score,
+                             roc_auc_score)
 from sklearn.model_selection import PredefinedSplit
-from sklearn.neighbors import NearestNeighbors, KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier, NearestNeighbors
 from sklearn.preprocessing import StandardScaler
-
-from common import parse_endpoint_input, REPRESENTATION_INFOS, RepresentationInfo
 
 
 def prepare_feat_for_knn(
@@ -311,7 +306,12 @@ def main(n_jobs: int, endpoint: str) -> None:
     ]
 
     classical_representations = {"morgan", "morgan_count", "rdkit_physchem", "mordred"}
-    learned_representations = {"chemeleon_finetuned", "chemeleon_frozen", "chemprop", "chemeleon_no_pretraining"}
+    learned_representations = {
+        "chemeleon_finetuned",
+        "chemeleon_frozen",
+        "chemprop",
+        "chemmprop_large",
+    }
     representation_list = [*classical_representations, *learned_representations]
 
     metrics_df_list = []

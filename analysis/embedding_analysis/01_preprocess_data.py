@@ -35,16 +35,10 @@ from loguru import logger
 from molpipeline.any2mol import SmilesToMol
 from molpipeline.error_handling import ErrorFilter, FilterReinserter
 from molpipeline.mol2any import MolToSmiles
-from molpipeline.mol2mol import (
-    EmptyMoleculeFilter,
-    FragmentDeduplicator,
-    MetalDisconnector,
-    MixtureFilter,
-    SaltRemover,
-    StereoRemover,
-    TautomerCanonicalizer,
-    Uncharger,
-)
+from molpipeline.mol2mol import (EmptyMoleculeFilter, FragmentDeduplicator,
+                                 MetalDisconnector, MixtureFilter, SaltRemover,
+                                 StereoRemover, TautomerCanonicalizer,
+                                 Uncharger)
 from molpipeline.mol2mol.filter import ElementFilter
 from molpipeline.pipeline import Pipeline
 

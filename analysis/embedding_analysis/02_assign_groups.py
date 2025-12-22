@@ -36,18 +36,17 @@ from pathlib import Path  # pathmodifications
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from common import parse_endpoint_input
 from molpipeline import Pipeline
 from molpipeline.any2mol import SmilesToMol
 from molpipeline.error_handling import ErrorFilter, FilterReinserter
+from molpipeline.kernel.tanimoto_functions import self_tanimoto_distance
 from molpipeline.mol2any import MolToMorganFP, MolToSmiles
 from molpipeline.mol2mol import MakeScaffoldGeneric, MurckoScaffold
-from molpipeline.kernel.tanimoto_functions import self_tanimoto_distance
 from sklearn.base import clone
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.model_selection import StratifiedGroupKFold, StratifiedKFold
 from sklearn.preprocessing import FunctionTransformer, OrdinalEncoder
-
-from common import parse_endpoint_input
 
 
 def get_clustering_pipeline(n_jobs: int = 1) -> Pipeline:

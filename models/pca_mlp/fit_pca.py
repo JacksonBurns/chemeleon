@@ -5,17 +5,18 @@ Fits a PCA model on the pretraining data and saves it for later use.
 This allows for consistent dimensionality reduction across different benchmarks.
 """
 
-import sys
 import argparse
+import sys
 from pathlib import Path
-import torch
+
 import numpy as np
+import torch
 import zarr
-from tqdm import tqdm
+from fastprop.data import standard_scale
 from sklearn.decomposition import PCA
 from torch.utils.data import DataLoader as TorchDataLoader
 from torch.utils.data import Dataset as TorchDataset
-from fastprop.data import standard_scale
+from tqdm import tqdm
 
 
 class ZarrDataset(TorchDataset):

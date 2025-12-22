@@ -1,31 +1,32 @@
 """
 fit a direct MLP model on PCA-reduced descriptors without pretraining
 """
-from pathlib import Path
-import sys
-import datetime
-import warnings
-import json
-import argparse
-from typing import Tuple
-from statistics import mean
-import os
-import pandas as pd
 
+import argparse
+import datetime
+import json
+import os
+import sys
+import warnings
+from pathlib import Path
+from statistics import mean
+from typing import Tuple
+
+import numpy as np
+import pandas as pd
+import polaris as po
 import torch
 from astartes import train_test_split
-from mordred import Calculator, descriptors
-import numpy as np
-from rdkit.Chem import MolFromSmiles
-import polaris as po
-from torch import distributed
-from polaris.utils.types import TargetType
-from lightning import Trainer, LightningModule
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from fastprop.data import inverse_standard_scale, standard_scale
+from lightning import LightningModule, Trainer
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger
-from fastprop.data import standard_scale, inverse_standard_scale
+from mordred import Calculator, descriptors
+from polaris.utils.types import TargetType
+from rdkit.Chem import MolFromSmiles
 from sklearn.decomposition import PCA
 from sklearn.metrics import root_mean_squared_error
+from torch import distributed
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
@@ -199,8 +200,8 @@ GPU: {use_gpu} (CUDA_VISIBLE_DEVICES={cuda_devices})
             )
         try:
             # Allow loading of scikit-learn PCA objects with the new PyTorch 2.6 security restrictions
-            from sklearn.decomposition import PCA
             import torch.serialization
+            from sklearn.decomposition import PCA
 
             # Explicitly add PCA to the allowlist of safe globals for deserialization
             with torch.serialization.safe_globals([PCA]):

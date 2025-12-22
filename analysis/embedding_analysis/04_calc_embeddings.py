@@ -7,23 +7,17 @@ from urllib.request import urlretrieve
 import numpy as np
 import pandas as pd
 import torch
-from chemprop.data import (
-    MoleculeDatapoint,
-    MoleculeDataset,
-    build_dataloader,
-    BatchMolGraph,
-)
+from chemprop.data import (BatchMolGraph, MoleculeDatapoint, MoleculeDataset,
+                           build_dataloader)
 from chemprop.models import MPNN
-from sklearn.model_selection import train_test_split
-from lightning.pytorch.callbacks import EarlyStopping
-from lightning.pytorch.callbacks import ModelCheckpoint
-from chemprop.nn import BondMessagePassing, MeanAggregation, BinaryClassificationFFN
-from lightning import seed_everything, Trainer
+from chemprop.nn import (BinaryClassificationFFN, BondMessagePassing,
+                         MeanAggregation)
+from common import parse_endpoint_input
+from lightning import Trainer, seed_everything
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger
 from loguru import logger
-from sklearn.model_selection import PredefinedSplit
-
-from common import parse_endpoint_input
+from sklearn.model_selection import PredefinedSplit, train_test_split
 
 
 def from_chemeleon(no_weights: bool = False) -> BondMessagePassing:
@@ -129,7 +123,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
         Endpoint to train on. Can be a single endpoint or a path to a YAML file
         containing a list of endpoints.
     model_name : str
-        Name of base architecture. One of ["chemprop", "chemeleon_finetuned", "chemeleon_frozen", "chemeleon_no_pretraining"].
+        Name of base architecture. One of ["chemprop", "chemeleon_finetuned", "chemeleon_frozen", "chemprop_large"].
     random_state : int | None
         Random seed for all randomizations (default: None)
     """
@@ -188,7 +182,6 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                 train_df = endpoint_df.iloc[train_idx]
                 test_df = endpoint_df.iloc[test_idx].copy()
 
-
                 # Split train_df into train and val (90:10)
                 if model_name != "chemeleon_frozen":
                     train_df_split, val_df = train_test_split(
@@ -236,7 +229,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                     mp = from_chemeleon()
                 elif model_name == "chemeleon_frozen":
                     mp = from_chemeleon()
-                elif model_name == "chemeleon_no_pretraining":
+                elif model_name == "chemprop_large":
                     mp = from_chemeleon(no_weights=True)
                 elif model_name == "chemprop":
                     mp = BondMessagePassing()
@@ -370,7 +363,12 @@ if __name__ == "__main__":
         "--model-name",
         required=True,
         type=str,
-        choices=["chemprop", "chemeleon_finetuned", "chemeleon_frozen", "chemeleon_no_pretraining"],
+        choices=[
+            "chemprop",
+            "chemeleon_finetuned",
+            "chemeleon_frozen",
+            "chemprop_large",
+        ],
         help="Name of base architecture.",
     )
     argument_parser.add_argument(

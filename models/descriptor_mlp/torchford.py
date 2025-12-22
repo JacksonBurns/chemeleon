@@ -2,6 +2,7 @@
 Adapted from: https://github.com/a-mitani/welford/tree/main
 (under the terms of the MIT license) to work with PyTorch
 """
+
 import torch
 
 

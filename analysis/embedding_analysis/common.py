@@ -56,8 +56,8 @@ REPRESENTATION_INFOS = {
         need_standardization=False,
         distance_measure="euclidean",
     ),
-    "chemeleon_no_pretraining": RepresentationInfo(
-        representation_type="chemeleon_no_pretraining",
+    "chemprop_large": RepresentationInfo(
+        representation_type="chemprop_large",
         need_standardization=False,
         distance_measure="euclidean",
     ),
