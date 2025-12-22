@@ -14,6 +14,9 @@ from chemprop.data import (
     BatchMolGraph,
 )
 from chemprop.models import MPNN
+from sklearn.model_selection import train_test_split
+from lightning.pytorch.callbacks import EarlyStopping
+from lightning.pytorch.callbacks import ModelCheckpoint
 from chemprop.nn import BondMessagePassing, MeanAggregation, BinaryClassificationFFN
 from lightning import seed_everything, Trainer
 from lightning.pytorch.loggers import TensorBoardLogger
@@ -185,11 +188,36 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                 train_df = endpoint_df.iloc[train_idx]
                 test_df = endpoint_df.iloc[test_idx].copy()
 
+
+                # Split train_df into train and val (90:10)
+                if model_name != "chemeleon_frozen":
+                    train_df_split, val_df = train_test_split(
+                        train_df,
+                        test_size=0.1,
+                        random_state=random_state,
+                        shuffle=True,
+                    )
+                else:
+                    train_df_split = train_df
+                    val_df = None
+
                 train_dataset = smiles_table_to_chemprop_molecule_dataset(
-                    train_df,
+                    train_df_split,
                     smiles_col="smiles",
                     label_cols=["label"],
                 )
+
+                if val_df is not None:
+                    val_dataset = smiles_table_to_chemprop_molecule_dataset(
+                        val_df,
+                        smiles_col="smiles",
+                        label_cols=["label"],
+                    )
+                    val_dataloader = build_dataloader(
+                        val_dataset, num_workers=n_jobs, shuffle=False
+                    )
+                else:
+                    val_dataloader = None
 
                 test_dataset = smiles_table_to_chemprop_molecule_dataset(
                     test_df,
@@ -232,6 +260,25 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                     name="tensorboard_logs",
                     default_hp_metric=False,
                 )
+
+                # Setup callbacks for early stopping and checkpointing
+                callbacks = []
+                if val_dataloader is not None:
+                    callbacks = [
+                        EarlyStopping(
+                            monitor="val_loss",
+                            mode="min",
+                            verbose=False,
+                            patience=5,
+                        ),
+                        ModelCheckpoint(
+                            monitor="val_loss",
+                            save_top_k=2,
+                            mode="min",
+                            dirpath=split_dir / "checkpoints",
+                        ),
+                    ]
+
                 trainer = Trainer(
                     max_epochs=epochs,
                     logger=tensorboard_logger,
@@ -239,6 +286,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                     enable_checkpointing=True,
                     check_val_every_n_epoch=1,
                     deterministic=deterministic,
+                    callbacks=callbacks,
                 )
 
                 if model_name == "chemeleon_frozen":
@@ -246,7 +294,7 @@ def main(n_jobs: int, endpoint: str, model_name: str, random_state: int | None) 
                     for param in model.parameters():
                         param.requires_grad = False
                 else:
-                    trainer.fit(model, train_dataloader, val_dataloaders=None)
+                    trainer.fit(model, train_dataloader, val_dataloaders=val_dataloader)
 
                 # save test set predictions
                 predictions = (
