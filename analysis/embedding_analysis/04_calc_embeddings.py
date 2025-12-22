@@ -300,9 +300,6 @@ def main(
                     ckpt_path = trainer.checkpoints.best_model_path
                 if ckpt_path and ckpt_path != "":
                     print(f"Reloading best model from checkpoint file: {ckpt_path}")
-                    del model, train_dataloader, train_dataset
-                    if val_dataloader is not None:
-                        del val_dataloader, val_dataset
                     torch.cuda.empty_cache()
                     model = MPNN.load_from_checkpoint(ckpt_path)
                     trainer = Trainer(logger=tensorboard_logger)
@@ -330,6 +327,13 @@ def main(
                         .cpu()
                         .numpy()
                     )
+                    val_mol_graphs = [data_point.mg for data_point in val_dataset] if val_df is not None else []
+                    val_fingerprints = (
+                        model.fingerprint(BatchMolGraph(val_mol_graphs))
+                        .detach()
+                        .cpu()
+                        .numpy()
+                    ) if val_df is not None else np.array([])
                     test_mol_graphs = [data_point.mg for data_point in test_dataset]
                     test_fingerprints = (
                         model.fingerprint(BatchMolGraph(test_mol_graphs))
@@ -339,11 +343,17 @@ def main(
                     )
 
                 # sanity checks
-                if len(train_fingerprints) != train_df.shape[0]:
+                if len(train_fingerprints) != train_df_split.shape[0]:
                     raise ValueError("Invalid shapes in train fingerprints")
+                if len(val_fingerprints) != val_df.shape[0]:
+                    raise ValueError("Invalid shapes in val fingerprints")
                 if len(test_fingerprints) != test_df.shape[0]:
-                    raise ValueError("Invalid shapes in train fingerprints")
-
+                    raise ValueError("Invalid shapes in test fingerprints")
+                
+                train_fingerprints = np.concatenate(
+                    [train_fingerprints, val_fingerprints], axis=0
+                )
+                
                 np.save(
                     split_dir / "train_fps.npy", train_fingerprints, allow_pickle=False
                 )
