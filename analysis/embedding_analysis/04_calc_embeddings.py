@@ -1,409 +1,255 @@
-"""Calculate embeddings for molecule datasets."""
-
+import csv
 import argparse
+import copy
 from pathlib import Path
 from urllib.request import urlretrieve
 
 import numpy as np
 import pandas as pd
 import torch
-from chemprop.data import (BatchMolGraph, MoleculeDatapoint, MoleculeDataset,
-                           build_dataloader)
-from chemprop.models import MPNN
-from chemprop.nn import (BinaryClassificationFFN, BondMessagePassing,
-                         MeanAggregation)
-from lightning import Trainer, seed_everything
-from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
-from lightning.pytorch.loggers import TensorBoardLogger
 from loguru import logger
 from sklearn.model_selection import PredefinedSplit, train_test_split
 
-from common import parse_endpoint_input
+# Chemprop specific imports
+from chemprop.data import (
+    BatchMolGraph,
+    MoleculeDatapoint,
+    MoleculeDataset,
+    build_dataloader,
+)
+from chemprop.models import MPNN
+from chemprop.nn import (
+    BinaryClassificationFFN,
+    BondMessagePassing,
+    MeanAggregation,
+)
 
+# Lightning imports
+from lightning import Trainer, seed_everything
+from lightning.pytorch.callbacks import Callback, ModelCheckpoint
+from lightning.pytorch.loggers import TensorBoardLogger
 
+# Assumes this local file exists in your directory
+try:
+    from common import parse_endpoint_input
+except ImportError:
+    logger.error("Could not find 'common.py'. Ensure parse_endpoint_input is available.")
+
+# ---------------------------------------------------------------------
+# Logger for CSV
+# ---------------------------------------------------------------------
+class CSVLossLogger(Callback):
+    def __init__(self, csv_path: Path):
+        super().__init__()
+        self.csv_path = csv_path
+
+    def on_train_epoch_end(self, trainer, pl_module):
+        metrics = trainer.callback_metrics
+
+        # Ensure we extract scalar values from tensors safely
+        def get_metric(name):
+            val = metrics.get(name)
+            if torch.is_tensor(val):
+                return val.item()
+            return val
+
+        row = {
+            "epoch": trainer.current_epoch,
+            "train_loss": get_metric("train_loss"),
+            "val_loss": get_metric("val_loss"),
+        }
+
+        write_header = not self.csv_path.exists()
+        with open(self.csv_path, "a", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["epoch", "train_loss", "val_loss"])
+            if write_header:
+                writer.writeheader()
+            writer.writerow(row)
+
+# ---------------------------------------------------------------------
+# Model & Dataset Helpers
+# ---------------------------------------------------------------------
 def from_chemeleon(no_weights: bool = False) -> BondMessagePassing:
-    """Load CheMeleon foundation model for message passing block initialization.
-
-    See https://github.com/chemprop/chemprop/blob/751102dec3c5186d348b6cc80822e3c31cf39840/chemprop/cli/train.py#L1251
-
-    Returns
-    -------
-    BondMessagePassing
-        Message passing block initialized with CheMeleon weights.
-    """
-    ckpt_dir = Path().home() / ".chemprop"
+    ckpt_dir = Path.home() / ".chemprop"
     ckpt_dir.mkdir(exist_ok=True)
     model_path = ckpt_dir / "chemeleon_mp.pt"
+
     if not model_path.exists():
-        logger.info(
-            f"Downloading CheMeleon Foundation model from Zenodo (https://zenodo.org/records/15460715) to {model_path}"
-        )
+        logger.info("Downloading CheMeleon foundation model...")
         urlretrieve(
-            r"https://zenodo.org/records/15460715/files/chemeleon_mp.pt", model_path
+            "https://zenodo.org/records/15460715/files/chemeleon_mp.pt",
+            model_path,
         )
-    else:
-        logger.info(f"Loading cached CheMeleon from {model_path}")
-    logger.info(
-        "Please cite DOI: 10.48550/arXiv.2506.15792 when using CheMeleon in published work"
-    )
-    chemeleon_mp = torch.load(model_path, weights_only=True)
 
-    mp_block = BondMessagePassing(**chemeleon_mp["hyper_parameters"])
+    ckpt = torch.load(model_path, weights_only=True, map_location="cpu")
+    mp = BondMessagePassing(**ckpt["hyper_parameters"])
+
     if not no_weights:
-        mp_block.load_state_dict(chemeleon_mp["state_dict"])
-    return mp_block
+        mp.load_state_dict(ckpt["state_dict"])
 
+    return mp
 
-def smiles_table_to_chemprop_molecule_datapoints(
-    df_data: pd.DataFrame,
-    smiles_col: str,
-    label_cols: list[str],
-) -> list[MoleculeDatapoint]:
-    """Convert a SMILES table to a list of Chemprop's MoleculeDatapoints.
-
-    Parameters
-    ----------
-    df_data : pd.DataFrame
-        DataFrame containing the data.
-    smiles_col : str
-        Name of the column containing SMILES strings.
-    label_cols : list[str]
-        Names of the columns containing labels.
-
-    Returns
-    -------
-    list[MoleculeDatapoint]
-        List of Chemprop MoleculeDatapoint objects.
-    """
-    # remove rows with missing values in relevant columns.
-    df_data_ref = df_data.dropna(subset=[smiles_col, *label_cols], how="any")
-
-    smiles = df_data_ref.loc[:, smiles_col].to_numpy()
-    ys = df_data_ref.loc[:, label_cols].to_numpy()
-
+def smiles_to_dataset(df: pd.DataFrame) -> MoleculeDataset:
+    df = df.dropna(subset=["smiles", "label"])
     datapoints = [
-        MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(smiles, ys, strict=True)
+        MoleculeDatapoint.from_smi(smi, y)
+        for smi, y in zip(df["smiles"], df[["label"]].to_numpy(), strict=True)
     ]
-    return datapoints
+    return MoleculeDataset(datapoints)
 
+def fingerprint_dataset(model: MPNN, dataset: MoleculeDataset) -> np.ndarray:
+    model.eval()
+    device = next(model.parameters()).device
+    with torch.inference_mode():
+        mol_graphs = [dp.mg for dp in dataset]
+        # Process in one batch (if dataset is very large, consider a loop/dataloader)
+        fps = model.fingerprint(BatchMolGraph(mol_graphs).to(device))
+        return fps.detach().cpu().numpy()
 
-def smiles_table_to_chemprop_molecule_dataset(
-    df_data: pd.DataFrame,
-    smiles_col: str,
-    label_cols: list[str],
-) -> MoleculeDataset:
-    """Convert a SMILES table to a Chemprop MoleculeDataset.
-
-    Parameters
-    ----------
-    df_data : pd.DataFrame
-        DataFrame containing the data.
-    smiles_col : str
-        Name of the column containing SMILES strings.
-    label_cols : list[str]
-        Names of the columns containing labels.
-
-    Returns
-    -------
-    MoleculeDataset
-        Table as MoleculeDataset.
-    """
-    return MoleculeDataset(
-        smiles_table_to_chemprop_molecule_datapoints(df_data, smiles_col, label_cols)
+# ---------------------------------------------------------------------
+# Training Logic
+# ---------------------------------------------------------------------
+def train_model(model: MPNN, train_loader, val_loader, split_dir: Path, epochs: int):
+    ckpt_cb = ModelCheckpoint(
+        monitor="val_loss",
+        mode="min",
+        save_top_k=1,
+        save_last=True,
+        dirpath=split_dir / "checkpoints",
     )
 
+    csv_logger = CSVLossLogger(split_dir / "losses.csv")
 
-def main(
-    n_workers: int, endpoint: str, model_name: str, random_state: int | None
-) -> None:
-    """Calculate embeddings for on datasets using different encodings.
+    trainer = Trainer(
+        max_epochs=epochs,
+        callbacks=[ckpt_cb, csv_logger],
+        logger=TensorBoardLogger(str(split_dir), name="tensorboard_logs"),
+        log_every_n_steps=1,
+        deterministic=True,
+        accelerator="auto", # Automatically use GPU if available
+    )
 
-    Parameters
-    ----------
-    n_workers : int
-        Number of workers to use for data loading.
-    endpoint : str
-        Endpoint to train on. Can be a single endpoint or a path to a YAML file
-        containing a list of endpoints.
-    model_name : str
-        Name of base architecture. One of ["chemprop", "chemeleon_finetuned", "chemeleon_frozen", "chemprop_large"].
-    random_state : int | None
-        Random seed for all randomizations (default: None)
-    """
-    base_path = Path(__file__).parents[0]
+    trainer.fit(model, train_loader, val_dataloaders=val_loader)
+    return ckpt_cb.best_model_path, ckpt_cb.last_model_path
+
+# ---------------------------------------------------------------------
+# Main Execution
+# ---------------------------------------------------------------------
+def main(n_workers: int, endpoint: str, model_name: str, seed: int):
+    seed_everything(seed, workers=True)
+
+    IS_FROZEN = model_name == "chemeleon_frozen"
+    base_path = Path(__file__).resolve().parent
     data_path = base_path / "data"
-    logger.add(base_path / "logs" / f"{Path(__file__).stem}.log")
-    endpoint_list = parse_endpoint_input(endpoint)
-
     epochs = 50
 
-    logger.info(f"random_state: {random_state}")
-    logger.info(f"n_workers: {n_workers}")
-    logger.info(f"model_name: {model_name}")
-    logger.info(f"epochs: {epochs}")
+    endpoints = parse_endpoint_input(endpoint)
+    split_strategies = ["Random", "Agglomerative clustering"]
 
-    # Set seeds for reproducibility using best practices
-    deterministic = False
-    if random_state is not None:
-        torch.manual_seed(random_state)
-        deterministic = True
-        seed_everything(random_state, workers=True)
+    # Pre-load the base Message Passing block once to save time
+    logger.info(f"Initializing base model: {model_name}")
+    if model_name in ["chemeleon_frozen", "chemeleon_finetuned"]:
+        master_mp = from_chemeleon()
+    elif model_name == "chemprop_large":
+        master_mp = from_chemeleon(no_weights=True)
+    else:  # standard chemprop
+        master_mp = BondMessagePassing()
 
-    split_strategy_list = [
-        "Random",
-        "Agglomerative clustering",
-        # "Murcko scaffold",
-        #  "Generic scaffold",
-    ]
+    for ep in endpoints:
+        df_path = data_path / "intermediate_data" / "presplit_data" / f"presplit_data_{ep}.tsv"
+        if not df_path.exists():
+            logger.warning(f"Data file not found: {df_path}")
+            continue
 
-    for ep in endpoint_list:
-        logger.info(f"Calculating embeddings for endpoint: {ep}.")
+        endpoint_df = pd.read_csv(df_path, sep="\t")
+        all_predictions = []
 
-        endpoint_df = pd.read_csv(
-            data_path
-            / "intermediate_data"
-            / "presplit_data"
-            / f"presplit_data_{ep}.tsv",
-            sep="\t",
-        )
-
-        prediction_df_list = []
-        for split_strategy in split_strategy_list:
-            for trial, (train_idx, test_idx) in enumerate(
-                PredefinedSplit(endpoint_df[split_strategy]).split()
-            ):
+        for split_strategy in split_strategies:
+            ps = PredefinedSplit(endpoint_df[split_strategy])
+            
+            for trial, (train_idx, test_idx) in enumerate(ps.split()):
+                logger.info(f"Processing {ep} | {split_strategy} | Trial {trial}")
+                
                 split_dir = (
-                    data_path
-                    / "intermediate_data"
-                    / "model_data"
-                    / model_name
-                    / ep
-                    / split_strategy
-                    / f"fold_{trial}"
+                    data_path / "intermediate_data" / "model_data" / 
+                    model_name / ep / split_strategy / f"fold_{trial}"
                 )
+                split_dir.mkdir(parents=True, exist_ok=True)
 
                 train_df = endpoint_df.iloc[train_idx]
                 test_df = endpoint_df.iloc[test_idx].copy()
+                test_dataset = smiles_to_dataset(test_df)
 
-                # Split train_df into train and val (90:10)
-                if model_name != "chemeleon_frozen":
-                    train_df_split, val_df = train_test_split(
-                        train_df,
-                        test_size=0.1,
-                        random_state=random_state,
-                        shuffle=True,
-                    )
-                else:
-                    train_df_split = train_df
-                    val_df = None
-
-                train_dataset = smiles_table_to_chemprop_molecule_dataset(
-                    train_df_split,
-                    smiles_col="smiles",
-                    label_cols=["label"],
-                )
-
-                if val_df is not None:
-                    val_dataset = smiles_table_to_chemprop_molecule_dataset(
-                        val_df,
-                        smiles_col="smiles",
-                        label_cols=["label"],
-                    )
-                    val_dataloader = build_dataloader(
-                        val_dataset, num_workers=n_workers, shuffle=False
-                    )
-                else:
-                    val_dataloader = None
-
-                test_dataset = smiles_table_to_chemprop_molecule_dataset(
-                    test_df,
-                    smiles_col="smiles",
-                    label_cols=["label"],
-                )
-
-                train_dataloader = build_dataloader(
-                    train_dataset, num_workers=n_workers, shuffle=True
-                )
-                test_dataloader = build_dataloader(
-                    test_dataset, num_workers=n_workers, shuffle=False
-                )
-
-                if model_name == "chemeleon_finetuned":
-                    mp = from_chemeleon()
-                elif model_name == "chemeleon_frozen":
-                    mp = from_chemeleon()
-                elif model_name == "chemprop_large":
-                    mp = from_chemeleon(no_weights=True)
-                elif model_name == "chemprop":
-                    mp = BondMessagePassing()
-                else:
-                    raise ValueError(f"{model_name} is not a valid model")
-                agg = MeanAggregation()
-                output_transform = None
-                fnn = BinaryClassificationFFN(
-                    output_transform=output_transform,
-                    input_dim=mp.output_dim,
-                    hidden_dim=300,
-                )
+                # Clone the master MP block for this specific trial
+                mp_block = copy.deepcopy(master_mp)
                 model = MPNN(
-                    mp,
-                    agg,
-                    fnn,
+                    mp_block,
+                    MeanAggregation(),
+                    BinaryClassificationFFN(input_dim=mp_block.output_dim, hidden_dim=300),
                 )
 
-                tensorboard_logger = TensorBoardLogger(
-                    split_dir,
-                    name="tensorboard_logs",
-                    default_hp_metric=False,
+                if IS_FROZEN:
+                    for p in model.parameters():
+                        p.requires_grad = False
+                    
+                    train_dataset = smiles_to_dataset(train_df)
+                    np.save(split_dir / "train_fps.npy", fingerprint_dataset(model, train_dataset))
+                    np.save(split_dir / "test_fps.npy", fingerprint_dataset(model, test_dataset))
+                    continue
+
+                # --- Trainable Path ---
+                train_df, val_df = train_test_split(
+                    train_df, test_size=0.1, random_state=seed, shuffle=True
                 )
 
-                # Setup callbacks for early stopping and checkpointing
-                callbacks = []
-                if val_dataloader is not None:
-                    callbacks = [
-                        EarlyStopping(
-                            monitor="val_loss",
-                            mode="min",
-                            verbose=False,
-                            patience=5,
-                        ),
-                        ModelCheckpoint(
-                            monitor="val_loss",
-                            save_top_k=2,
-                            mode="min",
-                            dirpath=split_dir / "checkpoints",
-                        ),
-                    ]
+                train_loader = build_dataloader(smiles_to_dataset(train_df), num_workers=n_workers, shuffle=True)
+                val_loader = build_dataloader(smiles_to_dataset(val_df), num_workers=n_workers, shuffle=False)
+                test_loader = build_dataloader(test_dataset, num_workers=n_workers, shuffle=False)
 
-                trainer = Trainer(
-                    max_epochs=epochs,
-                    logger=tensorboard_logger,
-                    log_every_n_steps=1,
-                    enable_checkpointing=True,
-                    check_val_every_n_epoch=1,
-                    deterministic=deterministic,
-                    callbacks=callbacks,
-                )
+                best_ckpt, last_ckpt = train_model(model, train_loader, val_loader, split_dir, epochs)
 
-                if model_name == "chemeleon_frozen":
-                    # Freeze all model parameters
-                    for param in model.parameters():
-                        param.requires_grad = False
-                else:
-                    trainer.fit(model, train_dataloader, val_dataloaders=val_dataloader)
+                # Load for evaluation
+                model_best = MPNN.load_from_checkpoint(best_ckpt)
+                model_last = MPNN.load_from_checkpoint(last_ckpt)
 
-                # After training, reload the best model checkpoint if validation was used
-                ckpt_path = None
-                if val_dataloader is not None and hasattr(trainer, "checkpoint_callback") and hasattr(trainer.checkpoint_callback, "best_model_path"):
-                    ckpt_path = trainer.checkpoint_callback.best_model_path
-                elif hasattr(trainer, "checkpoints") and hasattr(trainer.checkpoints, "best_model_path"):
-                    ckpt_path = trainer.checkpoints.best_model_path
-                if ckpt_path and ckpt_path != "":
-                    print(f"Reloading best model from checkpoint file: {ckpt_path}")
-                    torch.cuda.empty_cache()
-                    model = MPNN.load_from_checkpoint(ckpt_path)
-                    trainer = Trainer(logger=tensorboard_logger)
+                # Predict
+                predict_trainer = Trainer(logger=False, accelerator="auto")
+                preds_list = predict_trainer.predict(model_best, test_loader)
+                preds = torch.vstack(preds_list).cpu().numpy().flatten()
 
-                # save test set predictions
-                predictions = (
-                    torch.vstack(trainer.predict(model, test_dataloader))
-                    .numpy(force=True)
-                    .flatten()
-                )
-                test_df["proba"] = predictions
-                test_df["prediction"] = test_df["proba"] > 0.5
+                # Save fingerprints
+                full_train_ds = MoleculeDataset(smiles_to_dataset(train_df).data + smiles_to_dataset(val_df).data)
+                np.save(split_dir / "train_fps_best.npy", fingerprint_dataset(model_best, full_train_ds))
+                np.save(split_dir / "test_fps_best.npy", fingerprint_dataset(model_best, test_dataset))
+
+                # Store Results
+                test_df["proba"] = preds
+                test_df["prediction"] = (preds > 0.5).astype(int)
                 test_df["endpoint"] = ep
                 test_df["trial"] = trial
                 test_df["Split strategy"] = split_strategy
                 test_df["model"] = model_name
-                prediction_df_list.append(test_df)
+                all_predictions.append(test_df)
 
-                # save fingerprints
-                with torch.inference_mode():
-                    train_mol_graphs = [data_point.mg for data_point in train_dataset]
-                    train_fingerprints = (
-                        model.fingerprint(BatchMolGraph(train_mol_graphs))
-                        .detach()
-                        .cpu()
-                        .numpy()
-                    )
-                    val_mol_graphs = [data_point.mg for data_point in val_dataset] if val_df is not None else []
-                    val_fingerprints = (
-                        model.fingerprint(BatchMolGraph(val_mol_graphs))
-                        .detach()
-                        .cpu()
-                        .numpy()
-                    ) if val_df is not None else np.array([])
-                    test_mol_graphs = [data_point.mg for data_point in test_dataset]
-                    test_fingerprints = (
-                        model.fingerprint(BatchMolGraph(test_mol_graphs))
-                        .detach()
-                        .cpu()
-                        .numpy()
-                    )
+                # Cleanup to prevent VRAM accumulation
+                del model, model_best, model_last, mp_block
+                torch.cuda.empty_cache()
 
-                # sanity checks
-                if len(train_fingerprints) != train_df_split.shape[0]:
-                    raise ValueError("Invalid shapes in train fingerprints")
-                if len(val_fingerprints) != val_df.shape[0]:
-                    raise ValueError("Invalid shapes in val fingerprints")
-                if len(test_fingerprints) != test_df.shape[0]:
-                    raise ValueError("Invalid shapes in test fingerprints")
-                
-                train_fingerprints = np.concatenate(
-                    [train_fingerprints, val_fingerprints], axis=0
-                )
-                
-                np.save(
-                    split_dir / "train_fps.npy", train_fingerprints, allow_pickle=False
-                )
-                np.save(
-                    split_dir / "test_fps.npy", test_fingerprints, allow_pickle=False
-                )
+        if not IS_FROZEN and all_predictions:
+            output_file = data_path / "intermediate_data" / "model_data" / model_name / ep / "test_predictions.tsv"
+            pd.concat(all_predictions).to_csv(output_file, sep="\t", index=False)
 
-        prediction_df = pd.concat(prediction_df_list)
-        prediction_df.to_csv(
-            data_path
-            / "intermediate_data"
-            / "model_data"
-            / model_name
-            / ep
-            / "test_predictions.tsv",
-            sep="\t",
-            index=False,
-        )
-
-
+# ---------------------------------------------------------------------
 if __name__ == "__main__":
-    argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument(
-        "--n_workers",
-        type=int,
-        default=1,
-        help="Number of workers to use for dataloading.",
-    )
-    argument_parser.add_argument(
-        "--endpoint",
-        type=str,
-        help="Endpoint to train on.",
-    )
-    argument_parser.add_argument(
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n_workers", type=int, default=1)
+    parser.add_argument("--endpoint", required=True)
+    parser.add_argument(
         "--model-name",
         required=True,
-        type=str,
-        choices=[
-            "chemprop",
-            "chemeleon_finetuned",
-            "chemeleon_frozen",
-            "chemprop_large",
-        ],
-        help="Name of base architecture.",
+        choices=["chemprop", "chemprop_large", "chemeleon_finetuned", "chemeleon_frozen"],
     )
-    argument_parser.add_argument(
-        "--seed",
-        type=int,
-        default=23,
-        help="Random seed for all randomizations (default: 23)",
-    )
-    args = argument_parser.parse_args()
+    parser.add_argument("--seed", type=int, default=23)
+    args = parser.parse_args()
+
     main(args.n_workers, args.endpoint, args.model_name, args.seed)
