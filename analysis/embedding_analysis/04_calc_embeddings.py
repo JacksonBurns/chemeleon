@@ -56,7 +56,7 @@ class CSVLossLogger(Callback):
             writer.writerow(row)
 
 # ---------------------------------------------------------------------
-# 2. Helper Functions (Exactly like your working script)
+# 2. Helper Functions
 # ---------------------------------------------------------------------
 def from_chemeleon(no_weights: bool = False) -> BondMessagePassing:
     ckpt_dir = Path.home() / ".chemprop"
@@ -124,7 +124,6 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
 
                 if model_name == "chemeleon_frozen":
                     for p in model.parameters(): p.requires_grad = False
-                    # Use a dummy trainer to trigger featurization (the secret of the old script)
                     dummy_trainer = Trainer(accelerator="auto", logger=False)
                     dummy_trainer.predict(model, build_dataloader(train_ds, num_workers=n_workers))
                     dummy_trainer.predict(model, build_dataloader(test_ds, num_workers=n_workers))
@@ -145,7 +144,7 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                 # Loop through Best and Last exactly as requested
                 for label, ckpt_path in [("best", ckpt_cb.best_model_path), ("last", ckpt_cb.last_model_path)]:
                     if not ckpt_path: continue
-                    
+                    logger.info(f"Generating {label} fingerprints using checkpoint: {ckpt_path}")
                     m_eval = MPNN.load_from_checkpoint(ckpt_path)
                     eval_trainer = Trainer(accelerator="auto", logger=False)
                     
