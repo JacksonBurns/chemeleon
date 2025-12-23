@@ -141,7 +141,6 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                             build_dataloader(train_ds, num_workers=n_workers, shuffle=True), 
                             val_dataloaders=build_dataloader(val_ds, num_workers=n_workers, shuffle=False) if val_ds else None)
 
-                # Loop through Best and Last exactly as requested
                 for label, ckpt_path in [("best", ckpt_cb.best_model_path), ("last", ckpt_cb.last_model_path)]:
                     if not ckpt_path: continue
                     logger.info(f"Generating {label} fingerprints using checkpoint: {ckpt_path}")
@@ -162,7 +161,7 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                     eval_trainer.predict(m_eval, build_dataloader(train_ds, num_workers=n_workers))
                     if val_ds: eval_trainer.predict(m_eval, build_dataloader(val_ds, num_workers=n_workers))
 
-                    # 3. Save fingerprints using the old script's list comprehension style
+                    # 3. Save fingerprints
                     with torch.inference_mode():
                         fps_train_part = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in train_ds])).cpu().numpy()
                         fps_val_part = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in val_ds])).cpu().numpy() if val_ds else np.array([])
