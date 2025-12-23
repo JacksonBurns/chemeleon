@@ -1,6 +1,6 @@
 #! /bin/bash
 # DESCRIPTOR_LIST="morgan morgan_count rdkit_physchem mordred"
-MODEL_LIST="chemprop chemprop_large chemeleon_finetuned chemeleon_frozen"
+MODEL_LIST="chemprop chemprop_large"
 
 n_jobs=-1
 n_workers=2
