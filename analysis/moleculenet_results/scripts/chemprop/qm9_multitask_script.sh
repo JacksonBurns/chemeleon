@@ -1,10 +1,9 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
-data_path="/home/akshatz/bond_order_free/pcqm4mv2/dataset/pcqm4mv2_data_filtered.csv"
-splits_path="/home/akshatz/bond_order_free/pcqm4mv2/dataset/splits_filtered.json"
+results_dir="qm9_multitask_results"
+data_path="/home/akshatz/bond_order_free/qm9/dataset/qm9_data.csv"
+splits_path="/home/akshatz/bond_order_free/qm9/dataset/splits.json"
 
 chemprop train \
 -t regression \
@@ -15,8 +14,7 @@ chemprop train \
 --pytorch-seed 42 \
 --save-dir $results_dir \
 --ensemble-size 5 \
---metrics mae r2 \
---from-foundation chemeleon \
+--metrics mae rmse \
 --accelerator gpu \
 --devices "1," \
 

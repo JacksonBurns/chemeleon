@@ -1,9 +1,8 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir=results_sampl
-results_dir2=results_sampl_production
+results_dir=sampl_results
+results_dir2=sampl_production_results
 data_path=/home/akshatz/bond_order_free/logp/dataset/logP/data.csv
 splits_path=/home/akshatz/bond_order_free/logp/dataset/logP/splits.json
 all_splits_path=/home/akshatz/bond_order_free/logp/dataset/logP/all_splits.json

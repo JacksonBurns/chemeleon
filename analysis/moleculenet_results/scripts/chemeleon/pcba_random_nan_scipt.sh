@@ -2,7 +2,7 @@
 echo 'date: ' $(date)
 conda activate chemprop
 
-results_dir="results"
+results_dir="pcba_random_nan_results"
 data_path="/home/akshatz/bond_order_free/pcba_random_nan/dataset/pcba_random_nan_data_filtered.csv"
 splits_path="/home/akshatz/bond_order_free/pcba_random_nan/dataset/splits_filtered.json"
 

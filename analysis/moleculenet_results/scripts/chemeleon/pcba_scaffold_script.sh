@@ -1,10 +1,9 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
-data_path="/home/akshatz/bond_order_free/hiv/dataset/hiv_data_filtered.csv"
-splits_path="/home/akshatz/bond_order_free/hiv/dataset/splits_filtered.json"
+results_dir="pcba_scaffold_results"
+data_path="/home/akshatz/bond_order_free/pcba_scaffold/dataset/pcba_scaffold_data_filtered.csv"
+splits_path="/home/akshatz/bond_order_free/pcba_scaffold/dataset/splits_filtered.json"
 
 chemprop train \
 -t classification \
@@ -17,4 +16,4 @@ chemprop train \
 --ensemble-size 5 \
 --from-foundation chemeleon \
 --accelerator gpu \
---devices 1 \
+--devices "1," \

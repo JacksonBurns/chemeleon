@@ -1,8 +1,7 @@
 #!/bin/bash -l
 echo 'date: ' $(date)
-conda activate chemprop
 
-results_dir="results"
+results_dir="uv_vis_results"
 data_path="/home/akshatz/bond_order_free/multi_molecule/dataset/mult_mol_data_filtered.csv"
 splits_path="/home/akshatz/bond_order_free/multi_molecule/dataset/splits_filtered.json"
 
@@ -17,6 +16,5 @@ chemprop train \
 --save-dir $results_dir \
 --ensemble-size 5 \
 --metrics mae r2 \
---from-foundation CheMeleon \
 --accelerator gpu \
---devices 1 \
+--devices "1," \

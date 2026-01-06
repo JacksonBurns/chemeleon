@@ -2,9 +2,9 @@
 echo 'date: ' $(date)
 conda activate chemprop
 
-results_dir="results"
-data_path="/home/akshatz/bond_order_free/pcba_scaffold/dataset/pcba_scaffold_data_filtered.csv"
-splits_path="/home/akshatz/bond_order_free/pcba_scaffold/dataset/splits_filtered.json"
+results_dir="pcba_random_nan_results"
+data_path="/home/akshatz/bond_order_free/pcba_random_nan/dataset/pcba_random_nan_data_filtered.csv"
+splits_path="/home/akshatz/bond_order_free/pcba_random_nan/dataset/splits_filtered.json"
 
 chemprop train \
 -t classification \
@@ -15,6 +15,5 @@ chemprop train \
 --pytorch-seed 42 \
 --save-dir $results_dir \
 --ensemble-size 5 \
---from-foundation chemeleon \
 --accelerator gpu \
 --devices "1," \
