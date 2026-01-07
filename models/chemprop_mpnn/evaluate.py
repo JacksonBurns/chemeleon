@@ -4,38 +4,33 @@ fit a chemprop model directly on the smiles
 note that polaris requires zarr<3 but the feature generator requires
 zarr>=3 so two separate python environments are needed
 """
-from pathlib import Path
-import sys
+
 import datetime
 import json
-import shutil
 import os
+import shutil
+import sys
+from pathlib import Path
 
-import torch
-from mordred import Calculator, descriptors
-import polaris as po
-from polaris.utils.types import TargetType
-from lightning import Trainer
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
-from lightning.pytorch.loggers import TensorBoardLogger
-from astartes import train_test_split
-from sklearn.metrics import root_mean_squared_error
-import pandas as pd
 import numpy as np
-
+import pandas as pd
+import polaris as po
+import torch
+from astartes import train_test_split
+from chemprop.conf import DEFAULT_HIDDEN_DIM
 from chemprop.data import MoleculeDatapoint, MoleculeDataset, build_dataloader
 from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
-from chemprop.conf import DEFAULT_HIDDEN_DIM
-from chemprop.nn import (
-    BondMessagePassing,
-    BinaryClassificationFFN,
-    RegressionFFN,
-    UnscaleTransform,
-)
 from chemprop.models import MPNN
+from chemprop.nn import (BinaryClassificationFFN, BondMessagePassing,
+                         RegressionFFN, UnscaleTransform)
 from chemprop.nn.agg import MeanAggregation
-
+from lightning import Trainer
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
+from lightning.pytorch.loggers import TensorBoardLogger
+from mordred import Calculator, descriptors
+from polaris.utils.types import TargetType
 from pretrain import MaskedDescriptorsMPNN, WinsorizeStdevN
+from sklearn.metrics import root_mean_squared_error
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")

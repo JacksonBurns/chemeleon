@@ -1,22 +1,20 @@
-from pathlib import Path
-import sys
 import datetime
 import json
-import warnings
 import os
+import sys
+import warnings
+from pathlib import Path
 
-import polaris as po
-from polaris.utils.types import TargetType
-from mordred import Calculator, descriptors
 import numpy as np
 import pandas as pd
-from rdkit.Chem import MolFromSmiles
-from fastprop.data import standard_scale, inverse_standard_scale
+import polaris as po
 import torch
-
+from fastprop.data import inverse_standard_scale, standard_scale
+from mordred import Calculator, descriptors
+from polaris.utils.types import TargetType
+from rdkit.Chem import MolFromSmiles
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import root_mean_squared_error
-
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)

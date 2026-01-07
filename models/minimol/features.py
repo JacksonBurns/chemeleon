@@ -1,10 +1,9 @@
 from pathlib import Path
 
-import polaris as po
-import pandas as pd
 import numpy as np
+import pandas as pd
+import polaris as po
 from minimol import Minimol
-
 
 if __name__ == "__main__":
     all_benchmarks = (

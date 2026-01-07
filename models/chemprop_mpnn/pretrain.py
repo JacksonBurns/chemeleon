@@ -1,16 +1,15 @@
 from typing import Iterable
 
-from lightning import pytorch as pl
 import torch
-from torch import distributed
 import zarr
-
-from rdkit.Chem import MolFromSmiles
+from chemprop.data import Datum
+from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
+from chemprop.models import MPNN
 from chemprop.nn import Aggregation, ChempropMetric, MessagePassing, Predictor
 from fastprop.data import standard_scale
-from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
-from chemprop.data import Datum
-from chemprop.models import MPNN
+from lightning import pytorch as pl
+from rdkit.Chem import MolFromSmiles
+from torch import distributed
 
 
 class WinsorizeStdevN(torch.nn.Module):
@@ -101,14 +100,15 @@ if __name__ == "__main__":
     import sys
     from pathlib import Path
 
-    from tqdm import tqdm
-    from chemprop.nn import MeanAggregation, BondMessagePassing, RegressionFFN, metrics
     from chemprop.data import build_dataloader
-    from lightning.pytorch.utilities import rank_zero_info
+    from chemprop.nn import (BondMessagePassing, MeanAggregation,
+                             RegressionFFN, metrics)
     from lightning.pytorch import Trainer
-    from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
     from lightning.pytorch.callbacks.early_stopping import EarlyStopping
+    from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
     from lightning.pytorch.loggers import TensorBoardLogger
+    from lightning.pytorch.utilities import rank_zero_info
+    from tqdm import tqdm
 
     BATCH_SIZE = 128
     NUM_EPOCHS = 500

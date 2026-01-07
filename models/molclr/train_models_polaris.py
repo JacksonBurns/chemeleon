@@ -1,37 +1,37 @@
+import datetime
+import json
+import logging
 import os
 import sys
-import yaml
-import json
-import datetime
 import warnings
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-import logging
-from pathlib import Path
-from tqdm import tqdm
-
 import torch
-from torch import nn
 import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter
+import yaml
+from sklearn.metrics import (mean_absolute_error, mean_squared_error,
+                             roc_auc_score)
+from sklearn.model_selection import train_test_split
+from torch import nn
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
-from torch.optim.lr_scheduler import CosineAnnealingLR
-from sklearn.metrics import mean_squared_error, mean_absolute_error, roc_auc_score
-from sklearn.model_selection import train_test_split
-
+from torch.utils.tensorboard import SummaryWriter
 from torch_geometric.data import Data, DataLoader
+from tqdm import tqdm
 
 # MolCLR imports
 sys.path.append("/home/akshatz/MolCLR")
-from models.gcn_finetune import GCN
-from dataset.dataset_test import ATOM_LIST, CHIRALITY_LIST, BOND_LIST, BONDDIR_LIST
-
 import rdkit
-from rdkit import Chem
-from rdkit.Chem.rdchem import HybridizationType
+from dataset.dataset_test import (ATOM_LIST, BOND_LIST, BONDDIR_LIST,
+                                  CHIRALITY_LIST)
+from rdkit import Chem, RDLogger
 from rdkit.Chem.rdchem import BondType as BT
-from rdkit import RDLogger
+from rdkit.Chem.rdchem import HybridizationType
+
+from models.gcn_finetune import GCN
 
 RDLogger.DisableLog("rdApp.*")
 

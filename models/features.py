@@ -6,15 +6,15 @@ as float32 to a zarr file
 """
 
 import sys
-from multiprocessing import Pool
 import warnings
+from multiprocessing import Pool
 
 import numpy as np
-from rdkit import rdBase
+import zarr
 from mordred import Calculator, descriptors
+from rdkit import rdBase
 from rdkit.Chem import MolFromSmiles, RemoveHs
 from tqdm import tqdm
-import zarr
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 

@@ -1,5 +1,5 @@
 # chemeleon_fingerprint.py
-# 
+#
 # this file contains the class CheMeleonFingerprint which can be instantiated
 # and called to generate the CheMeleon learned embeddings for a list of SMILES
 # strings and/or RDKit Mols. you may wish to simply copy or download this file directly for use,
@@ -13,13 +13,13 @@
 from pathlib import Path
 from urllib.request import urlretrieve
 
+import numpy as np
 import torch
 from chemprop import featurizers, nn
 from chemprop.data import BatchMolGraph
-from chemprop.nn import RegressionFFN
 from chemprop.models import MPNN
-from rdkit.Chem import MolFromSmiles, Mol
-import numpy as np
+from chemprop.nn import RegressionFFN
+from rdkit.Chem import Mol, MolFromSmiles
 
 
 class CheMeleonFingerprint:
@@ -35,8 +35,8 @@ class CheMeleonFingerprint:
                 mp_path,
             )
         chemeleon_mp = torch.load(mp_path, weights_only=True)
-        mp = nn.BondMessagePassing(**chemeleon_mp['hyper_parameters'])
-        mp.load_state_dict(chemeleon_mp['state_dict'])
+        mp = nn.BondMessagePassing(**chemeleon_mp["hyper_parameters"])
+        mp.load_state_dict(chemeleon_mp["state_dict"])
         self.model = MPNN(
             message_passing=mp,
             agg=agg,
@@ -47,7 +47,12 @@ class CheMeleonFingerprint:
             self.model.to(device=device)
 
     def __call__(self, molecules: list[str | Mol]) -> np.ndarray:
-        bmg = BatchMolGraph([self.featurizer(MolFromSmiles(m) if isinstance(m, str) else m) for m in molecules])
+        bmg = BatchMolGraph(
+            [
+                self.featurizer(MolFromSmiles(m) if isinstance(m, str) else m)
+                for m in molecules
+            ]
+        )
         bmg.to(device=self.model.device)
         with torch.no_grad():
             return self.model.fingerprint(bmg).numpy(force=True)

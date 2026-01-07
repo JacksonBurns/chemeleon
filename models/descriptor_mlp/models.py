@@ -5,9 +5,8 @@ from typing import Tuple
 import torch
 from fastprop.data import standard_scale
 from lightning import LightningModule
-from torch import distributed
 from rtdl_num_embeddings import PeriodicEmbeddings
-
+from torch import distributed
 
 # code for the SNN has been adapted from the author's demo notebook on GitHub:
 # https://github.com/bioinf-jku/SNNs/blob/master/Pytorch/SelfNormalizingNetworks_MLP_MNIST.ipynb

@@ -7,39 +7,34 @@ to handle extreme outliers and prevent numerical instability.
 note that polaris requires zarr<3 but the feature generator requires
 zarr>=3 so two separate python environments are needed
 """
-from pathlib import Path
-import sys
+
 import datetime
 import json
-import shutil
 import os
+import shutil
+import sys
+from pathlib import Path
 
-import torch
-from rdkit import Chem
-from rdkit.Chem import MolFromSmiles
-from mordred import Calculator, descriptors
-import polaris as po
-from polaris.utils.types import TargetType
-from lightning import Trainer
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
-from lightning.pytorch.loggers import TensorBoardLogger
-from astartes import train_test_split
-from sklearn.metrics import root_mean_squared_error
-import pandas as pd
 import numpy as np
-
+import pandas as pd
+import polaris as po
+import torch
+from astartes import train_test_split
+from chemprop.conf import DEFAULT_HIDDEN_DIM
 from chemprop.data import MoleculeDatapoint, MoleculeDataset, build_dataloader
 from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
-from chemprop.conf import DEFAULT_HIDDEN_DIM
-from chemprop.nn import (
-    BondMessagePassing,
-    BinaryClassificationFFN,
-    RegressionFFN,
-    UnscaleTransform,
-    ScaleTransform,
-)
 from chemprop.models import MPNN
+from chemprop.nn import (BinaryClassificationFFN, BondMessagePassing,
+                         RegressionFFN, ScaleTransform, UnscaleTransform)
 from chemprop.nn.agg import MeanAggregation
+from lightning import Trainer
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
+from lightning.pytorch.loggers import TensorBoardLogger
+from mordred import Calculator, descriptors
+from polaris.utils.types import TargetType
+from rdkit import Chem
+from rdkit.Chem import MolFromSmiles
+from sklearn.metrics import root_mean_squared_error
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
@@ -122,11 +117,11 @@ timestamp: {datetime.datetime.now()}
         "CHEMBL4616_EC50",
         "CHEMBL4792_Ki",
     )
-    
+
     # Initialize Mordred calculator for descriptor computation
     calc = Calculator(descriptors, ignore_3D=True)
     calc.config(timeout=1)
-    
+
     for random_seed in (42, 117, 709, 1701, 9001):
         output_file.write(f"## Random Seed {random_seed}\n")
         seed_dir = output_dir / f"seed_{random_seed}"
@@ -159,7 +154,7 @@ timestamp: {datetime.datetime.now()}
             # Calculate Mordred descriptors for all molecules
             train_mols = [MolFromSmiles(smi) for smi in train_df[smiles_col]]
             test_mols = [MolFromSmiles(smi) for smi in test_df[smiles_col]]
-            
+
             # Set molecule names to avoid issues
             for mol in train_mols:
                 if mol is not None:
@@ -167,10 +162,14 @@ timestamp: {datetime.datetime.now()}
             for mol in test_mols:
                 if mol is not None:
                     mol.SetProp("_Name", "")
-            
+
             # Calculate Mordred descriptors as extra datapoint descriptors
-            train_descriptors = calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32)
-            test_descriptors = calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32)
+            train_descriptors = (
+                calc.pandas(train_mols).fill_missing().to_numpy(dtype=np.float32)
+            )
+            test_descriptors = (
+                calc.pandas(test_mols).fill_missing().to_numpy(dtype=np.float32)
+            )
 
             # typical chemprop training
             train_idxs, val_idxs = train_test_split(
@@ -182,17 +181,17 @@ timestamp: {datetime.datetime.now()}
             train_data = [
                 MoleculeDatapoint.from_smi(smi, y, x_d=descriptors)
                 for smi, y, descriptors in zip(
-                    train_df[smiles_col].iloc[train_idxs], 
+                    train_df[smiles_col].iloc[train_idxs],
                     targets[train_idxs],
-                    train_descriptors[train_idxs]
+                    train_descriptors[train_idxs],
                 )
             ]
             val_data = [
                 MoleculeDatapoint.from_smi(smi, y, x_d=descriptors)
                 for smi, y, descriptors in zip(
-                    train_df[smiles_col].iloc[val_idxs], 
+                    train_df[smiles_col].iloc[val_idxs],
                     targets[val_idxs],
-                    train_descriptors[val_idxs]
+                    train_descriptors[val_idxs],
                 )
             ]
             test_data = [
@@ -207,15 +206,15 @@ timestamp: {datetime.datetime.now()}
             if task_type == TargetType.REGRESSION:
                 scaler = train_dataset.normalize_targets()
                 val_dataset.normalize_targets(scaler)
-            
+
             # Normalize Mordred descriptor features (extra datapoint descriptors)
             descriptor_scaler = train_dataset.normalize_inputs("X_d")
             val_dataset.normalize_inputs("X_d", descriptor_scaler)
-            
+
             # Clamp descriptor values to ±6 standard deviations to handle extreme outliers
             train_dataset.X_d = np.clip(train_dataset.X_d, -6.0, 6.0)
             val_dataset.X_d = np.clip(val_dataset.X_d, -6.0, 6.0)
-            
+
             train_dataloader = build_dataloader(train_dataset, num_workers=1)
             val_dataloader = build_dataloader(val_dataset, num_workers=1, shuffle=False)
             test_dataloader = build_dataloader(
@@ -226,6 +225,7 @@ timestamp: {datetime.datetime.now()}
                 if scaler is not None
                 else torch.nn.Identity()
             )
+
             # Create transform for extra datapoint descriptors (Mordred descriptors)
             # This combines scaling with clamping to handle extreme outliers during inference
             class ScaleAndClampTransform(torch.nn.Module):
@@ -234,18 +234,18 @@ timestamp: {datetime.datetime.now()}
                     self.scale_transform = ScaleTransform.from_standard_scaler(scaler)
                     self.clamp_min = clamp_min
                     self.clamp_max = clamp_max
-                
+
                 def forward(self, x):
                     x = self.scale_transform(x)
                     return torch.clamp(x, self.clamp_min, self.clamp_max)
-            
+
             X_d_transform = ScaleAndClampTransform(descriptor_scaler)
-            
+
             # Training from scratch (no pretraining)
             mp = BondMessagePassing()
             agg = MeanAggregation()
             hidden_size = DEFAULT_HIDDEN_DIM
-            
+
             # FFN input dimension: mp output + Mordred descriptors
             num_descriptors = train_descriptors.shape[1]
             ffn_input_dim = hidden_size + num_descriptors

@@ -1,23 +1,20 @@
-import sys
 import os
+import sys
 from pathlib import Path
 
+import optuna
 import torch
 import zarr
-from torch.utils.data import DataLoader as TorchDataLoader
-
 from lightning import Trainer
-from lightning.pytorch.utilities.rank_zero import rank_zero_info
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger
+from lightning.pytorch.utilities.rank_zero import rank_zero_info
+from pretrain import ZarrDataset
+from torch.utils.data import DataLoader as TorchDataLoader
+from torchford import Welford
 from tqdm import tqdm
 
-import optuna
-
 from models import fastpropFoundation
-from pretrain import ZarrDataset
-from torchford import Welford
-
 
 # training configuration
 LEARNING_RATE = 1e-5

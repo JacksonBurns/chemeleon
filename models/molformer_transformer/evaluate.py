@@ -1,25 +1,20 @@
-from pathlib import Path
-import sys
 import datetime
 import json
 import os
 import shutil
+import sys
+from pathlib import Path
 
-import polaris as po
-from polaris.utils.types import TargetType
-
-import torch
-from datasets import Dataset
-from astartes import train_test_split
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    TrainingArguments,
-    Trainer,
-)
 import numpy as np
 import pandas as pd
+import polaris as po
+import torch
+from astartes import train_test_split
+from datasets import Dataset
+from polaris.utils.types import TargetType
 from sklearn.metrics import root_mean_squared_error
+from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                          Trainer, TrainingArguments)
 
 BASE_MODEL = "ibm-research/MoLFormer-XL-both-10pct"
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")

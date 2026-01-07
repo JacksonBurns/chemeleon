@@ -1,12 +1,13 @@
-import polaris as po
-from polaris.utils.types import TargetType
-import pandas as pd
-import os
-import logging
 import argparse
 import json
+import logging
+import os
 import re
-from typing import List, Dict
+from typing import Dict, List
+
+import pandas as pd
+import polaris as po
+from polaris.utils.types import TargetType
 
 # Set up logging
 logging.basicConfig(
