@@ -10,3 +10,4 @@ screen.log
 *.ckpt
 *.log
 minimol_features
+analysis/moleculenet_results/**/*_results/
