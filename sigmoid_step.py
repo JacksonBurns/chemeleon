@@ -23,5 +23,9 @@ class SigmoidStep(nn.Module):
     Forward: sigmoid(x) -> threshold at 0.5
     Backward: gradient as if sigmoid (straight-through trick)
     """
+    def __init__(self, dropout_p: float = 0.2):
+        super().__init__()
+        self.dropout = nn.Dropout(dropout_p)
+
     def forward(self, x):
-        return SigmoidStepSTE.apply(x)
+        return self.dropout(SigmoidStepSTE.apply(x))

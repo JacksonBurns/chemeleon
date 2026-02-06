@@ -61,7 +61,7 @@ class MaskedDescriptorsMPNN(MPNN):
         feature_vars: torch.Tensor,
         winsorization_factor: int = 6,
     ):
-        super().__init__(message_passing, agg, predictor, False, metrics)
+        super().__init__(message_passing, agg, predictor, False, metrics, final_lr=1e-5)
         self.masking_ratio = masking_ratio
         self.register_buffer("feature_means", feature_means)
         self.register_buffer("feature_vars", feature_vars)
@@ -109,8 +109,8 @@ if __name__ == "__main__":
     
     
     BATCH_SIZE = 128
-    NUM_EPOCHS = 5000
-    PATIENCE = 50
+    NUM_EPOCHS = 200
+    PATIENCE = 20
     HIDDEN_SIZE = 2_048
     DEPTH = 6
     

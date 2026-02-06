@@ -26,9 +26,9 @@ from utils.torchford import Welford
 
 
 # architecture
-EMBEDDING_DIM = 8
+EMBEDDING_DIM = 16
 ENCODING_SIZE = 4096
-HIDDEN_SIZES = tuple([ENCODING_SIZE] * 3)
+HIDDEN_SIZES = tuple([ENCODING_SIZE] * 2)
 DECODER_SIZES = tuple()
 # output/pubchem1MM_MDAE_PLR_15mask_8embedding_4096x3layers_4096encoding
 # 
