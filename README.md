@@ -10,3 +10,5 @@ Deps (formalize into reqs):
  - chemprop 2.1+
  - zarr 3 for training < 3 for finetuning
  - polaris 0.11.6+ 
+
+Yo, you really gotta rename this branch man
