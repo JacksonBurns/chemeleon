@@ -6,3 +6,5 @@ output
 screen.log
 *.ckpt
 *.log
+*.parquet
+.vscode

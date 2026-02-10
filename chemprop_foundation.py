@@ -1,3 +1,4 @@
+import os
 from typing import Iterable
 
 from lightning import pytorch as pl
@@ -14,8 +15,6 @@ from chemprop.featurizers.bond import RIGRBondFeaturizer
 from chemprop.data import Datum
 from chemprop.models import MPNN
 
-from sigmoid_step import SigmoidStep
-
 
 class WinsorizeStdevN(torch.nn.Module):
     def __init__(self, n: float) -> None:
@@ -28,14 +27,18 @@ class WinsorizeStdevN(torch.nn.Module):
     def extra_repr(self) -> str:
         return f"n={self.n}"
 
+import numpy as np
+from chemprop.data.collate import TrainingBatch, BatchMolGraph
+
 
 # mock the default chemprop dataset class to load y's incrementally
-class ChemPropZarrDataset(torch.utils.data.Dataset):
+class ChemPropChunkwiseZarrDataset(torch.utils.data.Dataset):
     def __init__(self, smiles: list[str], zarr_store: str):
-        self.smiles = smiles
-        self.len = len(smiles)
+        self.smiles = np.array(smiles)
         self.z = zarr.open_array(zarr_store)
         assert self.z.shape[0] == len(smiles), "Mismatched smiles and feature sizes"
+        self.len = self.z.nchunks
+        self.chunksize = self.z.chunks[0]
         self.molgraph_generator = SimpleMoleculeMolGraphFeaturizer(
             atom_featurizer=RIGRAtomFeaturizer(),
             bond_featurizer=RIGRBondFeaturizer(),
@@ -43,10 +46,127 @@ class ChemPropZarrDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self.len
-    
+
     def __getitem__(self, idx: int):
-        mg = self.molgraph_generator(MolFromSmiles(self.smiles[idx]))
-        return Datum(mg, None, None, self.z[idx, :], 1.0, None, None)     
+        start_idx = idx * self.chunksize
+        stop_idx = start_idx + self.chunksize
+        return TrainingBatch(
+            [self.molgraph_generator(MolFromSmiles(s)) for s in self.smiles[start_idx:stop_idx]],
+            None,
+            None,
+            self.z[start_idx:stop_idx, :],
+            torch.ones((self.chunksize, 1)),
+            None,
+            None,
+        )
+        
+        
+import torch
+import os
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+import torch
+
+class BatchedWelford:
+    """
+    Computes running mean and variance using Welford's online algorithm.
+    Optimized for processing batches of data.
+    
+    ROBUSTNESS:
+    - Handles NaNs (ignores them).
+    - Handles Infs (treats them as NaNs/missing).
+    - Tracks per-feature sample counts to handle variable missingness.
+    """
+    def __init__(self, num_features):
+        self.num_features = num_features
+        # We defer device allocation until we see the first batch
+        self.n = None
+        self.mean = None
+        self.M2 = None
+
+    def _init_stats(self, device, dtype):
+        self.n = torch.zeros(self.num_features, dtype=dtype, device=device)
+        self.mean = torch.zeros(self.num_features, dtype=dtype, device=device)
+        self.M2 = torch.zeros(self.num_features, dtype=dtype, device=device)
+
+    def update(self, batch):
+        """
+        Update stats with a new batch. 
+        Shape: [Batch_Size, Num_Features] or [Num_Features]
+        """
+        # 1. Standardize Shape and Type
+        batch = batch.reshape(-1, self.num_features).to(torch.float64)
+        
+        if batch.shape[0] == 0:
+            return
+
+        # Initialize stats on the correct device if this is the first batch
+        if self.mean is None:
+            self._init_stats(batch.device, torch.float64)
+
+        # 2. SANITIZE: Convert +/- Infinity to NaN
+        # This prevents mean -> Inf, which causes Inf - Inf -> NaN later.
+        if torch.isinf(batch).any():
+            # We clone to avoid modifying the dataset tensor in-place
+            batch = batch.clone()
+            batch[torch.isinf(batch)] = float('nan')
+
+        # 3. Calculate Batch Stats (Robust to NaNs)
+        # Count valid (non-NaN) values per feature
+        # ~isnan() returns 1 for valid, 0 for nan
+        n_b = torch.isnan(batch).logical_not().sum(dim=0).to(torch.float64)
+        
+        # Calculate batch mean (ignoring NaNs)
+        # nanmean returns NaN if a column is ALL NaNs -> we default these to 0.0
+        mean_b = torch.nanmean(batch, dim=0)
+        mean_b = torch.nan_to_num(mean_b, nan=0.0)
+
+        # Calculate M2_b: sum((x - mean_b)^2) ignoring NaNs
+        # (batch - mean_b) creates NaNs where batch was NaN. nansum treats them as 0.
+        diff = batch - mean_b
+        M2_b = torch.nansum(diff ** 2, dim=0)
+
+        # 4. Merge with Global Stats (Welford's Parallel Formula)
+        n_a = self.n
+        mean_a = self.mean
+        M2_a = self.M2
+
+        new_n = n_a + n_b
+
+        # Mask to handle cases where a feature effectively has NO data yet (n=0)
+        # This prevents 0/0 division errors
+        valid_mask = new_n > 0
+        
+        delta = mean_b - mean_a
+
+        # Prepare updates
+        # We only update indices where we actually have data (valid_mask)
+        term1 = torch.zeros_like(mean_a)
+        term1[valid_mask] = delta[valid_mask] * (n_b[valid_mask] / new_n[valid_mask])
+        
+        term2 = torch.zeros_like(M2_a)
+        term2[valid_mask] = (delta[valid_mask] ** 2) * (n_a[valid_mask] * n_b[valid_mask] / new_n[valid_mask])
+
+        # Commit updates
+        self.mean = mean_a + term1
+        self.M2 = M2_a + M2_b + term2
+        self.n = new_n
+
+    @property
+    def var(self):
+        if self.n is None: return None
+        # Variance is M2 / (n - 1)
+        # Return 0.0 where n < 2 to avoid NaNs
+        variance = torch.zeros_like(self.mean)
+        valid = self.n > 1
+        variance[valid] = self.M2[valid] / (self.n[valid] - 1)
+        return variance
+
+    @property
+    def std(self):
+        if self.n is None: return None
+        return torch.sqrt(self.var)
 
 
 class MaskedDescriptorsMPNN(MPNN):
@@ -61,12 +181,11 @@ class MaskedDescriptorsMPNN(MPNN):
         feature_vars: torch.Tensor,
         winsorization_factor: int = 6,
     ):
-        super().__init__(message_passing, agg, predictor, False, metrics, final_lr=1e-5)
+        super().__init__(message_passing, agg, predictor, False, metrics)
         self.masking_ratio = masking_ratio
         self.register_buffer("feature_means", feature_means)
         self.register_buffer("feature_vars", feature_vars)
         self.winsorization = WinsorizeStdevN(winsorization_factor)
-        self.bn = SigmoidStep()
 
     def validation_step(self, batch, batch_idx = 0):
         bmg, V_d, X_d, targets, weights, lt_mask, gt_mask = batch
@@ -90,7 +209,7 @@ class MaskedDescriptorsMPNN(MPNN):
         Z = self.fingerprint(bmg, V_d, X_d)
         preds = self.predictor.train_step(Z)
         l = self.criterion(preds, targets, mask, weights, lt_mask, gt_mask)
-        self.log("train/masked_loss", self.criterion, batch_size=batch_size, prog_bar=True, on_epoch=True, sync_dist=distributed.is_initialized())
+        self.log("train/masked_loss", l, batch_size=batch_size, prog_bar=True, on_epoch=True, sync_dist=distributed.is_initialized())
         return l
 
 
@@ -100,17 +219,18 @@ if __name__ == "__main__":
     
     from tqdm import tqdm
     from chemprop.nn import NormAggregation, BondMessagePassing, RegressionFFN, metrics
-    from chemprop.data import build_dataloader
     from lightning.pytorch.utilities import rank_zero_info
     from lightning.pytorch import Trainer
     from lightning.pytorch.callbacks.model_checkpoint import ModelCheckpoint
     from lightning.pytorch.callbacks.early_stopping import EarlyStopping
     from lightning.pytorch.loggers import TensorBoardLogger
+    import polars
+    from utils.torchford import Welford
+    from rdkit.rdBase import BlockLogs
+    bl = BlockLogs()
     
-    
-    BATCH_SIZE = 128
-    NUM_EPOCHS = 200
-    PATIENCE = 20
+    NUM_EPOCHS = 40
+    PATIENCE = 4
     HIDDEN_SIZE = 2_048
     DEPTH = 6
     
@@ -119,30 +239,44 @@ if __name__ == "__main__":
         output_dir = Path(sys.argv[2])
         smiles_file = Path(sys.argv[3])
     except:
-        print("usage: python chemprop_foundation.py TRAINING_STORE OUTPUT_DIR SMILES_FILE")
+        print("usage: python chemprop_foundation.py TRAINING_STORE OUTPUT_DIR /path/to/smiles.parquet")
         exit(1)
         
     z = zarr.open_array(training_store, mode='r')
     n_features = z.shape[1]
     del z
 
-    with open(smiles_file, "r") as file:
-        smiles = [i.strip() for i in tqdm(file.readlines(), "Reading SMILES")]
+    smiles = polars.read_parquet(smiles_file)["SMILES"].to_list()
     
     
     # lightning training code from other script    
-    dataset = ChemPropZarrDataset(
+    dataset = ChemPropChunkwiseZarrDataset(
         smiles,
         training_store,
     )
     gen = torch.Generator().manual_seed(1701)
-    train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.7, 0.2, 0.1], gen)
-    train_dataloader = build_dataloader(train_dset, num_workers=4, batch_size=BATCH_SIZE, shuffle=True, persistent_workers=True)
-    val_dataloader = build_dataloader(val_dset, num_workers=4, batch_size=BATCH_SIZE, shuffle=False, persistent_workers=True)
-    test_dataloader = build_dataloader(test_dset, num_workers=4, batch_size=BATCH_SIZE, shuffle=False, persistent_workers=True)
+    train_dset, val_dset, test_dset = torch.utils.data.random_split(dataset, [0.95, 0.04, 0.01], gen)
+    
+    sampler = None
+    from torch.utils.data import DataLoader
+    train_dataloader = DataLoader(dataset=train_dset, batch_size=None, shuffle=True, num_workers=4, persistent_workers=True)
+    val_dataloader = DataLoader(dataset=val_dset, batch_size=None, shuffle=False, num_workers=4, persistent_workers=True)
+    test_dataloader = DataLoader(dataset=test_dset, batch_size=None, shuffle=False, num_workers=4, persistent_workers=True)
+
+
+    # --- Configuration ---
+    TOLERANCE_REL = 1e-3  # Stop when mean changes by less than 0.1%
+    CHECK_EVERY = 32
+    MIN_SAMPLES = 100_000_000     # Force minimum sample size to avoid lucky early stops
+    # ---------------------
 
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
+
+    if not os.path.exists(cached_means_fpath) or not os.path.exists(cached_vars_fpath):
+        print("missing cached stats, run get_training_set_stats.py before this script")
+        exit(1)
+    # Load
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 
@@ -164,7 +298,7 @@ if __name__ == "__main__":
             hidden_dim=1_024,
         ),
         metrics=[metrics.MSE()],
-        masking_ratio=0.15,
+        masking_ratio=0.30,
         feature_means=feature_means,
         feature_vars=feature_vars,
         winsorization_factor=6,
