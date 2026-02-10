@@ -51,7 +51,7 @@ class ChemPropChunkwiseZarrDataset(torch.utils.data.Dataset):
         start_idx = idx * self.chunksize
         stop_idx = start_idx + self.chunksize
         return TrainingBatch(
-            [self.molgraph_generator(MolFromSmiles(s)) for s in self.smiles[start_idx:stop_idx]],
+            BatchMolGraph([self.molgraph_generator(MolFromSmiles(s)) for s in self.smiles[start_idx:stop_idx]]),
             None,
             None,
             self.z[start_idx:stop_idx, :],
@@ -263,20 +263,11 @@ if __name__ == "__main__":
     val_dataloader = DataLoader(dataset=val_dset, batch_size=None, shuffle=False, num_workers=4, persistent_workers=True)
     test_dataloader = DataLoader(dataset=test_dset, batch_size=None, shuffle=False, num_workers=4, persistent_workers=True)
 
-
-    # --- Configuration ---
-    TOLERANCE_REL = 1e-3  # Stop when mean changes by less than 0.1%
-    CHECK_EVERY = 32
-    MIN_SAMPLES = 100_000_000     # Force minimum sample size to avoid lucky early stops
-    # ---------------------
-
     cached_means_fpath = f"feature_means_cached_{training_store.stem}.pt"
     cached_vars_fpath = f"feature_vars_cached_{training_store.stem}.pt"
-
     if not os.path.exists(cached_means_fpath) or not os.path.exists(cached_vars_fpath):
         print("missing cached stats, run get_training_set_stats.py before this script")
         exit(1)
-    # Load
     feature_means = torch.load(cached_means_fpath, weights_only=True, map_location="cpu")
     feature_vars = torch.load(cached_vars_fpath, weights_only=True, map_location="cpu")
 

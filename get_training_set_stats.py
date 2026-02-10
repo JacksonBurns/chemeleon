@@ -174,5 +174,5 @@ if __name__ == "__main__":
     print(f"  Mean (first 5): {mean[:5]}")
     print(f"  Std  (first 5): {std[:5]}")
     
-    torch.save(mean, f"feature_means_cached_{input_path.stem}.pt")
-    torch.save(std, f"feature_vars_cached_{input_path.stem}.pt")
+    torch.save(torch.tensor(mean), f"feature_means_cached_{input_path.stem}.pt")
+    torch.save(torch.tensor(std), f"feature_vars_cached_{input_path.stem}.pt")

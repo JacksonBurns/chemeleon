@@ -8,3 +8,4 @@ screen.log
 *.log
 *.parquet
 .vscode
+chemeleon2_output
