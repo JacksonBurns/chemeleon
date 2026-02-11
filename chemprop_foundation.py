@@ -38,6 +38,7 @@ class ChemPropChunkwiseZarrDataset(torch.utils.data.Dataset):
         self.z = zarr.open_array(zarr_store)
         assert self.z.shape[0] == len(smiles), "Mismatched smiles and feature sizes"
         self.len = self.z.nchunks
+        self.n_rows = len(smiles)
         self.chunksize = self.z.chunks[0]
         self.molgraph_generator = SimpleMoleculeMolGraphFeaturizer(
             atom_featurizer=RIGRAtomFeaturizer(),
@@ -48,14 +49,15 @@ class ChemPropChunkwiseZarrDataset(torch.utils.data.Dataset):
         return self.len
 
     def __getitem__(self, idx: int):
+        # final chunk may not be full size, so we need to calculate the actual size of this batch
         start_idx = idx * self.chunksize
-        stop_idx = start_idx + self.chunksize
+        stop_idx = min(start_idx + self.chunksize, self.n_rows)
         return TrainingBatch(
             BatchMolGraph([self.molgraph_generator(MolFromSmiles(s)) for s in self.smiles[start_idx:stop_idx]]),
             None,
             None,
             self.z[start_idx:stop_idx, :],
-            torch.ones((self.chunksize, 1)),
+            torch.ones((stop_idx - start_idx, 1)),
             None,
             None,
         )
