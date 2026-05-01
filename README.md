@@ -14,7 +14,9 @@ To generate fingerprints from `CheMeleon` _without_ fine-tuning, see the [`cheme
 It contains the class `CheMeleonFingerprint` which can be instantiated and called to generate CheMeleon fingerprints for SMILES strings and RDKit mols.
 See the top of that file for more information.
 
-The code in this repository is primarily intended to aid in reproducing the results of the original study, but it may also be used to train other foundation models or fine-tune on new targets.
+To train new `CheMeleon`-style foundation models, check out the [_How to Train your CheMeleon_](https://github.com/JacksonBurns/how-to-train-your-chemeleon) repository.
+
+The code in this repository is primarily intended to aid in reproducing the results of the original study.
 It is laid out as follows:
  - `analysis` - Jupyter notebooks and their required input data (results from pretraining and finetuning) to generate the facts and figures referenced in the study
  - `models` - Python code for feature calculation, pretraining, and finetuning with each unique model sorted into its own subdirectory
