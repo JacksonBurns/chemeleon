@@ -5,7 +5,9 @@
 
 This repository provides the supporting code associated with our paper, "Descriptor-based Foundation Models for Molecular Property Prediction."
 
-Paper: [arXiv](https://doi.org/10.48550/arXiv.2506.15792) / [alphaXiv](https://www.alphaxiv.org/abs/2506.15792) 
+Paper: [arXiv](https://doi.org/10.48550/arXiv.2506.15792) / [alphaXiv](https://www.alphaxiv.org/abs/2506.15792),
+Training Data: [Zenodo](https://doi.org/10.5281/ZENODO.15733574),
+Model weights: [Zenodo](https://doi.org/10.5281/ZENODO.15426600)
 
 To fine-tune your own models using `CheMeleon`, simply install [ChemProp 2.2.0 or newer](https://chemprop.readthedocs.io/en/latest/installation.html) (i.e., `pip install 'chemprop>=2.2.0'`) and use the `--from-foundation CheMeleon` flag in the Command Line Interface.
 To fine-tune models from a Python script, see [`finetuning_demo.ipynb`](./finetuning_demo.ipynb).
