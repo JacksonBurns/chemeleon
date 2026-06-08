@@ -147,10 +147,8 @@ timestamp: {datetime.datetime.now()}
                 atom_featurizer=RIGRAtomFeaturizer(),
                 bond_featurizer=RIGRBondFeaturizer(),
             )
-            # todo: why can't I use weight_only = True? check that one pr that added chemeleon to chemprop where i figured this out with nathan...
-            _mp = torch.load("./chemeleon2_preview_initial_training_e4s281344_mp.pt", weights_only=False)
-            _mp["hparams"].pop("cls")
-            mp = MultiweightMessagePassing(**_mp["hparams"])
+            _mp = torch.load("./chemeleon2_preview_mp.pt", weights_only=True)
+            mp = MultiweightMessagePassing(**_mp["hyper_params"])
             mp.load_state_dict(_mp["state_dict"])
             agg = NormAggregation()
             hidden_size = mp.output_dim
