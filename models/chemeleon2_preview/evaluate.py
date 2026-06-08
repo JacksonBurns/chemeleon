@@ -154,6 +154,9 @@ timestamp: {datetime.datetime.now()}
             agg = NormAggregation()
             hidden_size = mp.output_dim
 
+            mp.apply(lambda module: module.requires_grad_(False))
+            mp.eval()
+
             # typical chemprop training
             train_idxs, val_idxs = train_test_split(
                 np.arange(len(targets)),
