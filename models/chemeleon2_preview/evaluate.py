@@ -148,6 +148,7 @@ timestamp: {datetime.datetime.now()}
                 bond_featurizer=RIGRBondFeaturizer(),
             )
             _mp = torch.load("./chemeleon2_preview_mp.pt", weights_only=True)
+            _mp["hyper_params"]["activation"] = torch.nn.GELU()  # chemprop needs to add support for GELU activation
             mp = MultiweightMessagePassing(**_mp["hyper_params"])
             mp.load_state_dict(_mp["state_dict"])
             agg = NormAggregation()
