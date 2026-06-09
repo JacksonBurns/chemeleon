@@ -240,9 +240,46 @@ timestamp: {datetime.datetime.now()}
             trainer.fit(model, train_dataloader, val_dataloader)
             ckpt_path = trainer.checkpoint_callback.best_model_path
             print(f"Reloading best model from checkpoint file: {ckpt_path}")
+            model = MPNN.load_from_checkpoint(ckpt_path)
+
+            # stage two - train the MPNN and the FFN
+            model.message_passing.apply(lambda module: module.requires_grad_(True))
+            model.message_passing.train()
+            tensorboard_logger = TensorBoardLogger(
+                seed_dir / _subdir,
+                name="tensorboard_logs",
+                default_hp_metric=False,
+            )
+            callbacks = [
+                EarlyStopping(
+                    monitor="val_loss",
+                    mode="min",
+                    verbose=False,
+                    patience=5,
+                ),
+                ModelCheckpoint(
+                    monitor="val_loss",
+                    save_top_k=2,
+                    mode="min",
+                    dirpath=seed_dir / _subdir / "checkpoints",
+                ),
+            ]
+            trainer = Trainer(
+                max_epochs=50,
+                logger=tensorboard_logger,
+                log_every_n_steps=1,
+                enable_checkpointing=True,
+                check_val_every_n_epoch=1,
+                callbacks=callbacks,
+            )
+            trainer.fit(model, train_dataloader, val_dataloader)
+            ckpt_path = trainer.checkpoint_callback.best_model_path
+            print(f"Reloading best model from checkpoint file: {ckpt_path}")
+            model = MPNN.load_from_checkpoint(ckpt_path)
+            #
+
             del model, train_dataloader, train_dataset, val_dataloader, val_dataset
             torch.cuda.empty_cache()
-            model = MPNN.load_from_checkpoint(ckpt_path)
             trainer = Trainer(logger=tensorboard_logger)
             predictions = (
                 torch.vstack(trainer.predict(model, test_dataloader))
