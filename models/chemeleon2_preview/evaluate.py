@@ -277,15 +277,15 @@ timestamp: {datetime.datetime.now()}
             print(f"Reloading best model from checkpoint file: {ckpt_path}")
             model = MPNN.load_from_checkpoint(ckpt_path)
             #
-
-            del model, train_dataloader, train_dataset, val_dataloader, val_dataset
-            torch.cuda.empty_cache()
             trainer = Trainer(logger=tensorboard_logger)
             predictions = (
                 torch.vstack(trainer.predict(model, test_dataloader))
                 .numpy(force=True)
                 .flatten()
             )
+
+            del model, train_dataloader, train_dataset, val_dataloader, val_dataset
+            torch.cuda.empty_cache()
 
             # prepare the predictions in the format polaris expects
             if task_type == TargetType.CLASSIFICATION:
