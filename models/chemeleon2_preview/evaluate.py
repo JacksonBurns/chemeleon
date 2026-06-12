@@ -27,7 +27,7 @@ from lightning.pytorch.loggers import TensorBoardLogger
 from polaris.utils.types import TargetType
 from sklearn.metrics import root_mean_squared_error
 
-from multiweight_message_passing import MultiweightMessagePassing
+from attention_atom_mp import AttentionAtomMessagePassing
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
@@ -142,17 +142,22 @@ timestamp: {datetime.datetime.now()}
             targets = train_df[target_cols]
             targets = targets.fillna(targets.mean(axis=0)).to_numpy()
 
-            # chemeleon2_preview setup
+            #############################
+            # chemeleon2_preview_v2 setup
+            #############################
             featurizer = SimpleMoleculeMolGraphFeaturizer(
                 atom_featurizer=RIGRAtomFeaturizer(),
                 bond_featurizer=RIGRBondFeaturizer(),
             )
-            _mp = torch.load("./chemeleon2_preview_mp.pt", weights_only=True)
-            _mp["hyper_params"]["activation"] = torch.nn.GELU()  # chemprop needs to add support for GELU activation
-            mp = MultiweightMessagePassing(**_mp["hyper_params"])
+            _mp = torch.load("./chemeleon2_preview_v2_mp.pt", weights_only=True)
+            mp = AttentionAtomMessagePassing(**_mp["hyper_params"])
             mp.load_state_dict(_mp["state_dict"])
             agg = NormAggregation()
             hidden_size = mp.output_dim
+            batch_norm=False
+            #############################
+            #
+            #############################
 
             # typical chemprop training
             train_idxs, val_idxs = train_test_split(
@@ -204,7 +209,7 @@ timestamp: {datetime.datetime.now()}
                     hidden_dim=512,
                 )
             )
-            model = MPNN(mp, agg, fnn, batch_norm=True)
+            model = MPNN(mp, agg, fnn, batch_norm=batch_norm)
 
             _subdir = "".join(c if c.isalnum() else "_" for c in benchmark_name)
             tensorboard_logger = TensorBoardLogger(
