@@ -200,13 +200,15 @@ timestamp: {datetime.datetime.now()}
                 RegressionFFN(
                     output_transform=output_transform,
                     input_dim=hidden_size,
-                    hidden_dim=512,
+                    hidden_dim=hidden_size,
+                    n_layers=3,
                 )
                 if task_type == TargetType.REGRESSION
                 else BinaryClassificationFFN(
                     output_transform=output_transform,
                     input_dim=hidden_size,
-                    hidden_dim=512,
+                    hidden_dim=hidden_size,
+                    n_layers=3,
                 )
             )
             model = MPNN(mp, agg, fnn, batch_norm=batch_norm)
