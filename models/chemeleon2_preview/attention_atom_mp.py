@@ -20,6 +20,7 @@ modifications were made by the AI:
    data structures.
 4. Integrated Chemprop's descriptor concatenation (`V_d`) directly into the 
    Transformer's readout phase.
+5. Added optional weight-tying across message passing depths.
 
 Original Source Attribution:
 The foundational architecture and logic for this model are based on the 
@@ -277,6 +278,7 @@ class AttentionAtomMessagePassing(MessagePassing, HyperparametersMixin):
         dropout: float = 0.1,
         gate: bool = False,
         qkv_bias: bool = False,
+        tied_weights: bool = False,
         d_vd: int | None = None,
         V_d_transform: ScaleTransform | None = None,
         graph_transform: GraphTransform | None = None,
@@ -290,6 +292,8 @@ class AttentionAtomMessagePassing(MessagePassing, HyperparametersMixin):
         
         self.d_h = d_h
         self.d_vd = d_vd
+        self.num_layers = num_layers
+        self.tied_weights = tied_weights
         self.V_d_transform = V_d_transform if V_d_transform is not None else nn.Identity()
         self.graph_transform = graph_transform if graph_transform is not None else nn.Identity()
 
@@ -301,8 +305,8 @@ class AttentionAtomMessagePassing(MessagePassing, HyperparametersMixin):
         self.input_dropout = nn.Dropout(dropout)
 
         # Transformer Blocks
-        self.layers = nn.ModuleList([
-            AttentionAtomMessagePassingLayer(
+        if self.tied_weights:
+            self.shared_layer = AttentionAtomMessagePassingLayer(
                 node_in_dim=d_h,
                 hidden_dim=d_h,
                 edge_in_dim=d_h if d_e else None,
@@ -310,9 +314,21 @@ class AttentionAtomMessagePassing(MessagePassing, HyperparametersMixin):
                 gate=gate,
                 qkv_bias=qkv_bias,
                 dropout=dropout,
-                update_edges=(i < num_layers - 1)
-            ) for i in range(num_layers)
-        ])
+                update_edges=True  # Must keep updating edges so they cascade down the depths
+            )
+        else:
+            self.layers = nn.ModuleList([
+                AttentionAtomMessagePassingLayer(
+                    node_in_dim=d_h,
+                    hidden_dim=d_h,
+                    edge_in_dim=d_h if d_e else None,
+                    num_heads=num_heads,
+                    gate=gate,
+                    qkv_bias=qkv_bias,
+                    dropout=dropout,
+                    update_edges=(i < num_layers - 1)
+                ) for i in range(num_layers)
+            ])
 
         # Readout Projection (to combine with extra descriptors V_d if they exist)
         if d_vd is not None:
@@ -354,8 +370,12 @@ class AttentionAtomMessagePassing(MessagePassing, HyperparametersMixin):
             E = None
 
         # 3. Message Passing over Transformer Layers
-        for layer in self.layers:
-            V, E = layer(V, E, bmg.edge_index)
+        if self.tied_weights:
+            for _ in range(self.num_layers):
+                V, E = self.shared_layer(V, E, bmg.edge_index)
+        else:
+            for layer in self.layers:
+                V, E = layer(V, E, bmg.edge_index)
 
         # 4. Finalize with extra descriptors (matching Chemprop's API expectations)
         if V_d is not None and self.W_d is not None:
