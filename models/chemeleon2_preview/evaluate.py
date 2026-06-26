@@ -149,6 +149,7 @@ timestamp: {datetime.datetime.now()}
                 atom_featurizer=RIGRAtomFeaturizer(),
                 bond_featurizer=RIGRBondFeaturizer(),
             )
+
             _mp = torch.load("./chemeleon2_preview_v2_mp.pt", weights_only=True)
             mp = AttentionAtomMessagePassing(**_mp["hyper_params"])
             mp.load_state_dict(_mp["state_dict"])
