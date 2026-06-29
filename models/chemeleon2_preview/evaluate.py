@@ -19,15 +19,13 @@ from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
 from chemprop.featurizers.atom import RIGRAtomFeaturizer
 from chemprop.featurizers.bond import RIGRBondFeaturizer
 from chemprop.models import MPNN
-from chemprop.nn import RegressionFFN, UnscaleTransform, BinaryClassificationFFN
+from chemprop.nn import RegressionFFN, UnscaleTransform, BinaryClassificationFFN, BondMessagePassing
 from chemprop.nn.agg import NormAggregation
 from lightning import Trainer
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger
 from polaris.utils.types import TargetType
 from sklearn.metrics import root_mean_squared_error
-
-from attention_atom_mp import AttentionAtomMessagePassing
 
 BENCHMARK_SET = os.getenv("BENCHMARK_SET", "polaris")
 print(f"Running benchmark set {BENCHMARK_SET}")
@@ -151,10 +149,10 @@ timestamp: {datetime.datetime.now()}
             )
 
             _mp = torch.load("./chemeleon2_preview_v2_mp.pt", weights_only=True)
-            mp = AttentionAtomMessagePassing(**_mp["hyper_params"])
+            mp = BondMessagePassing(**_mp["hyper_params"])
             mp.load_state_dict(_mp["state_dict"])
-            mp.apply(lambda module: module.requires_grad_(False))
-            mp.eval()
+            # mp.apply(lambda module: module.requires_grad_(False))
+            # mp.eval()
             agg = NormAggregation()
             hidden_size = mp.output_dim
             batch_norm=False
@@ -204,14 +202,14 @@ timestamp: {datetime.datetime.now()}
                     output_transform=output_transform,
                     input_dim=hidden_size,
                     hidden_dim=hidden_size,
-                    n_layers=3,
+                    n_layers=1,
                 )
                 if task_type == TargetType.REGRESSION
                 else BinaryClassificationFFN(
                     output_transform=output_transform,
                     input_dim=hidden_size,
                     hidden_dim=hidden_size,
-                    n_layers=3,
+                    n_layers=1,
                 )
             )
             model = MPNN(mp, agg, fnn, batch_norm=batch_norm)
