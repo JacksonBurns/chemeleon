@@ -1,275 +1,275 @@
 # chemeleon2_preview_initial_training_e4s281344 Baseline Results
-timestamp: 2026-06-27 20:52:12.722624
+timestamp: 2026-06-29 21:09:32.169893
 ## Random Seed 42
 
 ### `CHEMBL1862_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.947307 |
-| noncliff test rmse | 0.989822 |
-| cliff test rmse    | 0.88422  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.42744 |
+| noncliff test rmse | 1.47179 |
+| cliff test rmse    | 1.36278 |
 
 
 ### `CHEMBL1871_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.757802 |
-| noncliff test rmse | 0.635467 |
-| cliff test rmse    | 1.05715  |
+| overall test rmse  | 0.828199 |
+| noncliff test rmse | 0.71448  |
+| cliff test rmse    | 1.11584  |
 
 
 ### `CHEMBL2034_Ki`
 
-| metric             |   value |
-|:-------------------|--------:|
-| overall test rmse  | 1.04897 |
-| noncliff test rmse | 1.07142 |
-| cliff test rmse    | 1.00437 |
+| metric             |    value |
+|:-------------------|---------:|
+| overall test rmse  | 0.946915 |
+| noncliff test rmse | 0.960977 |
+| cliff test rmse    | 0.919269 |
 
 
 ### `CHEMBL2047_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.640738 |
-| noncliff test rmse | 0.643903 |
-| cliff test rmse    | 0.63577  |
+| overall test rmse  | 0.905423 |
+| noncliff test rmse | 0.951622 |
+| cliff test rmse    | 0.828221 |
 
 
 ### `CHEMBL204_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.772417 |
-| noncliff test rmse | 0.683656 |
-| cliff test rmse    | 0.890086 |
+| overall test rmse  | 0.978832 |
+| noncliff test rmse | 0.906881 |
+| cliff test rmse    | 1.07865  |
 
 
 ### `CHEMBL2147_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.788575 |
-| noncliff test rmse | 0.780265 |
-| cliff test rmse    | 0.801158 |
+| overall test rmse  | 0.996525 |
+| noncliff test rmse | 1.0253   |
+| cliff test rmse    | 0.950671 |
 
 
 ### `CHEMBL214_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.669774 |
-| noncliff test rmse | 0.591326 |
-| cliff test rmse    | 0.786508 |
+| overall test rmse  | 0.923866 |
+| noncliff test rmse | 0.884892 |
+| cliff test rmse    | 0.987252 |
 
 
 ### `CHEMBL218_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.763652 |
-| noncliff test rmse | 0.746154 |
-| cliff test rmse    | 0.793127 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04585 |
+| noncliff test rmse | 1.06731 |
+| cliff test rmse    | 1.00748 |
 
 
 ### `CHEMBL219_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.720847 |
-| noncliff test rmse | 0.670327 |
-| cliff test rmse    | 0.791797 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.0567  |
+| noncliff test rmse | 1.06784 |
+| cliff test rmse    | 1.03944 |
 
 
 ### `CHEMBL228_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.729256 |
-| noncliff test rmse | 0.715661 |
-| cliff test rmse    | 0.75171  |
+| overall test rmse  | 0.899746 |
+| noncliff test rmse | 0.887889 |
+| cliff test rmse    | 0.919471 |
 
 
 ### `CHEMBL231_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.77841  |
-| noncliff test rmse | 0.710276 |
-| cliff test rmse    | 0.959574 |
+| overall test rmse  | 0.918379 |
+| noncliff test rmse | 0.890886 |
+| cliff test rmse    | 0.998913 |
 
 
 ### `CHEMBL233_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.797086 |
-| noncliff test rmse | 0.752791 |
-| cliff test rmse    | 0.856555 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.038   |
+| noncliff test rmse | 1.0393  |
+| cliff test rmse    | 1.03614 |
 
 
 ### `CHEMBL234_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.655769 |
-| noncliff test rmse | 0.666525 |
-| cliff test rmse    | 0.641621 |
+| overall test rmse  | 0.961512 |
+| noncliff test rmse | 0.999173 |
+| cliff test rmse    | 0.910605 |
 
 
 ### `CHEMBL235_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.677884 |
-| noncliff test rmse | 0.583938 |
-| cliff test rmse    | 0.80952  |
+| overall test rmse  | 0.873441 |
+| noncliff test rmse | 0.815454 |
+| cliff test rmse    | 0.961591 |
 
 
 ### `CHEMBL236_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.922146 |
-| noncliff test rmse | 0.900368 |
-| cliff test rmse    | 0.955003 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.17389 |
+| noncliff test rmse | 1.12455 |
+| cliff test rmse    | 1.2467  |
 
 
 ### `CHEMBL237_EC50`
 
 | metric             |   value |
 |:-------------------|--------:|
-| overall test rmse  | 1.02837 |
-| noncliff test rmse | 1.02577 |
-| cliff test rmse    | 1.03126 |
+| overall test rmse  | 1.40108 |
+| noncliff test rmse | 1.47423 |
+| cliff test rmse    | 1.31426 |
 
 
 ### `CHEMBL237_Ki`
 
 | metric             |   value |
 |:-------------------|--------:|
-| overall test rmse  | 1.03664 |
-| noncliff test rmse | 1.02879 |
-| cliff test rmse    | 1.04707 |
+| overall test rmse  | 1.18207 |
+| noncliff test rmse | 1.1973  |
+| cliff test rmse    | 1.16133 |
 
 
 ### `CHEMBL238_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.68696  |
-| noncliff test rmse | 0.669237 |
-| cliff test rmse    | 0.735502 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.12483 |
+| noncliff test rmse | 1.10626 |
+| cliff test rmse    | 1.17654 |
 
 
 ### `CHEMBL239_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.8031   |
-| noncliff test rmse | 0.710598 |
-| cliff test rmse    | 0.921704 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.10001 |
+| noncliff test rmse | 1.06348 |
+| cliff test rmse    | 1.1513  |
 
 
 ### `CHEMBL244_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.718429 |
-| noncliff test rmse | 0.677525 |
-| cliff test rmse    | 0.760811 |
+| overall test rmse  | 0.89792  |
+| noncliff test rmse | 0.842548 |
+| cliff test rmse    | 0.955027 |
 
 
 ### `CHEMBL262_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.882765 |
-| noncliff test rmse | 0.878711 |
-| cliff test rmse    | 0.900411 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.06766 |
+| noncliff test rmse | 1.05305 |
+| cliff test rmse    | 1.12978 |
 
 
 ### `CHEMBL264_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.613648 |
-| noncliff test rmse | 0.563255 |
-| cliff test rmse    | 0.678007 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.06166 |
+| noncliff test rmse | 1.07562 |
+| cliff test rmse    | 1.04177 |
 
 
 ### `CHEMBL2835_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.527457 |
-| noncliff test rmse | 0.441453 |
-| cliff test rmse    | 1.00127  |
+| overall test rmse  | 0.607288 |
+| noncliff test rmse | 0.555729 |
+| cliff test rmse    | 0.943411 |
 
 
 ### `CHEMBL287_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.776314 |
-| noncliff test rmse | 0.741955 |
-| cliff test rmse    | 0.828084 |
+| overall test rmse  | 0.899743 |
+| noncliff test rmse | 0.887344 |
+| cliff test rmse    | 0.919141 |
 
 
 ### `CHEMBL2971_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.891131 |
-| noncliff test rmse | 0.881127 |
-| cliff test rmse    | 0.93761  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.05774 |
+| noncliff test rmse | 1.06163 |
+| cliff test rmse    | 1.03892 |
 
 
 ### `CHEMBL3979_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.680774 |
-| noncliff test rmse | 0.629928 |
-| cliff test rmse    | 0.74635  |
+| overall test rmse  | 1.04134  |
+| noncliff test rmse | 1.10792  |
+| cliff test rmse    | 0.939932 |
 
 
 ### `CHEMBL4005_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.946397 |
-| noncliff test rmse | 0.938585 |
-| cliff test rmse    | 0.957093 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.09458 |
+| noncliff test rmse | 1.08254 |
+| cliff test rmse    | 1.11101 |
 
 
 ### `CHEMBL4203_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.907216 |
-| noncliff test rmse | 0.88431  |
-| cliff test rmse    | 1.11909  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.0676  |
+| noncliff test rmse | 1.06762 |
+| cliff test rmse    | 1.06737 |
 
 
 ### `CHEMBL4616_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.850356 |
-| noncliff test rmse | 0.86872  |
-| cliff test rmse    | 0.833405 |
+| overall test rmse  | 0.921813 |
+| noncliff test rmse | 0.993952 |
+| cliff test rmse    | 0.851345 |
 
 
 ### `CHEMBL4792_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.674366 |
-| noncliff test rmse | 0.643603 |
-| cliff test rmse    | 0.699632 |
+| overall test rmse  | 0.868652 |
+| noncliff test rmse | 0.864633 |
+| cliff test rmse    | 0.872078 |
 
 
 ### Summary
@@ -277,124 +277,124 @@ timestamp: 2026-06-27 20:52:12.722624
 ```
 results_dict = {
     "CHEMBL1862_Ki": {
-        "cliff": 0.8842200936219763,
-        "noncliff": 0.9898215339630301
+        "cliff": 1.3627842898377514,
+        "noncliff": 1.4717857302524546
     },
     "CHEMBL1871_Ki": {
-        "cliff": 1.0571457936813318,
-        "noncliff": 0.6354672576905812
+        "cliff": 1.1158421136530767,
+        "noncliff": 0.7144800830015686
     },
     "CHEMBL2034_Ki": {
-        "cliff": 1.0043652341212277,
-        "noncliff": 1.0714244552556969
+        "cliff": 0.9192694771533362,
+        "noncliff": 0.9609765710286928
     },
     "CHEMBL2047_EC50": {
-        "cliff": 0.6357696411652104,
-        "noncliff": 0.6439025033912629
+        "cliff": 0.8282212547974251,
+        "noncliff": 0.9516221147732773
     },
     "CHEMBL204_Ki": {
-        "cliff": 0.8900857999090868,
-        "noncliff": 0.6836561352418066
+        "cliff": 1.0786479610183894,
+        "noncliff": 0.9068814252912093
     },
     "CHEMBL2147_Ki": {
-        "cliff": 0.8011582718610109,
-        "noncliff": 0.7802651582850342
+        "cliff": 0.9506713625517366,
+        "noncliff": 1.0253034934908822
     },
     "CHEMBL214_Ki": {
-        "cliff": 0.7865081064801055,
-        "noncliff": 0.5913262172808006
+        "cliff": 0.9872515038284542,
+        "noncliff": 0.8848919392290896
     },
     "CHEMBL218_EC50": {
-        "cliff": 0.7931271730516574,
-        "noncliff": 0.7461540711225931
+        "cliff": 1.007478078770424,
+        "noncliff": 1.067314053657115
     },
     "CHEMBL219_Ki": {
-        "cliff": 0.7917965992122666,
-        "noncliff": 0.6703272551173854
+        "cliff": 1.039444717046255,
+        "noncliff": 1.067844707694357
     },
     "CHEMBL228_Ki": {
-        "cliff": 0.7517102578675005,
-        "noncliff": 0.7156613938707076
+        "cliff": 0.9194711783815027,
+        "noncliff": 0.8878892475404404
     },
     "CHEMBL231_Ki": {
-        "cliff": 0.9595743029534937,
-        "noncliff": 0.7102756465850806
+        "cliff": 0.9989129912926776,
+        "noncliff": 0.8908859509935525
     },
     "CHEMBL233_Ki": {
-        "cliff": 0.8565551108843674,
-        "noncliff": 0.7527908110812872
+        "cliff": 1.03614135732116,
+        "noncliff": 1.0392958673137818
     },
     "CHEMBL234_Ki": {
-        "cliff": 0.6416214342005554,
-        "noncliff": 0.6665250709283282
+        "cliff": 0.9106051168811808,
+        "noncliff": 0.9991734781688821
     },
     "CHEMBL235_EC50": {
-        "cliff": 0.8095195457180915,
-        "noncliff": 0.5839382197228364
+        "cliff": 0.961591331052092,
+        "noncliff": 0.8154536155354891
     },
     "CHEMBL236_Ki": {
-        "cliff": 0.9550030666012228,
-        "noncliff": 0.9003680616757247
+        "cliff": 1.2466992691839123,
+        "noncliff": 1.124548796238755
     },
     "CHEMBL237_EC50": {
-        "cliff": 1.0312649262249456,
-        "noncliff": 1.0257720093735918
+        "cliff": 1.3142554200048862,
+        "noncliff": 1.4742321993807455
     },
     "CHEMBL237_Ki": {
-        "cliff": 1.0470664331013875,
-        "noncliff": 1.0287909568738496
+        "cliff": 1.1613349920768339,
+        "noncliff": 1.1972975807772581
     },
     "CHEMBL238_Ki": {
-        "cliff": 0.7355016905407074,
-        "noncliff": 0.669236865317275
+        "cliff": 1.1765365459643484,
+        "noncliff": 1.1062636804925323
     },
     "CHEMBL239_EC50": {
-        "cliff": 0.9217043897513001,
-        "noncliff": 0.7105975178602165
+        "cliff": 1.1513002329838862,
+        "noncliff": 1.0634763696463776
     },
     "CHEMBL244_Ki": {
-        "cliff": 0.7608109090582452,
-        "noncliff": 0.677525013980776
+        "cliff": 0.9550267115629462,
+        "noncliff": 0.8425479063698872
     },
     "CHEMBL262_Ki": {
-        "cliff": 0.9004106599172299,
-        "noncliff": 0.878711034152821
+        "cliff": 1.129783500746566,
+        "noncliff": 1.0530507804737428
     },
     "CHEMBL264_Ki": {
-        "cliff": 0.6780072970231917,
-        "noncliff": 0.5632546831256098
+        "cliff": 1.0417665889279455,
+        "noncliff": 1.0756231426250284
     },
     "CHEMBL2835_Ki": {
-        "cliff": 1.001268728204617,
-        "noncliff": 0.44145347528212553
+        "cliff": 0.9434114574096096,
+        "noncliff": 0.555729068987956
     },
     "CHEMBL287_Ki": {
-        "cliff": 0.8280838818882824,
-        "noncliff": 0.7419546954978026
+        "cliff": 0.9191408370067818,
+        "noncliff": 0.8873440352449653
     },
     "CHEMBL2971_Ki": {
-        "cliff": 0.937610424341716,
-        "noncliff": 0.8811274536995936
+        "cliff": 1.0389176319748379,
+        "noncliff": 1.0616268019042068
     },
     "CHEMBL3979_EC50": {
-        "cliff": 0.7463502232319719,
-        "noncliff": 0.629928088830261
+        "cliff": 0.9399317281959547,
+        "noncliff": 1.1079178633514035
     },
     "CHEMBL4005_Ki": {
-        "cliff": 0.9570932038011072,
-        "noncliff": 0.9385850094628203
+        "cliff": 1.1110125018957582,
+        "noncliff": 1.0825409934704417
     },
     "CHEMBL4203_Ki": {
-        "cliff": 1.1190856411453813,
-        "noncliff": 0.8843101219001198
+        "cliff": 1.0673720849785255,
+        "noncliff": 1.0676178699563739
     },
     "CHEMBL4616_EC50": {
-        "cliff": 0.8334051133710546,
-        "noncliff": 0.8687195791728577
+        "cliff": 0.8513446381861317,
+        "noncliff": 0.9939523392512275
     },
     "CHEMBL4792_Ki": {
-        "cliff": 0.6996324240242301,
-        "noncliff": 0.6436025442446391
+        "cliff": 0.8720779364971304,
+        "noncliff": 0.8646331387494922
     }
 }
 ```
@@ -402,272 +402,272 @@ results_dict = {
 
 ### `CHEMBL1862_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.871869 |
-| noncliff test rmse | 0.916149 |
-| cliff test rmse    | 0.805654 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.41175 |
+| noncliff test rmse | 1.46358 |
+| cliff test rmse    | 1.33565 |
 
 
 ### `CHEMBL1871_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.735982 |
-| noncliff test rmse | 0.663113 |
-| cliff test rmse    | 0.930932 |
+| overall test rmse  | 0.858036 |
+| noncliff test rmse | 0.76949  |
+| cliff test rmse    | 1.09343  |
 
 
 ### `CHEMBL2034_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.828032 |
-| noncliff test rmse | 0.76074  |
-| cliff test rmse    | 0.944053 |
+| overall test rmse  | 0.884811 |
+| noncliff test rmse | 0.903373 |
+| cliff test rmse    | 0.847973 |
 
 
 ### `CHEMBL2047_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.654105 |
-| noncliff test rmse | 0.613444 |
-| cliff test rmse    | 0.71292  |
+| overall test rmse  | 0.9689   |
+| noncliff test rmse | 1.01267  |
+| cliff test rmse    | 0.896358 |
 
 
 ### `CHEMBL204_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.805641 |
-| noncliff test rmse | 0.693102 |
-| cliff test rmse    | 0.950978 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.48066 |
+| noncliff test rmse | 1.38396 |
+| cliff test rmse    | 1.61607 |
 
 
 ### `CHEMBL2147_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.689106 |
-| noncliff test rmse | 0.719977 |
-| cliff test rmse    | 0.63884  |
+| overall test rmse  | 1.07418  |
+| noncliff test rmse | 1.14379  |
+| cliff test rmse    | 0.957562 |
 
 
 ### `CHEMBL214_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.696001 |
-| noncliff test rmse | 0.62541  |
-| cliff test rmse    | 0.802935 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.09381 |
+| noncliff test rmse | 1.08697 |
+| cliff test rmse    | 1.10546 |
 
 
 ### `CHEMBL218_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.771267 |
-| noncliff test rmse | 0.767108 |
-| cliff test rmse    | 0.778438 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04023 |
+| noncliff test rmse | 1.03842 |
+| cliff test rmse    | 1.04336 |
 
 
 ### `CHEMBL219_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.822804 |
-| noncliff test rmse | 0.782521 |
-| cliff test rmse    | 0.880769 |
+| overall test rmse  | 0.971278 |
+| noncliff test rmse | 0.973032 |
+| cliff test rmse    | 0.968593 |
 
 
 ### `CHEMBL228_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.741867 |
-| noncliff test rmse | 0.7373   |
-| cliff test rmse    | 0.749534 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.18631 |
+| noncliff test rmse | 1.20877 |
+| cliff test rmse    | 1.14729 |
 
 
 ### `CHEMBL231_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.77204  |
-| noncliff test rmse | 0.736044 |
-| cliff test rmse    | 0.87439  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04019 |
+| noncliff test rmse | 1.07514 |
+| cliff test rmse    | 0.92328 |
 
 
 ### `CHEMBL233_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.836404 |
-| noncliff test rmse | 0.776228 |
-| cliff test rmse    | 0.915739 |
+| overall test rmse  | 0.922253 |
+| noncliff test rmse | 0.908426 |
+| cliff test rmse    | 0.941705 |
 
 
 ### `CHEMBL234_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.667414 |
-| noncliff test rmse | 0.701755 |
-| cliff test rmse    | 0.620287 |
+| overall test rmse  | 0.882771 |
+| noncliff test rmse | 0.945549 |
+| cliff test rmse    | 0.794447 |
 
 
 ### `CHEMBL235_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.68578  |
-| noncliff test rmse | 0.5948   |
-| cliff test rmse    | 0.814079 |
+| overall test rmse  | 0.83226  |
+| noncliff test rmse | 0.76277  |
+| cliff test rmse    | 0.935804 |
 
 
 ### `CHEMBL236_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.760198 |
-| noncliff test rmse | 0.72332  |
-| cliff test rmse    | 0.814195 |
+| overall test rmse  | 0.9308   |
+| noncliff test rmse | 0.891387 |
+| cliff test rmse    | 0.988933 |
 
 
 ### `CHEMBL237_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.906571 |
-| noncliff test rmse | 0.829411 |
-| cliff test rmse    | 0.985907 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.43938 |
+| noncliff test rmse | 1.51507 |
+| cliff test rmse    | 1.34951 |
 
 
 ### `CHEMBL237_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.810372 |
-| noncliff test rmse | 0.77924  |
-| cliff test rmse    | 0.850328 |
+| overall test rmse  | 0.990885 |
+| noncliff test rmse | 0.939767 |
+| cliff test rmse    | 1.05555  |
 
 
 ### `CHEMBL238_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.709622 |
-| noncliff test rmse | 0.669078 |
-| cliff test rmse    | 0.814949 |
+| overall test rmse  | 0.830159 |
+| noncliff test rmse | 0.817741 |
+| cliff test rmse    | 0.864841 |
 
 
 ### `CHEMBL239_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.991869 |
-| noncliff test rmse | 0.932415 |
-| cliff test rmse    | 1.07282  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.0818  |
+| noncliff test rmse | 1.05654 |
+| cliff test rmse    | 1.11767 |
 
 
 ### `CHEMBL244_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.745447 |
-| noncliff test rmse | 0.705054 |
-| cliff test rmse    | 0.787416 |
+| overall test rmse  | 1.0349   |
+| noncliff test rmse | 0.997997 |
+| cliff test rmse    | 1.07396  |
 
 
 ### `CHEMBL262_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.87508  |
-| noncliff test rmse | 0.871283 |
-| cliff test rmse    | 0.89162  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.07734 |
+| noncliff test rmse | 1.06475 |
+| cliff test rmse    | 1.13114 |
 
 
 ### `CHEMBL264_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.662258 |
-| noncliff test rmse | 0.632579 |
-| cliff test rmse    | 0.70175  |
+| overall test rmse  | 0.801233 |
+| noncliff test rmse | 0.763869 |
+| cliff test rmse    | 0.850848 |
 
 
 ### `CHEMBL2835_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.531696 |
-| noncliff test rmse | 0.460789 |
-| cliff test rmse    | 0.945733 |
+| overall test rmse  | 0.910265 |
+| noncliff test rmse | 0.858251 |
+| cliff test rmse    | 1.27599  |
 
 
 ### `CHEMBL287_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.792886 |
-| noncliff test rmse | 0.785338 |
-| cliff test rmse    | 0.804757 |
+| overall test rmse  | 0.891196 |
+| noncliff test rmse | 0.884093 |
+| cliff test rmse    | 0.902391 |
 
 
 ### `CHEMBL2971_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.704785 |
-| noncliff test rmse | 0.674625 |
-| cliff test rmse    | 0.834365 |
+| overall test rmse  | 0.870112 |
+| noncliff test rmse | 0.849407 |
+| cliff test rmse    | 0.963214 |
 
 
 ### `CHEMBL3979_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.695296 |
-| noncliff test rmse | 0.68748  |
-| cliff test rmse    | 0.706127 |
+| overall test rmse  | 1.07634  |
+| noncliff test rmse | 1.13139  |
+| cliff test rmse    | 0.993882 |
 
 
 ### `CHEMBL4005_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.730366 |
-| noncliff test rmse | 0.666094 |
-| cliff test rmse    | 0.810887 |
+| overall test rmse  | 0.878604 |
+| noncliff test rmse | 0.851166 |
+| cliff test rmse    | 0.915189 |
 
 
 ### `CHEMBL4203_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.95009  |
-| noncliff test rmse | 0.931081 |
-| cliff test rmse    | 1.12994  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.10271 |
+| noncliff test rmse | 1.09892 |
+| cliff test rmse    | 1.14159 |
 
 
 ### `CHEMBL4616_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.856788 |
-| noncliff test rmse | 0.916656 |
-| cliff test rmse    | 0.798808 |
+| overall test rmse  | 0.910623 |
+| noncliff test rmse | 0.959172 |
+| cliff test rmse    | 0.864386 |
 
 
 ### `CHEMBL4792_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.684364 |
-| noncliff test rmse | 0.666371 |
-| cliff test rmse    | 0.699403 |
+| overall test rmse  | 0.917338 |
+| noncliff test rmse | 0.923646 |
+| cliff test rmse    | 0.911902 |
 
 
 ### Summary
@@ -675,124 +675,124 @@ results_dict = {
 ```
 results_dict = {
     "CHEMBL1862_Ki": {
-        "cliff": 0.8056543372223575,
-        "noncliff": 0.9161486401195014
+        "cliff": 1.3356522756470701,
+        "noncliff": 1.4635837655910509
     },
     "CHEMBL1871_Ki": {
-        "cliff": 0.9309320852600842,
-        "noncliff": 0.6631129742418425
+        "cliff": 1.093425648844481,
+        "noncliff": 0.7694897967043947
     },
     "CHEMBL2034_Ki": {
-        "cliff": 0.9440527851794708,
-        "noncliff": 0.7607399721159698
+        "cliff": 0.8479729075875634,
+        "noncliff": 0.9033728111836703
     },
     "CHEMBL2047_EC50": {
-        "cliff": 0.7129199215565901,
-        "noncliff": 0.6134441477791744
+        "cliff": 0.8963581009423549,
+        "noncliff": 1.0126711385385532
     },
     "CHEMBL204_Ki": {
-        "cliff": 0.9509776786357195,
-        "noncliff": 0.6931023967165583
+        "cliff": 1.6160685384255247,
+        "noncliff": 1.3839593295235844
     },
     "CHEMBL2147_Ki": {
-        "cliff": 0.6388397811857103,
-        "noncliff": 0.7199773713925252
+        "cliff": 0.9575618162082065,
+        "noncliff": 1.143789942178671
     },
     "CHEMBL214_Ki": {
-        "cliff": 0.8029351934985346,
-        "noncliff": 0.6254100932222625
+        "cliff": 1.1054630969654804,
+        "noncliff": 1.086974585895566
     },
     "CHEMBL218_EC50": {
-        "cliff": 0.7784375383929851,
-        "noncliff": 0.7671075955741031
+        "cliff": 1.0433559396322196,
+        "noncliff": 1.0384248603922197
     },
     "CHEMBL219_Ki": {
-        "cliff": 0.8807691740396877,
-        "noncliff": 0.7825210854309371
+        "cliff": 0.9685928155062465,
+        "noncliff": 0.9730319890129682
     },
     "CHEMBL228_Ki": {
-        "cliff": 0.7495335349083941,
-        "noncliff": 0.7373002465429883
+        "cliff": 1.1472913504230344,
+        "noncliff": 1.208766895306777
     },
     "CHEMBL231_Ki": {
-        "cliff": 0.8743898112741683,
-        "noncliff": 0.7360436981813746
+        "cliff": 0.9232799244774909,
+        "noncliff": 1.075143801354577
     },
     "CHEMBL233_Ki": {
-        "cliff": 0.9157388161846075,
-        "noncliff": 0.7762277881473184
+        "cliff": 0.9417048996435055,
+        "noncliff": 0.9084261979460986
     },
     "CHEMBL234_Ki": {
-        "cliff": 0.6202870626598521,
-        "noncliff": 0.7017554249840288
+        "cliff": 0.7944469275797437,
+        "noncliff": 0.9455494133387822
     },
     "CHEMBL235_EC50": {
-        "cliff": 0.8140793655211206,
-        "noncliff": 0.5948004923473438
+        "cliff": 0.9358037156219497,
+        "noncliff": 0.7627702963725156
     },
     "CHEMBL236_Ki": {
-        "cliff": 0.8141953938086874,
-        "noncliff": 0.7233204072003188
+        "cliff": 0.9889332880108868,
+        "noncliff": 0.8913866597129765
     },
     "CHEMBL237_EC50": {
-        "cliff": 0.9859066802071774,
-        "noncliff": 0.8294111394379856
+        "cliff": 1.3495066812668226,
+        "noncliff": 1.515071047998063
     },
     "CHEMBL237_Ki": {
-        "cliff": 0.8503276507252349,
-        "noncliff": 0.7792396207866006
+        "cliff": 1.0555467358535142,
+        "noncliff": 0.9397673465302164
     },
     "CHEMBL238_Ki": {
-        "cliff": 0.8149493301559737,
-        "noncliff": 0.6690778249724956
+        "cliff": 0.8648409080024867,
+        "noncliff": 0.8177410287385753
     },
     "CHEMBL239_EC50": {
-        "cliff": 1.0728227576245413,
-        "noncliff": 0.9324152374147466
+        "cliff": 1.1176714700875006,
+        "noncliff": 1.0565368798073203
     },
     "CHEMBL244_Ki": {
-        "cliff": 0.7874156075421477,
-        "noncliff": 0.7050537664833548
+        "cliff": 1.073955555325631,
+        "noncliff": 0.9979973113296111
     },
     "CHEMBL262_Ki": {
-        "cliff": 0.8916200815100157,
-        "noncliff": 0.8712825922007625
+        "cliff": 1.1311414107811784,
+        "noncliff": 1.064745593883001
     },
     "CHEMBL264_Ki": {
-        "cliff": 0.7017500205105865,
-        "noncliff": 0.6325786060541009
+        "cliff": 0.8508484998342852,
+        "noncliff": 0.7638686107668553
     },
     "CHEMBL2835_Ki": {
-        "cliff": 0.9457331885654447,
-        "noncliff": 0.4607894477464527
+        "cliff": 1.2759946720910724,
+        "noncliff": 0.8582511213155333
     },
     "CHEMBL287_Ki": {
-        "cliff": 0.8047572679267058,
-        "noncliff": 0.7853384968517281
+        "cliff": 0.9023912756554181,
+        "noncliff": 0.8840926461877948
     },
     "CHEMBL2971_Ki": {
-        "cliff": 0.8343654507460015,
-        "noncliff": 0.6746253616476988
+        "cliff": 0.9632141985464443,
+        "noncliff": 0.8494066890571987
     },
     "CHEMBL3979_EC50": {
-        "cliff": 0.7061265548242063,
-        "noncliff": 0.6874801777858093
+        "cliff": 0.993881631617465,
+        "noncliff": 1.1313946054451218
     },
     "CHEMBL4005_Ki": {
-        "cliff": 0.8108866859818954,
-        "noncliff": 0.6660939402521737
+        "cliff": 0.9151888282792902,
+        "noncliff": 0.8511658263097046
     },
     "CHEMBL4203_Ki": {
-        "cliff": 1.1299380180737943,
-        "noncliff": 0.9310814631438941
+        "cliff": 1.1415933813756958,
+        "noncliff": 1.0989219052599648
     },
     "CHEMBL4616_EC50": {
-        "cliff": 0.798807736229576,
-        "noncliff": 0.9166555524048774
+        "cliff": 0.8643855251760784,
+        "noncliff": 0.9591721200653431
     },
     "CHEMBL4792_Ki": {
-        "cliff": 0.6994026481928496,
-        "noncliff": 0.6663707358007368
+        "cliff": 0.9119019879906507,
+        "noncliff": 0.9236464655829195
     }
 }
 ```
@@ -800,272 +800,272 @@ results_dict = {
 
 ### `CHEMBL1862_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.942289 |
-| noncliff test rmse | 0.97626  |
-| cliff test rmse    | 0.89245  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.46246 |
+| noncliff test rmse | 1.48787 |
+| cliff test rmse    | 1.42607 |
 
 
 ### `CHEMBL1871_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.788498 |
-| noncliff test rmse | 0.691055 |
-| cliff test rmse    | 1.03985  |
+| overall test rmse  | 0.991215 |
+| noncliff test rmse | 0.938415 |
+| cliff test rmse    | 1.14336  |
 
 
 ### `CHEMBL2034_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.85882  |
-| noncliff test rmse | 0.813345 |
-| cliff test rmse    | 0.940109 |
+| overall test rmse  | 0.9316   |
+| noncliff test rmse | 0.943946 |
+| cliff test rmse    | 0.907386 |
 
 
 ### `CHEMBL2047_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.650366 |
-| noncliff test rmse | 0.663231 |
-| cliff test rmse    | 0.629771 |
+| overall test rmse  | 0.935179 |
+| noncliff test rmse | 1.0264   |
+| cliff test rmse    | 0.771639 |
 
 
 ### `CHEMBL204_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.965824 |
-| noncliff test rmse | 0.8929   |
-| cliff test rmse    | 1.06676  |
+| overall test rmse  | 0.980727 |
+| noncliff test rmse | 0.926544 |
+| cliff test rmse    | 1.05747  |
 
 
 ### `CHEMBL2147_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.713033 |
-| noncliff test rmse | 0.728849 |
-| cliff test rmse    | 0.688057 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.85566 |
+| noncliff test rmse | 1.99861 |
+| cliff test rmse    | 1.61185 |
 
 
 ### `CHEMBL214_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.685417 |
-| noncliff test rmse | 0.61574  |
-| cliff test rmse    | 0.790939 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.11121 |
+| noncliff test rmse | 1.09564 |
+| cliff test rmse    | 1.13747 |
 
 
 ### `CHEMBL218_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.765048 |
-| noncliff test rmse | 0.727616 |
-| cliff test rmse    | 0.826039 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.00418 |
+| noncliff test rmse | 1.00345 |
+| cliff test rmse    | 1.00544 |
 
 
 ### `CHEMBL219_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.837093 |
-| noncliff test rmse | 0.796127 |
-| cliff test rmse    | 0.896042 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04663 |
+| noncliff test rmse | 1.05155 |
+| cliff test rmse    | 1.03908 |
 
 
 ### `CHEMBL228_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.758987 |
-| noncliff test rmse | 0.739262 |
-| cliff test rmse    | 0.791259 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.12726 |
+| noncliff test rmse | 1.13506 |
+| cliff test rmse    | 1.11394 |
 
 
 ### `CHEMBL231_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.723958 |
-| noncliff test rmse | 0.685147 |
-| cliff test rmse    | 0.832993 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.30005 |
+| noncliff test rmse | 1.32073 |
+| cliff test rmse    | 1.23365 |
 
 
 ### `CHEMBL233_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.902418 |
-| noncliff test rmse | 0.86655  |
-| cliff test rmse    | 0.951443 |
+| overall test rmse  | 0.950698 |
+| noncliff test rmse | 0.922491 |
+| cliff test rmse    | 0.989704 |
 
 
 ### `CHEMBL234_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.663084 |
-| noncliff test rmse | 0.687758 |
-| cliff test rmse    | 0.62981  |
+| overall test rmse  | 0.968934 |
+| noncliff test rmse | 1.00814  |
+| cliff test rmse    | 0.915862 |
 
 
 ### `CHEMBL235_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.685314 |
-| noncliff test rmse | 0.606315 |
-| cliff test rmse    | 0.798868 |
+| overall test rmse  | 0.729993 |
+| noncliff test rmse | 0.643087 |
+| cliff test rmse    | 0.85439  |
 
 
 ### `CHEMBL236_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.83995  |
-| noncliff test rmse | 0.834194 |
-| cliff test rmse    | 0.848817 |
+| overall test rmse  | 0.959243 |
+| noncliff test rmse | 0.934691 |
+| cliff test rmse    | 0.996195 |
 
 
 ### `CHEMBL237_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.846865 |
-| noncliff test rmse | 0.763515 |
-| cliff test rmse    | 0.931467 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.429   |
+| noncliff test rmse | 1.49901 |
+| cliff test rmse    | 1.3462  |
 
 
 ### `CHEMBL237_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.798652 |
-| noncliff test rmse | 0.777217 |
-| cliff test rmse    | 0.826521 |
+| overall test rmse  | 1.01058  |
+| noncliff test rmse | 0.988201 |
+| cliff test rmse    | 1.03983  |
 
 
 ### `CHEMBL238_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.682859 |
-| noncliff test rmse | 0.644919 |
-| cliff test rmse    | 0.781672 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04824 |
+| noncliff test rmse | 1.05592 |
+| cliff test rmse    | 1.02586 |
 
 
 ### `CHEMBL239_EC50`
 
 | metric             |   value |
 |:-------------------|--------:|
-| overall test rmse  | 1.0656  |
-| noncliff test rmse | 1.06464 |
-| cliff test rmse    | 1.067   |
+| overall test rmse  | 1.04832 |
+| noncliff test rmse | 1.03954 |
+| cliff test rmse    | 1.06102 |
 
 
 ### `CHEMBL244_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.732319 |
-| noncliff test rmse | 0.654587 |
-| cliff test rmse    | 0.80911  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.55765 |
+| noncliff test rmse | 1.59129 |
+| cliff test rmse    | 1.51986 |
 
 
 ### `CHEMBL262_Ki`
 
 | metric             |   value |
 |:-------------------|--------:|
-| overall test rmse  | 1.03058 |
-| noncliff test rmse | 1.02806 |
-| cliff test rmse    | 1.04161 |
+| overall test rmse  | 1.09375 |
+| noncliff test rmse | 1.08311 |
+| cliff test rmse    | 1.13947 |
 
 
 ### `CHEMBL264_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.620416 |
-| noncliff test rmse | 0.57317  |
-| cliff test rmse    | 0.681146 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.03736 |
+| noncliff test rmse | 1.02655 |
+| cliff test rmse    | 1.05232 |
 
 
 ### `CHEMBL2835_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.505667 |
-| noncliff test rmse | 0.437894 |
-| cliff test rmse    | 0.900864 |
+| overall test rmse  | 0.898399 |
+| noncliff test rmse | 0.851417 |
+| cliff test rmse    | 1.23358  |
 
 
 ### `CHEMBL287_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.743011 |
-| noncliff test rmse | 0.723511 |
-| cliff test rmse    | 0.773044 |
+| overall test rmse  | 1.01098  |
+| noncliff test rmse | 0.982144 |
+| cliff test rmse    | 1.05526  |
 
 
 ### `CHEMBL2971_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.731754 |
-| noncliff test rmse | 0.714576 |
-| cliff test rmse    | 0.809055 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.08933 |
+| noncliff test rmse | 1.05424 |
+| cliff test rmse    | 1.24389 |
 
 
 ### `CHEMBL3979_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.660319 |
-| noncliff test rmse | 0.587851 |
-| cliff test rmse    | 0.75036  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.12682 |
+| noncliff test rmse | 1.17239 |
+| cliff test rmse    | 1.05951 |
 
 
 ### `CHEMBL4005_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.74583  |
-| noncliff test rmse | 0.678353 |
-| cliff test rmse    | 0.830144 |
+| overall test rmse  | 0.998714 |
+| noncliff test rmse | 0.981857 |
+| cliff test rmse    | 1.02156  |
 
 
 ### `CHEMBL4203_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.9551   |
-| noncliff test rmse | 0.928156 |
-| cliff test rmse    | 1.20127  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.06451 |
+| noncliff test rmse | 1.06334 |
+| cliff test rmse    | 1.07669 |
 
 
 ### `CHEMBL4616_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.750688 |
-| noncliff test rmse | 0.737385 |
-| cliff test rmse    | 0.762514 |
+| overall test rmse  | 0.902971 |
+| noncliff test rmse | 0.946469 |
+| cliff test rmse    | 0.861757 |
 
 
 ### `CHEMBL4792_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.672785 |
-| noncliff test rmse | 0.599918 |
-| cliff test rmse    | 0.729415 |
+| overall test rmse  | 1.00263  |
+| noncliff test rmse | 1.03585  |
+| cliff test rmse    | 0.973281 |
 
 
 ### Summary
@@ -1073,124 +1073,124 @@ results_dict = {
 ```
 results_dict = {
     "CHEMBL1862_Ki": {
-        "cliff": 0.8924502140397698,
-        "noncliff": 0.9762600829648437
+        "cliff": 1.4260658489847535,
+        "noncliff": 1.487865073166771
     },
     "CHEMBL1871_Ki": {
-        "cliff": 1.0398458233897325,
-        "noncliff": 0.6910550356105324
+        "cliff": 1.1433575639290863,
+        "noncliff": 0.9384146190142456
     },
     "CHEMBL2034_Ki": {
-        "cliff": 0.9401092652136145,
-        "noncliff": 0.8133454841769862
+        "cliff": 0.9073858644594597,
+        "noncliff": 0.943945942067785
     },
     "CHEMBL2047_EC50": {
-        "cliff": 0.6297713972715676,
-        "noncliff": 0.6632314865482499
+        "cliff": 0.77163907215147,
+        "noncliff": 1.0263978017572846
     },
     "CHEMBL204_Ki": {
-        "cliff": 1.0667639477183128,
-        "noncliff": 0.8928997357367362
+        "cliff": 1.0574723432334707,
+        "noncliff": 0.9265435154251627
     },
     "CHEMBL2147_Ki": {
-        "cliff": 0.6880569685678267,
-        "noncliff": 0.7288494514250454
+        "cliff": 1.6118508495309203,
+        "noncliff": 1.9986072796126142
     },
     "CHEMBL214_Ki": {
-        "cliff": 0.790939176934059,
-        "noncliff": 0.6157398009471632
+        "cliff": 1.1374697198714012,
+        "noncliff": 1.0956354975314262
     },
     "CHEMBL218_EC50": {
-        "cliff": 0.8260390869190238,
-        "noncliff": 0.7276164115400651
+        "cliff": 1.0054401196418619,
+        "noncliff": 1.003450649230074
     },
     "CHEMBL219_Ki": {
-        "cliff": 0.8960417749333498,
-        "noncliff": 0.7961272291951577
+        "cliff": 1.0390801526311937,
+        "noncliff": 1.0515489024606732
     },
     "CHEMBL228_Ki": {
-        "cliff": 0.7912593910053475,
-        "noncliff": 0.739261782004468
+        "cliff": 1.1139448428689858,
+        "noncliff": 1.1350577539930193
     },
     "CHEMBL231_Ki": {
-        "cliff": 0.8329925587211887,
-        "noncliff": 0.6851469787482714
+        "cliff": 1.2336460791430033,
+        "noncliff": 1.320727037872786
     },
     "CHEMBL233_Ki": {
-        "cliff": 0.9514433497714191,
-        "noncliff": 0.8665503459523365
+        "cliff": 0.989703642810924,
+        "noncliff": 0.9224913105195917
     },
     "CHEMBL234_Ki": {
-        "cliff": 0.6298104419762323,
-        "noncliff": 0.6877583209450664
+        "cliff": 0.9158624958091757,
+        "noncliff": 1.0081352829048496
     },
     "CHEMBL235_EC50": {
-        "cliff": 0.7988677397031505,
-        "noncliff": 0.6063148460394809
+        "cliff": 0.8543897632028326,
+        "noncliff": 0.6430869091896582
     },
     "CHEMBL236_Ki": {
-        "cliff": 0.8488172163347598,
-        "noncliff": 0.8341935209639205
+        "cliff": 0.9961954533482335,
+        "noncliff": 0.9346910381023206
     },
     "CHEMBL237_EC50": {
-        "cliff": 0.9314668095018276,
-        "noncliff": 0.7635146195923993
+        "cliff": 1.3462018481338864,
+        "noncliff": 1.4990110868657749
     },
     "CHEMBL237_Ki": {
-        "cliff": 0.8265214322151695,
-        "noncliff": 0.7772167906334646
+        "cliff": 1.0398346059555026,
+        "noncliff": 0.9882014731907698
     },
     "CHEMBL238_Ki": {
-        "cliff": 0.7816722896818311,
-        "noncliff": 0.644919270535027
+        "cliff": 1.025859804516731,
+        "noncliff": 1.0559151770394821
     },
     "CHEMBL239_EC50": {
-        "cliff": 1.0670002869536397,
-        "noncliff": 1.0646423112795296
+        "cliff": 1.0610209321206328,
+        "noncliff": 1.0395445250586999
     },
     "CHEMBL244_Ki": {
-        "cliff": 0.8091097028649127,
-        "noncliff": 0.6545873688306544
+        "cliff": 1.5198593563140887,
+        "noncliff": 1.591285244981188
     },
     "CHEMBL262_Ki": {
-        "cliff": 1.0416050200953662,
-        "noncliff": 1.0280641731591014
+        "cliff": 1.1394678648605363,
+        "noncliff": 1.0831114977024998
     },
     "CHEMBL264_Ki": {
-        "cliff": 0.6811457583634871,
-        "noncliff": 0.5731695724615956
+        "cliff": 1.052319634401942,
+        "noncliff": 1.0265515210654783
     },
     "CHEMBL2835_Ki": {
-        "cliff": 0.90086428655914,
-        "noncliff": 0.4378943390458405
+        "cliff": 1.233580414555715,
+        "noncliff": 0.8514166089886999
     },
     "CHEMBL287_Ki": {
-        "cliff": 0.7730444693066207,
-        "noncliff": 0.723511311697351
+        "cliff": 1.0552562342585743,
+        "noncliff": 0.9821443347624265
     },
     "CHEMBL2971_Ki": {
-        "cliff": 0.809055325878387,
-        "noncliff": 0.7145762514732769
+        "cliff": 1.243891013243905,
+        "noncliff": 1.0542426214527911
     },
     "CHEMBL3979_EC50": {
-        "cliff": 0.7503596338720881,
-        "noncliff": 0.5878510801992601
+        "cliff": 1.0595091121651303,
+        "noncliff": 1.1723947213058037
     },
     "CHEMBL4005_Ki": {
-        "cliff": 0.8301438414030536,
-        "noncliff": 0.6783531519257091
+        "cliff": 1.0215632509865349,
+        "noncliff": 0.9818569966890164
     },
     "CHEMBL4203_Ki": {
-        "cliff": 1.2012731347602361,
-        "noncliff": 0.9281560149221947
+        "cliff": 1.0766873644432242,
+        "noncliff": 1.0633435547736085
     },
     "CHEMBL4616_EC50": {
-        "cliff": 0.7625144668940268,
-        "noncliff": 0.7373854562461762
+        "cliff": 0.861756704459709,
+        "noncliff": 0.9464691451146885
     },
     "CHEMBL4792_Ki": {
-        "cliff": 0.7294151386485304,
-        "noncliff": 0.5999178649096106
+        "cliff": 0.973280919645265,
+        "noncliff": 1.0358492122966214
     }
 }
 ```
@@ -1198,272 +1198,272 @@ results_dict = {
 
 ### `CHEMBL1862_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.927665 |
-| noncliff test rmse | 0.967724 |
-| cliff test rmse    | 0.868353 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.67845 |
+| noncliff test rmse | 1.53729 |
+| cliff test rmse    | 1.85852 |
 
 
 ### `CHEMBL1871_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.767348 |
-| noncliff test rmse | 0.66391  |
-| cliff test rmse    | 1.02991  |
+| overall test rmse  | 0.948744 |
+| noncliff test rmse | 0.877217 |
+| cliff test rmse    | 1.14735  |
 
 
 ### `CHEMBL2034_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.898894 |
-| noncliff test rmse | 0.850977 |
-| cliff test rmse    | 0.984511 |
+| overall test rmse  | 0.965364 |
+| noncliff test rmse | 0.984287 |
+| cliff test rmse    | 0.927891 |
 
 
 ### `CHEMBL2047_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.675984 |
-| noncliff test rmse | 0.67186  |
-| cliff test rmse    | 0.682367 |
+| overall test rmse  | 0.935296 |
+| noncliff test rmse | 0.983911 |
+| cliff test rmse    | 0.853947 |
 
 
 ### `CHEMBL204_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.761151 |
-| noncliff test rmse | 0.650125 |
-| cliff test rmse    | 0.903615 |
+| overall test rmse  | 0.987139 |
+| noncliff test rmse | 0.892738 |
+| cliff test rmse    | 1.11492  |
 
 
 ### `CHEMBL2147_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.661273 |
-| noncliff test rmse | 0.684022 |
-| cliff test rmse    | 0.624755 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.23991 |
+| noncliff test rmse | 1.35144 |
+| cliff test rmse    | 1.0459  |
 
 
 ### `CHEMBL214_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.729881 |
-| noncliff test rmse | 0.674694 |
-| cliff test rmse    | 0.816043 |
+| overall test rmse  | 0.786777 |
+| noncliff test rmse | 0.745441 |
+| cliff test rmse    | 0.853144 |
 
 
 ### `CHEMBL218_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.75614  |
-| noncliff test rmse | 0.727201 |
-| cliff test rmse    | 0.80393  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04833 |
+| noncliff test rmse | 1.05956 |
+| cliff test rmse    | 1.02853 |
 
 
 ### `CHEMBL219_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.715073 |
-| noncliff test rmse | 0.670646 |
-| cliff test rmse    | 0.778036 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.05542 |
+| noncliff test rmse | 1.05872 |
+| cliff test rmse    | 1.05036 |
 
 
 ### `CHEMBL228_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.724169 |
-| noncliff test rmse | 0.699854 |
-| cliff test rmse    | 0.76357  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.19843 |
+| noncliff test rmse | 1.20685 |
+| cliff test rmse    | 1.18404 |
 
 
 ### `CHEMBL231_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.77773  |
-| noncliff test rmse | 0.732836 |
-| cliff test rmse    | 0.902981 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.22031 |
+| noncliff test rmse | 1.25736 |
+| cliff test rmse    | 1.09734 |
 
 
 ### `CHEMBL233_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.801658 |
-| noncliff test rmse | 0.743101 |
-| cliff test rmse    | 0.878766 |
+| overall test rmse  | 0.996518 |
+| noncliff test rmse | 0.982764 |
+| cliff test rmse    | 1.0159   |
 
 
 ### `CHEMBL234_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.679804 |
-| noncliff test rmse | 0.708015 |
-| cliff test rmse    | 0.641562 |
+| overall test rmse  | 0.951101 |
+| noncliff test rmse | 0.988849 |
+| cliff test rmse    | 0.900046 |
 
 
 ### `CHEMBL235_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.710106 |
-| noncliff test rmse | 0.624389 |
-| cliff test rmse    | 0.832577 |
+| overall test rmse  | 1.01756  |
+| noncliff test rmse | 0.927686 |
+| cliff test rmse    | 1.15074  |
 
 
 ### `CHEMBL236_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.78101  |
-| noncliff test rmse | 0.731662 |
-| cliff test rmse    | 0.85204  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.05595 |
+| noncliff test rmse | 1.0291  |
+| cliff test rmse    | 1.09637 |
 
 
 ### `CHEMBL237_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.861566 |
-| noncliff test rmse | 0.790395 |
-| cliff test rmse    | 0.934923 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.43581 |
+| noncliff test rmse | 1.51829 |
+| cliff test rmse    | 1.33734 |
 
 
 ### `CHEMBL237_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.765377 |
-| noncliff test rmse | 0.733877 |
-| cliff test rmse    | 0.805684 |
+| overall test rmse  | 0.855403 |
+| noncliff test rmse | 0.8079   |
+| cliff test rmse    | 0.915233 |
 
 
 ### `CHEMBL238_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.75412  |
-| noncliff test rmse | 0.756908 |
-| cliff test rmse    | 0.746055 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04725 |
+| noncliff test rmse | 1.04432 |
+| cliff test rmse    | 1.05561 |
 
 
 ### `CHEMBL239_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.823149 |
-| noncliff test rmse | 0.688839 |
-| cliff test rmse    | 0.987048 |
+| overall test rmse  | 1.03637  |
+| noncliff test rmse | 0.991616 |
+| cliff test rmse    | 1.09848  |
 
 
 ### `CHEMBL244_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.721756 |
-| noncliff test rmse | 0.675548 |
-| cliff test rmse    | 0.7693   |
+| overall test rmse  | 0.89816  |
+| noncliff test rmse | 0.807157 |
+| cliff test rmse    | 0.988477 |
 
 
 ### `CHEMBL262_Ki`
 
-| metric             |   value |
-|:-------------------|--------:|
-| overall test rmse  | 1.08209 |
-| noncliff test rmse | 1.06387 |
-| cliff test rmse    | 1.15895 |
+| metric             |    value |
+|:-------------------|---------:|
+| overall test rmse  | 0.935502 |
+| noncliff test rmse | 0.937552 |
+| cliff test rmse    | 0.926417 |
 
 
 ### `CHEMBL264_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.608587 |
-| noncliff test rmse | 0.558697 |
-| cliff test rmse    | 0.672313 |
+| overall test rmse  | 0.787678 |
+| noncliff test rmse | 0.773034 |
+| cliff test rmse    | 0.807758 |
 
 
 ### `CHEMBL2835_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.524593 |
-| noncliff test rmse | 0.446677 |
-| cliff test rmse    | 0.965921 |
+| overall test rmse  | 0.72609  |
+| noncliff test rmse | 0.674908 |
+| cliff test rmse    | 1.07261  |
 
 
 ### `CHEMBL287_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.767416 |
-| noncliff test rmse | 0.733567 |
-| cliff test rmse    | 0.818426 |
+| overall test rmse  | 0.859614 |
+| noncliff test rmse | 0.845336 |
+| cliff test rmse    | 0.881872 |
 
 
 ### `CHEMBL2971_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.71785  |
-| noncliff test rmse | 0.676917 |
-| cliff test rmse    | 0.888265 |
+| overall test rmse  | 0.988509 |
+| noncliff test rmse | 0.952619 |
+| cliff test rmse    | 1.14505  |
 
 
 ### `CHEMBL3979_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.691309 |
-| noncliff test rmse | 0.677101 |
-| cliff test rmse    | 0.710782 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.13564 |
+| noncliff test rmse | 1.18395 |
+| cliff test rmse    | 1.06411 |
 
 
 ### `CHEMBL4005_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.732309 |
-| noncliff test rmse | 0.669559 |
-| cliff test rmse    | 0.811117 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.06663 |
+| noncliff test rmse | 1.06105 |
+| cliff test rmse    | 1.07431 |
 
 
 ### `CHEMBL4203_Ki`
 
 | metric             |   value |
 |:-------------------|--------:|
-| overall test rmse  | 1.02341 |
-| noncliff test rmse | 1.0222  |
-| cliff test rmse    | 1.03595 |
+| overall test rmse  | 1.06844 |
+| noncliff test rmse | 1.06885 |
+| cliff test rmse    | 1.06413 |
 
 
 ### `CHEMBL4616_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.771742 |
-| noncliff test rmse | 0.773764 |
-| cliff test rmse    | 0.76991  |
+| overall test rmse  | 0.92782  |
+| noncliff test rmse | 0.982021 |
+| cliff test rmse    | 0.875933 |
 
 
 ### `CHEMBL4792_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.609867 |
-| noncliff test rmse | 0.564615 |
-| cliff test rmse    | 0.646099 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.03471 |
+| noncliff test rmse | 1.07351 |
+| cliff test rmse    | 1.0003  |
 
 
 ### Summary
@@ -1471,124 +1471,124 @@ results_dict = {
 ```
 results_dict = {
     "CHEMBL1862_Ki": {
-        "cliff": 0.8683528611636308,
-        "noncliff": 0.9677241587985205
+        "cliff": 1.8585182259381403,
+        "noncliff": 1.5372887387918415
     },
     "CHEMBL1871_Ki": {
-        "cliff": 1.0299124402806275,
-        "noncliff": 0.6639102648834726
+        "cliff": 1.1473549769558045,
+        "noncliff": 0.8772171178899232
     },
     "CHEMBL2034_Ki": {
-        "cliff": 0.9845105387195211,
-        "noncliff": 0.8509765914019611
+        "cliff": 0.9278906706320688,
+        "noncliff": 0.984287149430661
     },
     "CHEMBL2047_EC50": {
-        "cliff": 0.682366840068541,
-        "noncliff": 0.6718599175509661
+        "cliff": 0.8539473378846971,
+        "noncliff": 0.9839108947155599
     },
     "CHEMBL204_Ki": {
-        "cliff": 0.9036154456195334,
-        "noncliff": 0.6501250506639328
+        "cliff": 1.1149236664511002,
+        "noncliff": 0.8927378846764301
     },
     "CHEMBL2147_Ki": {
-        "cliff": 0.6247550331348263,
-        "noncliff": 0.6840223184085996
+        "cliff": 1.0458967089177338,
+        "noncliff": 1.3514377790320888
     },
     "CHEMBL214_Ki": {
-        "cliff": 0.8160433572973089,
-        "noncliff": 0.6746936158996099
+        "cliff": 0.8531438215851469,
+        "noncliff": 0.7454405743124524
     },
     "CHEMBL218_EC50": {
-        "cliff": 0.8039300650412192,
-        "noncliff": 0.7272008201731611
+        "cliff": 1.0285271674754481,
+        "noncliff": 1.0595644703439164
     },
     "CHEMBL219_Ki": {
-        "cliff": 0.7780359775218776,
-        "noncliff": 0.6706458376899721
+        "cliff": 1.0503550722393364,
+        "noncliff": 1.0587177117448336
     },
     "CHEMBL228_Ki": {
-        "cliff": 0.7635697825340105,
-        "noncliff": 0.6998535198774737
+        "cliff": 1.1840378152646345,
+        "noncliff": 1.2068510903269418
     },
     "CHEMBL231_Ki": {
-        "cliff": 0.9029807763637286,
-        "noncliff": 0.7328362287712088
+        "cliff": 1.097340159049613,
+        "noncliff": 1.2573595790141907
     },
     "CHEMBL233_Ki": {
-        "cliff": 0.8787659020823247,
-        "noncliff": 0.743101265397499
+        "cliff": 1.0158966172394222,
+        "noncliff": 0.9827635570777328
     },
     "CHEMBL234_Ki": {
-        "cliff": 0.6415623153754119,
-        "noncliff": 0.7080153858212493
+        "cliff": 0.9000461617546371,
+        "noncliff": 0.9888489525610124
     },
     "CHEMBL235_EC50": {
-        "cliff": 0.8325767524785057,
-        "noncliff": 0.6243888741827182
+        "cliff": 1.1507368715994168,
+        "noncliff": 0.9276862670593019
     },
     "CHEMBL236_Ki": {
-        "cliff": 0.8520397454470784,
-        "noncliff": 0.731662339120469
+        "cliff": 1.0963666839606356,
+        "noncliff": 1.0290967761609269
     },
     "CHEMBL237_EC50": {
-        "cliff": 0.934922724289582,
-        "noncliff": 0.7903950524734629
+        "cliff": 1.3373395968445456,
+        "noncliff": 1.5182858411092788
     },
     "CHEMBL237_Ki": {
-        "cliff": 0.8056835430961707,
-        "noncliff": 0.7338765555181204
+        "cliff": 0.9152333824426344,
+        "noncliff": 0.8079004323716961
     },
     "CHEMBL238_Ki": {
-        "cliff": 0.7460553793608455,
-        "noncliff": 0.7569077774524751
+        "cliff": 1.055609116360156,
+        "noncliff": 1.0443188303447173
     },
     "CHEMBL239_EC50": {
-        "cliff": 0.9870483199857736,
-        "noncliff": 0.6888390819618665
+        "cliff": 1.098478709365924,
+        "noncliff": 0.9916159341132958
     },
     "CHEMBL244_Ki": {
-        "cliff": 0.7693001276059872,
-        "noncliff": 0.675547964946198
+        "cliff": 0.9884766400846444,
+        "noncliff": 0.8071571046226154
     },
     "CHEMBL262_Ki": {
-        "cliff": 1.1589536029544976,
-        "noncliff": 1.0638720860028246
+        "cliff": 0.9264173639547176,
+        "noncliff": 0.937552039216006
     },
     "CHEMBL264_Ki": {
-        "cliff": 0.6723134522715889,
-        "noncliff": 0.55869684097026
+        "cliff": 0.8077577343961034,
+        "noncliff": 0.7730340131831944
     },
     "CHEMBL2835_Ki": {
-        "cliff": 0.9659208588188721,
-        "noncliff": 0.4466773263340331
+        "cliff": 1.0726138441610928,
+        "noncliff": 0.6749078544375833
     },
     "CHEMBL287_Ki": {
-        "cliff": 0.818426150297048,
-        "noncliff": 0.7335672454652712
+        "cliff": 0.8818720362504291,
+        "noncliff": 0.8453358816977088
     },
     "CHEMBL2971_Ki": {
-        "cliff": 0.8882653744791577,
-        "noncliff": 0.6769167368902976
+        "cliff": 1.1450517947831973,
+        "noncliff": 0.9526187607703096
     },
     "CHEMBL3979_EC50": {
-        "cliff": 0.7107818889172565,
-        "noncliff": 0.677101411296096
+        "cliff": 1.0641088291024723,
+        "noncliff": 1.1839492022469233
     },
     "CHEMBL4005_Ki": {
-        "cliff": 0.8111167101912413,
-        "noncliff": 0.6695587225934674
+        "cliff": 1.0743066077645769,
+        "noncliff": 1.0610513596243891
     },
     "CHEMBL4203_Ki": {
-        "cliff": 1.0359457576728748,
-        "noncliff": 1.0222013617590235
+        "cliff": 1.0641308261990643,
+        "noncliff": 1.0688505520723837
     },
     "CHEMBL4616_EC50": {
-        "cliff": 0.7699104348002552,
-        "noncliff": 0.7737638173782636
+        "cliff": 0.8759327818143355,
+        "noncliff": 0.9820214826468322
     },
     "CHEMBL4792_Ki": {
-        "cliff": 0.6460992569950864,
-        "noncliff": 0.564615089359856
+        "cliff": 1.000299739482444,
+        "noncliff": 1.0735099116984288
     }
 }
 ```
@@ -1598,270 +1598,270 @@ results_dict = {
 
 | metric             |   value |
 |:-------------------|--------:|
-| overall test rmse  | 1.39087 |
-| noncliff test rmse | 1.37975 |
-| cliff test rmse    | 1.40632 |
+| overall test rmse  | 1.41246 |
+| noncliff test rmse | 1.48488 |
+| cliff test rmse    | 1.30409 |
 
 
 ### `CHEMBL1871_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.799253 |
-| noncliff test rmse | 0.705967 |
-| cliff test rmse    | 1.0423   |
+| overall test rmse  | 0.846141 |
+| noncliff test rmse | 0.743479 |
+| cliff test rmse    | 1.11181  |
 
 
 ### `CHEMBL2034_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.795687 |
-| noncliff test rmse | 0.733603 |
-| cliff test rmse    | 0.903162 |
+| overall test rmse  | 0.947107 |
+| noncliff test rmse | 0.977869 |
+| cliff test rmse    | 0.88495  |
 
 
 ### `CHEMBL2047_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.630799 |
-| noncliff test rmse | 0.640043 |
-| cliff test rmse    | 0.616101 |
+| overall test rmse  | 0.887717 |
+| noncliff test rmse | 0.956513 |
+| cliff test rmse    | 0.768189 |
 
 
 ### `CHEMBL204_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.774562 |
-| noncliff test rmse | 0.70349  |
-| cliff test rmse    | 0.871177 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.41414 |
+| noncliff test rmse | 1.37473 |
+| cliff test rmse    | 1.47179 |
 
 
 ### `CHEMBL2147_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.643468 |
-| noncliff test rmse | 0.668213 |
-| cliff test rmse    | 0.603526 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.5138  |
+| noncliff test rmse | 1.47775 |
+| cliff test rmse    | 1.56752 |
 
 
 ### `CHEMBL214_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.689724 |
-| noncliff test rmse | 0.627578 |
-| cliff test rmse    | 0.785106 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.08035 |
+| noncliff test rmse | 1.05789 |
+| cliff test rmse    | 1.11788 |
 
 
 ### `CHEMBL218_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.799164 |
-| noncliff test rmse | 0.822914 |
-| cliff test rmse    | 0.756145 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04397 |
+| noncliff test rmse | 1.0796  |
+| cliff test rmse    | 0.979   |
 
 
 ### `CHEMBL219_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.774298 |
-| noncliff test rmse | 0.734378 |
-| cliff test rmse    | 0.831567 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.07541 |
+| noncliff test rmse | 1.07624 |
+| cliff test rmse    | 1.07415 |
 
 
 ### `CHEMBL228_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.822404 |
-| noncliff test rmse | 0.767098 |
-| cliff test rmse    | 0.90839  |
+| overall test rmse  | 1.12979  |
+| noncliff test rmse | 1.20086  |
+| cliff test rmse    | 0.997988 |
 
 
 ### `CHEMBL231_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.814664 |
-| noncliff test rmse | 0.789097 |
-| cliff test rmse    | 0.889358 |
+| overall test rmse  | 0.926137 |
+| noncliff test rmse | 0.912974 |
+| cliff test rmse    | 0.965854 |
 
 
 ### `CHEMBL233_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.886818 |
-| noncliff test rmse | 0.83234  |
-| cliff test rmse    | 0.959481 |
+| overall test rmse  | 0.972888 |
+| noncliff test rmse | 0.962067 |
+| cliff test rmse    | 0.988181 |
 
 
 ### `CHEMBL234_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.832102 |
-| noncliff test rmse | 0.87962  |
-| cliff test rmse    | 0.766432 |
+| overall test rmse  | 0.848071 |
+| noncliff test rmse | 0.865947 |
+| cliff test rmse    | 0.824427 |
 
 
 ### `CHEMBL235_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.705462 |
-| noncliff test rmse | 0.6117   |
-| cliff test rmse    | 0.837652 |
+| overall test rmse  | 1.04564  |
+| noncliff test rmse | 0.978755 |
+| cliff test rmse    | 1.1476   |
 
 
 ### `CHEMBL236_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.794817 |
-| noncliff test rmse | 0.759771 |
-| cliff test rmse    | 0.846401 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.28956 |
+| noncliff test rmse | 1.30428 |
+| cliff test rmse    | 1.26634 |
 
 
 ### `CHEMBL237_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.912872 |
-| noncliff test rmse | 0.85107  |
-| cliff test rmse    | 0.977511 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.40954 |
+| noncliff test rmse | 1.4792  |
+| cliff test rmse    | 1.32711 |
 
 
 ### `CHEMBL237_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.765107 |
-| noncliff test rmse | 0.742082 |
-| cliff test rmse    | 0.794933 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.24189 |
+| noncliff test rmse | 1.20222 |
+| cliff test rmse    | 1.29317 |
 
 
 ### `CHEMBL238_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.674958 |
-| noncliff test rmse | 0.65602  |
-| cliff test rmse    | 0.726622 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.15452 |
+| noncliff test rmse | 1.1382  |
+| cliff test rmse    | 1.20017 |
 
 
 ### `CHEMBL239_EC50`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.773381 |
-| noncliff test rmse | 0.667558 |
-| cliff test rmse    | 0.906033 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.04166 |
+| noncliff test rmse | 1.00288 |
+| cliff test rmse    | 1.09584 |
 
 
 ### `CHEMBL244_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.727281 |
-| noncliff test rmse | 0.638011 |
-| cliff test rmse    | 0.814098 |
+| overall test rmse  | 0.843037 |
+| noncliff test rmse | 0.756405 |
+| cliff test rmse    | 0.928897 |
 
 
 ### `CHEMBL262_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.768015 |
-| noncliff test rmse | 0.750437 |
-| cliff test rmse    | 0.841104 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.07866 |
+| noncliff test rmse | 1.05732 |
+| cliff test rmse    | 1.16808 |
 
 
 ### `CHEMBL264_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.650244 |
-| noncliff test rmse | 0.599543 |
-| cliff test rmse    | 0.715287 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.02478 |
+| noncliff test rmse | 1.03659 |
+| cliff test rmse    | 1.00799 |
 
 
 ### `CHEMBL2835_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.581138 |
-| noncliff test rmse | 0.504965 |
-| cliff test rmse    | 1.02804  |
+| overall test rmse  | 0.804487 |
+| noncliff test rmse | 0.758565 |
+| cliff test rmse    | 1.12744  |
 
 
 ### `CHEMBL287_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.762387 |
-| noncliff test rmse | 0.729853 |
-| cliff test rmse    | 0.811501 |
+| overall test rmse  | 0.882482 |
+| noncliff test rmse | 0.860913 |
+| cliff test rmse    | 0.915777 |
 
 
 ### `CHEMBL2971_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.690679 |
-| noncliff test rmse | 0.659183 |
-| cliff test rmse    | 0.825142 |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.05305 |
+| noncliff test rmse | 1.01267 |
+| cliff test rmse    | 1.22833 |
 
 
 ### `CHEMBL3979_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.665471 |
-| noncliff test rmse | 0.631137 |
-| cliff test rmse    | 0.71089  |
+| overall test rmse  | 0.854401 |
+| noncliff test rmse | 0.858744 |
+| cliff test rmse    | 0.848266 |
 
 
 ### `CHEMBL4005_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.732738 |
-| noncliff test rmse | 0.659327 |
-| cliff test rmse    | 0.823533 |
+| overall test rmse  | 0.881741 |
+| noncliff test rmse | 0.840303 |
+| cliff test rmse    | 0.936021 |
 
 
 ### `CHEMBL4203_Ki`
 
-| metric             |    value |
-|:-------------------|---------:|
-| overall test rmse  | 0.979209 |
-| noncliff test rmse | 0.920291 |
-| cliff test rmse    | 1.45933  |
+| metric             |   value |
+|:-------------------|--------:|
+| overall test rmse  | 1.06882 |
+| noncliff test rmse | 1.0703  |
+| cliff test rmse    | 1.05319 |
 
 
 ### `CHEMBL4616_EC50`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.83359  |
-| noncliff test rmse | 0.883315 |
-| cliff test rmse    | 0.785929 |
+| overall test rmse  | 0.90123  |
+| noncliff test rmse | 0.967774 |
+| cliff test rmse    | 0.836523 |
 
 
 ### `CHEMBL4792_Ki`
 
 | metric             |    value |
 |:-------------------|---------:|
-| overall test rmse  | 0.719319 |
-| noncliff test rmse | 0.656068 |
-| cliff test rmse    | 0.769356 |
+| overall test rmse  | 0.905948 |
+| noncliff test rmse | 0.915128 |
+| cliff test rmse    | 0.898012 |
 
 
 ### Summary
@@ -1869,124 +1869,124 @@ results_dict = {
 ```
 results_dict = {
     "CHEMBL1862_Ki": {
-        "cliff": 1.4063219260836977,
-        "noncliff": 1.379750657955887
+        "cliff": 1.3040902008721686,
+        "noncliff": 1.4848845150775933
     },
     "CHEMBL1871_Ki": {
-        "cliff": 1.0422968049253332,
-        "noncliff": 0.7059672386768634
+        "cliff": 1.1118139114458518,
+        "noncliff": 0.7434792504474397
     },
     "CHEMBL2034_Ki": {
-        "cliff": 0.9031622814059983,
-        "noncliff": 0.7336026244165531
+        "cliff": 0.8849503053792407,
+        "noncliff": 0.9778687596493899
     },
     "CHEMBL2047_EC50": {
-        "cliff": 0.6161011515380163,
-        "noncliff": 0.6400433103646966
+        "cliff": 0.768188606627365,
+        "noncliff": 0.9565130713545998
     },
     "CHEMBL204_Ki": {
-        "cliff": 0.8711774934537668,
-        "noncliff": 0.703490426183755
+        "cliff": 1.4717944320534861,
+        "noncliff": 1.374727591504635
     },
     "CHEMBL2147_Ki": {
-        "cliff": 0.6035263993888034,
-        "noncliff": 0.6682133849242246
+        "cliff": 1.56752089529469,
+        "noncliff": 1.4777482050018071
     },
     "CHEMBL214_Ki": {
-        "cliff": 0.7851061592423132,
-        "noncliff": 0.6275779837856605
+        "cliff": 1.1178803089600557,
+        "noncliff": 1.057889924865325
     },
     "CHEMBL218_EC50": {
-        "cliff": 0.7561445994624091,
-        "noncliff": 0.8229135210217627
+        "cliff": 0.9790002615301642,
+        "noncliff": 1.0796034618914203
     },
     "CHEMBL219_Ki": {
-        "cliff": 0.8315671666444859,
-        "noncliff": 0.7343780781167828
+        "cliff": 1.07415149755732,
+        "noncliff": 1.0762385658958122
     },
     "CHEMBL228_Ki": {
-        "cliff": 0.9083900009035714,
-        "noncliff": 0.7670980788478863
+        "cliff": 0.9979879653658511,
+        "noncliff": 1.2008644979001295
     },
     "CHEMBL231_Ki": {
-        "cliff": 0.8893575092268853,
-        "noncliff": 0.789097331971391
+        "cliff": 0.9658535293810789,
+        "noncliff": 0.9129741378462181
     },
     "CHEMBL233_Ki": {
-        "cliff": 0.9594813744280908,
-        "noncliff": 0.832339732167546
+        "cliff": 0.9881805500041962,
+        "noncliff": 0.9620674808346528
     },
     "CHEMBL234_Ki": {
-        "cliff": 0.7664316978800058,
-        "noncliff": 0.8796201803640389
+        "cliff": 0.8244266737536826,
+        "noncliff": 0.8659467425756013
     },
     "CHEMBL235_EC50": {
-        "cliff": 0.8376515955788775,
-        "noncliff": 0.6116999225609673
+        "cliff": 1.147601985639797,
+        "noncliff": 0.9787546304773898
     },
     "CHEMBL236_Ki": {
-        "cliff": 0.8464014518345826,
-        "noncliff": 0.759771325133551
+        "cliff": 1.266344078799769,
+        "noncliff": 1.304283610047531
     },
     "CHEMBL237_EC50": {
-        "cliff": 0.9775110026823937,
-        "noncliff": 0.8510702487763945
+        "cliff": 1.327105019737643,
+        "noncliff": 1.4792041039043036
     },
     "CHEMBL237_Ki": {
-        "cliff": 0.7949332203898708,
-        "noncliff": 0.7420817222585805
+        "cliff": 1.2931731555702597,
+        "noncliff": 1.2022186141049576
     },
     "CHEMBL238_Ki": {
-        "cliff": 0.7266218696535034,
-        "noncliff": 0.6560201495500351
+        "cliff": 1.200174415028479,
+        "noncliff": 1.1381994825474357
     },
     "CHEMBL239_EC50": {
-        "cliff": 0.9060331704564749,
-        "noncliff": 0.6675576264055623
+        "cliff": 1.0958435043311499,
+        "noncliff": 1.0028848753137094
     },
     "CHEMBL244_Ki": {
-        "cliff": 0.8140984525131715,
-        "noncliff": 0.6380113963827172
+        "cliff": 0.9288972421753078,
+        "noncliff": 0.7564049309519775
     },
     "CHEMBL262_Ki": {
-        "cliff": 0.8411041303745161,
-        "noncliff": 0.750437283067766
+        "cliff": 1.1680835135103653,
+        "noncliff": 1.0573172637420476
     },
     "CHEMBL264_Ki": {
-        "cliff": 0.7152868336786686,
-        "noncliff": 0.5995433196980107
+        "cliff": 1.007992037240638,
+        "noncliff": 1.0365918382051311
     },
     "CHEMBL2835_Ki": {
-        "cliff": 1.0280355086947015,
-        "noncliff": 0.504964671686287
+        "cliff": 1.1274397993457177,
+        "noncliff": 0.7585646727250581
     },
     "CHEMBL287_Ki": {
-        "cliff": 0.8115010426245072,
-        "noncliff": 0.729852996422398
+        "cliff": 0.915777247560255,
+        "noncliff": 0.8609130953633735
     },
     "CHEMBL2971_Ki": {
-        "cliff": 0.8251423496718537,
-        "noncliff": 0.6591830772689052
+        "cliff": 1.22833323642781,
+        "noncliff": 1.0126723816200498
     },
     "CHEMBL3979_EC50": {
-        "cliff": 0.7108900994418583,
-        "noncliff": 0.631136991041538
+        "cliff": 0.8482660662107708,
+        "noncliff": 0.8587437659608578
     },
     "CHEMBL4005_Ki": {
-        "cliff": 0.8235330825862716,
-        "noncliff": 0.6593271382637024
+        "cliff": 0.9360208231029821,
+        "noncliff": 0.8403034698099001
     },
     "CHEMBL4203_Ki": {
-        "cliff": 1.4593345072622563,
-        "noncliff": 0.9202906914287425
+        "cliff": 1.0531941724362655,
+        "noncliff": 1.070298363665036
     },
     "CHEMBL4616_EC50": {
-        "cliff": 0.7859292092223159,
-        "noncliff": 0.8833146561506809
+        "cliff": 0.8365227288544854,
+        "noncliff": 0.9677739145367883
     },
     "CHEMBL4792_Ki": {
-        "cliff": 0.7693557018086988,
-        "noncliff": 0.6560682939542013
+        "cliff": 0.8980121578006527,
+        "noncliff": 0.9151280472698908
     }
 }
 ```
