@@ -153,8 +153,8 @@ timestamp: {datetime.datetime.now()}
             _mp = torch.load("./chemeleon2_preview_v2_mp.pt", weights_only=True)
             mp = MinimolMessagePassing(**_mp["hyper_params"])
             mp.load_state_dict(_mp["state_dict"])
-            # mp.apply(lambda module: module.requires_grad_(False))
-            # mp.eval()
+            mp.apply(lambda module: module.requires_grad_(False))
+            mp.eval()
             agg = NormAggregation()
             hidden_size = mp.output_dim
             batch_norm=False
