@@ -115,6 +115,12 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                 test_ds = smiles_table_to_chemprop_molecule_dataset(test_df, "smiles", ["label"])
                 val_ds = smiles_table_to_chemprop_molecule_dataset(val_df, "smiles", ["label"]) if val_df is not None else None
 
+                # Full training fold in the original row order (train_idx). Used only for
+                # exporting fingerprints so they stay aligned with the labels that
+                # 05_knn_probing.py reads via endpoint_df.iloc[train_idx]. The shuffled
+                # train_ds/val_ds split above is used solely for training/validation.
+                train_ds_full = smiles_table_to_chemprop_molecule_dataset(train_df, "smiles", ["label"])
+
                 if "chemeleon" in model_name or model_name == "chemprop_large":
                     mp = from_chemeleon(no_weights=(model_name == "chemprop_large"))
                 else:
@@ -129,7 +135,7 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                     dummy_trainer.predict(model, build_dataloader(test_ds, num_workers=n_workers))
                     
                     with torch.inference_mode():
-                        np.save(split_dir / "train_fps.npy", model.fingerprint(BatchMolGraph([dp.mg for dp in train_ds])).cpu().numpy())
+                        np.save(split_dir / "train_fps.npy", model.fingerprint(BatchMolGraph([dp.mg for dp in train_ds_full])).cpu().numpy())
                         np.save(split_dir / "test_fps.npy", model.fingerprint(BatchMolGraph([dp.mg for dp in test_ds])).cpu().numpy())
                     continue
 
@@ -163,12 +169,9 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
 
                     # 3. Save fingerprints
                     with torch.inference_mode():
-                        fps_train_part = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in train_ds])).cpu().numpy()
-                        fps_val_part = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in val_ds])).cpu().numpy() if val_ds else np.array([])
+                        fps_train_full = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in train_ds_full])).cpu().numpy()
                         fps_test = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in test_ds])).cpu().numpy()
-                    
-                    fps_train_full = np.concatenate([fps_train_part, fps_val_part], axis=0) if fps_val_part.size else fps_train_part
-                    
+
                     np.save(split_dir / f"train_fps_{label}.npy", fps_train_full)
                     np.save(split_dir / f"test_fps_{label}.npy", fps_test)
                     del m_eval

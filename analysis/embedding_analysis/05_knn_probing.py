@@ -87,6 +87,44 @@ def calc_metrics(probas, test_labels):
         "pr_auc": pr_aucs, "balanced_accuracy": balanced_accuracies, "precision": precisions, "f1": f1_scores,
     }
 
+def assert_feature_split_alignment(
+    feat_train: npt.NDArray[np.float64],
+    feat_test: npt.NDArray[np.float64],
+    train_idx: npt.NDArray[np.int_],
+    test_idx: npt.NDArray[np.int_],
+    context: str = "",
+) -> None:
+    """Assert that feature matrices are row-aligned with their split indices.
+
+    Downstream, features are paired positionally with labels fetched via
+    ``endpoint_df.iloc[train_idx]`` / ``endpoint_df.iloc[test_idx]``, so each feature
+    matrix must have exactly one row per index in its split partition. A mismatch
+    means the fingerprints and labels would be misaligned and every KNN metric
+    silently corrupted. This guards against the shuffle-ordering bug fixed in
+    04_calc_embeddings.py as well as any silent row-dropping upstream.
+
+    Parameters
+    ----------
+    feat_train, feat_test : npt.NDArray[np.float64]
+        Train/test feature matrices.
+    train_idx, test_idx : npt.NDArray[np.int_]
+        Row indices of the train/test split partition.
+    context : str
+        Human-readable context string included in the error message.
+
+    Raises
+    ------
+    ValueError
+        If either feature matrix does not have one row per index in its split.
+    """
+    if len(feat_train) != len(train_idx) or len(feat_test) != len(test_idx):
+        raise ValueError(
+            f"Feature/split length mismatch{f' for {context}' if context else ''}: "
+            f"train {len(feat_train)} vs {len(train_idx)}, "
+            f"test {len(feat_test)} vs {len(test_idx)}."
+        )
+
+
 # ---------------------------------------------------------------------
 # File Reader (Updated for Best/Last Suffixes)
 # ---------------------------------------------------------------------
@@ -104,7 +142,12 @@ def read_feat_split_data(
         feature_matrix_path = data_path / "intermediate_data" / "descriptors" / repr_info.representation_type / f"{ep}_{repr_info.representation_type}.npy"
         feat_matrix = np.load(feature_matrix_path)
         for fold_i, (train_idx, test_idx) in enumerate(PredefinedSplit(endpoint_df[split_strategy]).split()):
-            yield fold_i, train_idx, test_idx, feat_matrix[train_idx], feat_matrix[test_idx]
+            feat_train, feat_test = feat_matrix[train_idx], feat_matrix[test_idx]
+            assert_feature_split_alignment(
+                feat_train, feat_test, train_idx, test_idx,
+                context=f"EP={ep} Repr={repr_info.representation_type} Split={split_strategy} fold={fold_i}",
+            )
+            yield fold_i, train_idx, test_idx, feat_train, feat_test
 
     elif repr_info.representation_type in learned_representations:
         folds_dir = data_path / "intermediate_data" / "model_data" / repr_info.representation_type / ep / split_strategy
@@ -116,6 +159,10 @@ def read_feat_split_data(
         for fold_i, (train_idx, test_idx) in enumerate(PredefinedSplit(endpoint_df[split_strategy]).split()):
             feat_train = np.load(folds_dir / f"fold_{fold_i}" / f"train_fps{suffix}.npy")
             feat_test = np.load(folds_dir / f"fold_{fold_i}" / f"test_fps{suffix}.npy")
+            assert_feature_split_alignment(
+                feat_train, feat_test, train_idx, test_idx,
+                context=f"EP={ep} Repr={repr_info.representation_type} Split={split_strategy} fold={fold_i}",
+            )
             yield fold_i, train_idx, test_idx, feat_train, feat_test
 
 # ---------------------------------------------------------------------
@@ -146,11 +193,12 @@ def main(n_jobs: int, endpoint: str, ckpt_type: str) -> None:
                 gen = read_feat_split_data(repr_info, ep, data_path, endpoint_df, split_strategy, classical_representations, learned_representations, ckpt_type)
 
                 for fold_i, train_idx, test_idx, feat_train, feat_test in gen:
-                    feat_train_prep, feat_test_prep = prepare_feat_for_knn(feat_train, feat_test, repr_info)
                     train_labels = endpoint_df.iloc[train_idx]["label"].to_numpy()
                     test_labels = endpoint_df.iloc[test_idx]["label"].to_numpy()
 
-                    neigh_dist, neigh_index = calc_knn(feat_train_prep, feat_test_p := feat_test_prep, repr_info, k_max, n_jobs)
+                    feat_train_prep, feat_test_prep = prepare_feat_for_knn(feat_train, feat_test, repr_info)
+
+                    neigh_dist, neigh_index = calc_knn(feat_train_prep, feat_test_prep, repr_info, k_max, n_jobs)
                     probas = calc_knn_proba(neigh_dist, neigh_index, train_labels, weighting_strategy)
 
                     metrics_dict = calc_metrics(probas, test_labels)
