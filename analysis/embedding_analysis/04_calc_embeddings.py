@@ -26,7 +26,7 @@ from chemprop.nn import (
 
 # Lightning imports
 from lightning import Trainer, seed_everything
-from lightning.pytorch.callbacks import Callback, ModelCheckpoint
+from lightning.pytorch.callbacks import Callback, ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
 try:
@@ -103,6 +103,11 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                 split_dir = data_path / "intermediate_data" / "model_data" / model_name / ep / split_strategy / f"fold_{trial}"
                 split_dir.mkdir(parents=True, exist_ok=True)
 
+                # skip if already run
+                if (split_dir / "train_fps_best.npy").exists() and (split_dir / "test_fps_best.npy").exists():
+                    logger.info(f"Skipping {split_dir} because fingerprints already exist.")
+                    continue
+
                 train_df = endpoint_df.iloc[train_idx]
                 test_df = endpoint_df.iloc[test_idx].copy()
 
@@ -141,7 +146,8 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
 
                 ckpt_cb = ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, save_last=True, dirpath=split_dir / "checkpoints")
                 loss_logger = CSVLossLogger(split_dir / "losses.csv")
-                trainer = Trainer(max_epochs=epochs, callbacks=[ckpt_cb, loss_logger], accelerator="auto", logger=False)
+                es_cb = EarlyStopping(monitor="val_loss", mode="min", patience=10, verbose=True)
+                trainer = Trainer(max_epochs=epochs, callbacks=[ckpt_cb, loss_logger, es_cb], accelerator="auto", logger=False)
                 
                 trainer.fit(model, 
                             build_dataloader(train_ds, num_workers=n_workers, shuffle=True), 
@@ -175,6 +181,10 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                     np.save(split_dir / f"train_fps_{label}.npy", fps_train_full)
                     np.save(split_dir / f"test_fps_{label}.npy", fps_test)
                     del m_eval
+
+                # delete the checkpoints to save disk space
+                for ckpt_file in (split_dir / "checkpoints").glob("*.ckpt"):
+                    ckpt_file.unlink()
 
                 torch.cuda.empty_cache()
 

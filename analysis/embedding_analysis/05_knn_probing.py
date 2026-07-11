@@ -178,7 +178,7 @@ def main(n_jobs: int, endpoint: str, ckpt_type: str) -> None:
     weighting_strategy = "weighted_inverse"
     split_strategy_list = ["Random", "Agglomerative clustering"]
     classical_representations = {"morgan", "morgan_count", "rdkit_physchem", "mordred"}
-    learned_representations = {"chemeleon_finetuned", "chemeleon_frozen", "chemprop", "chemprop_large"}
+    learned_representations = {"chemeleon_finetuned", "chemprop", "chemprop_large"}
     representation_list = [*classical_representations, *learned_representations]
 
     metrics_df_list = []
