@@ -26,7 +26,7 @@ from chemprop.nn import (
 
 # Lightning imports
 from lightning import Trainer, seed_everything
-from lightning.pytorch.callbacks import Callback, ModelCheckpoint
+from lightning.pytorch.callbacks import Callback, ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
 try:
@@ -103,6 +103,11 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                 split_dir = data_path / "intermediate_data" / "model_data" / model_name / ep / split_strategy / f"fold_{trial}"
                 split_dir.mkdir(parents=True, exist_ok=True)
 
+                # skip if already run
+                if (split_dir / "train_fps_best.npy").exists() and (split_dir / "test_fps_best.npy").exists():
+                    logger.info(f"Skipping {split_dir} because fingerprints already exist.")
+                    continue
+
                 train_df = endpoint_df.iloc[train_idx]
                 test_df = endpoint_df.iloc[test_idx].copy()
 
@@ -114,6 +119,12 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                 train_ds = smiles_table_to_chemprop_molecule_dataset(train_df_split, "smiles", ["label"])
                 test_ds = smiles_table_to_chemprop_molecule_dataset(test_df, "smiles", ["label"])
                 val_ds = smiles_table_to_chemprop_molecule_dataset(val_df, "smiles", ["label"]) if val_df is not None else None
+
+                # Full training fold in the original row order (train_idx). Used only for
+                # exporting fingerprints so they stay aligned with the labels that
+                # 05_knn_probing.py reads via endpoint_df.iloc[train_idx]. The shuffled
+                # train_ds/val_ds split above is used solely for training/validation.
+                train_ds_full = smiles_table_to_chemprop_molecule_dataset(train_df, "smiles", ["label"])
 
                 if "chemeleon" in model_name or model_name == "chemprop_large":
                     mp = from_chemeleon(no_weights=(model_name == "chemprop_large"))
@@ -129,13 +140,14 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
                     dummy_trainer.predict(model, build_dataloader(test_ds, num_workers=n_workers))
                     
                     with torch.inference_mode():
-                        np.save(split_dir / "train_fps.npy", model.fingerprint(BatchMolGraph([dp.mg for dp in train_ds])).cpu().numpy())
+                        np.save(split_dir / "train_fps.npy", model.fingerprint(BatchMolGraph([dp.mg for dp in train_ds_full])).cpu().numpy())
                         np.save(split_dir / "test_fps.npy", model.fingerprint(BatchMolGraph([dp.mg for dp in test_ds])).cpu().numpy())
                     continue
 
                 ckpt_cb = ModelCheckpoint(monitor="val_loss", mode="min", save_top_k=1, save_last=True, dirpath=split_dir / "checkpoints")
                 loss_logger = CSVLossLogger(split_dir / "losses.csv")
-                trainer = Trainer(max_epochs=epochs, callbacks=[ckpt_cb, loss_logger], accelerator="auto", logger=False)
+                es_cb = EarlyStopping(monitor="val_loss", mode="min", patience=10, verbose=True)
+                trainer = Trainer(max_epochs=epochs, callbacks=[ckpt_cb, loss_logger, es_cb], accelerator="auto", logger=False)
                 
                 trainer.fit(model, 
                             build_dataloader(train_ds, num_workers=n_workers, shuffle=True), 
@@ -163,15 +175,16 @@ def main(n_workers: int, endpoint: str, model_name: str, seed: int):
 
                     # 3. Save fingerprints
                     with torch.inference_mode():
-                        fps_train_part = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in train_ds])).cpu().numpy()
-                        fps_val_part = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in val_ds])).cpu().numpy() if val_ds else np.array([])
+                        fps_train_full = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in train_ds_full])).cpu().numpy()
                         fps_test = m_eval.fingerprint(BatchMolGraph([dp.mg for dp in test_ds])).cpu().numpy()
-                    
-                    fps_train_full = np.concatenate([fps_train_part, fps_val_part], axis=0) if fps_val_part.size else fps_train_part
-                    
+
                     np.save(split_dir / f"train_fps_{label}.npy", fps_train_full)
                     np.save(split_dir / f"test_fps_{label}.npy", fps_test)
                     del m_eval
+
+                # delete the checkpoints to save disk space
+                for ckpt_file in (split_dir / "checkpoints").glob("*.ckpt"):
+                    ckpt_file.unlink()
 
                 torch.cuda.empty_cache()
 

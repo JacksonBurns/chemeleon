@@ -11,3 +11,4 @@ screen.log
 *.log
 minimol_features
 analysis/moleculenet_results/**/*_results/
+analysis/embedding_analysis/data/intermediate_data
