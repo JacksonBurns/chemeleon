@@ -1,290 +1,290 @@
 # ChemProp Baseline Results
-timestamp: 2026-09-14 15:36:37.143141
+timestamp: 2026-09-16 13:39:36.887381
 ## Random Seed 42
 
 ### `polaris/pkis2-ret-wt-cls-v2`
 
 |    | Test set   | Target label   | Metric      |    Score |
 |---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_RET        | accuracy    | 0.858491 |
-|  1 | test       | CLS_RET        | cohen_kappa | 0.288272 |
-|  2 | test       | CLS_RET        | f1          | 0.347826 |
-|  3 | test       | CLS_RET        | roc_auc     | 0.872439 |
-|  4 | test       | CLS_RET        | pr_auc      | 0.654254 |
-|  5 | test       | CLS_RET        | mcc         | 0.337956 |
+|  0 | test       | CLS_RET        | accuracy    | 0.877358 |
+|  1 | test       | CLS_RET        | mcc         | 0.453107 |
+|  2 | test       | CLS_RET        | f1          | 0.380952 |
+|  3 | test       | CLS_RET        | roc_auc     | 0.856576 |
+|  4 | test       | CLS_RET        | pr_auc      | 0.642657 |
+|  5 | test       | CLS_RET        | cohen_kappa | 0.34067  |
 
 
 ### `polaris/pkis2-ret-wt-reg-v2`
 
 |    | Test set   | Target label   | Metric              |      Score |
 |---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | RET            | explained_var       |   0.247297 |
-|  1 | test       | RET            | mean_absolute_error |  23.7374   |
-|  2 | test       | RET            | r2                  |   0.236119 |
-|  3 | test       | RET            | mean_squared_error  | 907.036    |
-|  4 | test       | RET            | pearsonr            |   0.500899 |
-|  5 | test       | RET            | spearmanr           |   0.502124 |
+|  0 | test       | RET            | explained_var       |   0.311632 |
+|  1 | test       | RET            | pearsonr            |   0.558914 |
+|  2 | test       | RET            | mean_squared_error  | 849.053    |
+|  3 | test       | RET            | spearmanr           |   0.5496   |
+|  4 | test       | RET            | mean_absolute_error |  21.855    |
+|  5 | test       | RET            | r2                  |   0.284951 |
 
 
 ### `polaris/pkis2-kit-wt-cls-v2`
 
 |    | Test set   | Target label   | Metric      |    Score |
 |---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_KIT        | accuracy    | 0.827586 |
-|  1 | test       | CLS_KIT        | cohen_kappa | 0.22252  |
-|  2 | test       | CLS_KIT        | f1          | 0.285714 |
-|  3 | test       | CLS_KIT        | roc_auc     | 0.845261 |
-|  4 | test       | CLS_KIT        | pr_auc      | 0.630068 |
-|  5 | test       | CLS_KIT        | mcc         | 0.284178 |
+|  0 | test       | CLS_KIT        | accuracy    | 0.853448 |
+|  1 | test       | CLS_KIT        | mcc         | 0.435091 |
+|  2 | test       | CLS_KIT        | f1          | 0.451613 |
+|  3 | test       | CLS_KIT        | roc_auc     | 0.827853 |
+|  4 | test       | CLS_KIT        | pr_auc      | 0.600484 |
+|  5 | test       | CLS_KIT        | cohen_kappa | 0.38375  |
 
 
 ### `polaris/pkis2-kit-wt-reg-v2`
 
 |    | Test set   | Target label   | Metric              |      Score |
 |---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | KIT            | explained_var       |   0.380054 |
-|  1 | test       | KIT            | mean_absolute_error |  20.8344   |
-|  2 | test       | KIT            | r2                  |   0.359407 |
-|  3 | test       | KIT            | mean_squared_error  | 772.993    |
-|  4 | test       | KIT            | pearsonr            |   0.625747 |
-|  5 | test       | KIT            | spearmanr           |   0.563626 |
+|  0 | test       | KIT            | explained_var       |   0.318693 |
+|  1 | test       | KIT            | pearsonr            |   0.572771 |
+|  2 | test       | KIT            | mean_squared_error  | 893.371    |
+|  3 | test       | KIT            | spearmanr           |   0.515267 |
+|  4 | test       | KIT            | mean_absolute_error |  22.0142   |
+|  5 | test       | KIT            | r2                  |   0.259648 |
 
 
 ### `polaris/pkis2-egfr-wt-reg-v2`
 
 |    | Test set   | Target label   | Metric              |      Score |
 |---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | EGFR           | explained_var       |   0.414104 |
-|  1 | test       | EGFR           | mean_absolute_error |  16.8591   |
-|  2 | test       | EGFR           | r2                  |   0.413382 |
-|  3 | test       | EGFR           | mean_squared_error  | 472.678    |
-|  4 | test       | EGFR           | pearsonr            |   0.644084 |
-|  5 | test       | EGFR           | spearmanr           |   0.330845 |
+|  0 | test       | EGFR           | explained_var       |   0.454607 |
+|  1 | test       | EGFR           | pearsonr            |   0.674348 |
+|  2 | test       | EGFR           | mean_squared_error  | 440.576    |
+|  3 | test       | EGFR           | spearmanr           |   0.391038 |
+|  4 | test       | EGFR           | mean_absolute_error |  16.5071   |
+|  5 | test       | EGFR           | r2                  |   0.453223 |
 
 
 ### `polaris/adme-fang-solu-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.396594 |
-|  1 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.391912 |
-|  2 | test       | LOG_SOLUBILITY | r2                  | 0.392699 |
-|  3 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.329265 |
-|  4 | test       | LOG_SOLUBILITY | pearsonr            | 0.630429 |
-|  5 | test       | LOG_SOLUBILITY | spearmanr           | 0.520263 |
+|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.407026 |
+|  1 | test       | LOG_SOLUBILITY | pearsonr            | 0.640019 |
+|  2 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.324623 |
+|  3 | test       | LOG_SOLUBILITY | spearmanr           | 0.542313 |
+|  4 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.381218 |
+|  5 | test       | LOG_SOLUBILITY | r2                  | 0.401261 |
 
 
 ### `polaris/adme-fang-rppb-1`
 
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RPPB       | explained_var       | 0.328295 |
-|  1 | test       | LOG_RPPB       | mean_absolute_error | 0.530954 |
-|  2 | test       | LOG_RPPB       | r2                  | 0.327266 |
-|  3 | test       | LOG_RPPB       | mean_squared_error  | 0.597712 |
-|  4 | test       | LOG_RPPB       | pearsonr            | 0.576176 |
-|  5 | test       | LOG_RPPB       | spearmanr           | 0.657391 |
+|    | Test set   | Target label   | Metric              |     Score |
+|---:|:-----------|:---------------|:--------------------|----------:|
+|  0 | test       | LOG_RPPB       | explained_var       | 0.168761  |
+|  1 | test       | LOG_RPPB       | pearsonr            | 0.414549  |
+|  2 | test       | LOG_RPPB       | mean_squared_error  | 0.808964  |
+|  3 | test       | LOG_RPPB       | spearmanr           | 0.494783  |
+|  4 | test       | LOG_RPPB       | mean_absolute_error | 0.716732  |
+|  5 | test       | LOG_RPPB       | r2                  | 0.0894991 |
 
 
 ### `polaris/adme-fang-hppb-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HPPB       | explained_var       | 0.3476   |
-|  1 | test       | LOG_HPPB       | mean_absolute_error | 0.529697 |
-|  2 | test       | LOG_HPPB       | r2                  | 0.305847 |
-|  3 | test       | LOG_HPPB       | mean_squared_error  | 0.420406 |
-|  4 | test       | LOG_HPPB       | pearsonr            | 0.667989 |
-|  5 | test       | LOG_HPPB       | spearmanr           | 0.668653 |
+|  0 | test       | LOG_HPPB       | explained_var       | 0.330256 |
+|  1 | test       | LOG_HPPB       | pearsonr            | 0.602494 |
+|  2 | test       | LOG_HPPB       | mean_squared_error  | 0.413567 |
+|  3 | test       | LOG_HPPB       | spearmanr           | 0.578195 |
+|  4 | test       | LOG_HPPB       | mean_absolute_error | 0.541981 |
+|  5 | test       | LOG_HPPB       | r2                  | 0.317139 |
 
 
 ### `polaris/adme-fang-perm-1`
 
 |    | Test set   | Target label     | Metric              |    Score |
 |---:|:-----------|:-----------------|:--------------------|---------:|
-|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.611818 |
-|  1 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.326315 |
-|  2 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.609337 |
-|  3 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.193532 |
-|  4 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.782361 |
-|  5 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.79209  |
+|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.610332 |
+|  1 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.781284 |
+|  2 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.195452 |
+|  3 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.790057 |
+|  4 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.336519 |
+|  5 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.60546  |
 
 
 ### `polaris/adme-fang-rclint-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.507746 |
-|  1 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.424751 |
-|  2 | test       | LOG_RLM_CLint  | r2                  | 0.493555 |
-|  3 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.28591  |
-|  4 | test       | LOG_RLM_CLint  | pearsonr            | 0.715484 |
-|  5 | test       | LOG_RLM_CLint  | spearmanr           | 0.725121 |
+|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.497831 |
+|  1 | test       | LOG_RLM_CLint  | pearsonr            | 0.706203 |
+|  2 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.288887 |
+|  3 | test       | LOG_RLM_CLint  | spearmanr           | 0.712788 |
+|  4 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.42546  |
+|  5 | test       | LOG_RLM_CLint  | r2                  | 0.488281 |
 
 
 ### `polaris/adme-fang-hclint-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.455049 |
-|  1 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.358242 |
-|  2 | test       | LOG_HLM_CLint  | r2                  | 0.455047 |
-|  3 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.211665 |
-|  4 | test       | LOG_HLM_CLint  | pearsonr            | 0.693363 |
-|  5 | test       | LOG_HLM_CLint  | spearmanr           | 0.701853 |
+|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.467448 |
+|  1 | test       | LOG_HLM_CLint  | pearsonr            | 0.698987 |
+|  2 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.20685  |
+|  3 | test       | LOG_HLM_CLint  | spearmanr           | 0.706212 |
+|  4 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.35331  |
+|  5 | test       | LOG_HLM_CLint  | r2                  | 0.467444 |
 
 
 ### `tdcommons/lipophilicity-astrazeneca`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.452989 |
+|  0 | test       | Y              | mean_absolute_error | 0.445594 |
 
 
 ### `tdcommons/ppbr-az`
 
 |    | Test set   | Target label   | Metric              |   Score |
 |---:|:-----------|:---------------|:--------------------|--------:|
-|  0 | test       | Y              | mean_absolute_error | 8.16276 |
+|  0 | test       | Y              | mean_absolute_error |  7.7637 |
 
 
 ### `tdcommons/clearance-hepatocyte-az`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.434609 |
+|  0 | test       | Y              | spearmanr | 0.396162 |
 
 
 ### `tdcommons/cyp2d6-substrate-carbonmangels`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.552229 |
+|  0 | test       | Y              | pr_auc   | 0.665824 |
 
 
 ### `tdcommons/half-life-obach`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.291717 |
+|  0 | test       | Y              | spearmanr | 0.244917 |
 
 
 ### `tdcommons/cyp2c9-substrate-carbonmangels`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.398963 |
+|  0 | test       | Y              | pr_auc   | 0.417447 |
 
 
 ### `tdcommons/clearance-microsome-az`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.624319 |
+|  0 | test       | Y              | spearmanr | 0.605186 |
 
 
 ### `tdcommons/dili`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.905652 |
+|  0 | test       | Y              | roc_auc  | 0.918696 |
 
 
 ### `tdcommons/bioavailability-ma`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.515464 |
+|  0 | test       | Y              | roc_auc  | 0.569671 |
 
 
 ### `tdcommons/vdss-lombardo`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.566013 |
+|  0 | test       | Y              | spearmanr | 0.562561 |
 
 
 ### `tdcommons/cyp3a4-substrate-carbonmangels`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.573124 |
+|  0 | test       | Y              | roc_auc  | 0.571768 |
 
 
 ### `tdcommons/pgp-broccatelli`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.916356 |
+|  0 | test       | Y              | roc_auc  | 0.918488 |
 
 
 ### `tdcommons/caco2-wang`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.318565 |
+|  0 | test       | Y              | mean_absolute_error | 0.373653 |
 
 
 ### `tdcommons/herg`
 
-|    | Test set   | Target label   | Metric   |   Score |
-|---:|:-----------|:---------------|:---------|--------:|
-|  0 | test       | Y              | roc_auc  | 0.85729 |
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.849779 |
 
 
 ### `tdcommons/bbb-martins`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.883873 |
+|  0 | test       | Y              | roc_auc  | 0.858544 |
 
 
 ### `tdcommons/ames`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.844246 |
+|  0 | test       | Y              | roc_auc  | 0.838401 |
 
 
 ### `tdcommons/ld50-zhu`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.530698 |
+|  0 | test       | Y              | mean_absolute_error | 0.586801 |
 
 
 ### Summary
 
 ```
 results_dict = {
-    "polaris/pkis2-ret-wt-cls-v2": 0.6542536536332592,
-    "polaris/pkis2-ret-wt-reg-v2": 907.0360884366381,
-    "polaris/pkis2-kit-wt-cls-v2": 0.6300680727079923,
-    "polaris/pkis2-kit-wt-reg-v2": 772.993149290519,
-    "polaris/pkis2-egfr-wt-reg-v2": 472.67847781128006,
-    "polaris/adme-fang-solu-1": 0.6304293704981224,
-    "polaris/adme-fang-rppb-1": 0.5761759846515828,
-    "polaris/adme-fang-hppb-1": 0.6679892274050949,
-    "polaris/adme-fang-perm-1": 0.7823609087094935,
-    "polaris/adme-fang-rclint-1": 0.7154844094368781,
-    "polaris/adme-fang-hclint-1": 0.6933631006340434,
-    "tdcommons/lipophilicity-astrazeneca": 0.4529891844306673,
-    "tdcommons/ppbr-az": 8.162759434080721,
-    "tdcommons/clearance-hepatocyte-az": 0.4346091640675435,
-    "tdcommons/cyp2d6-substrate-carbonmangels": 0.5522287485444232,
-    "tdcommons/half-life-obach": 0.29171682169719204,
-    "tdcommons/cyp2c9-substrate-carbonmangels": 0.39896277573235545,
-    "tdcommons/clearance-microsome-az": 0.624318887117569,
-    "tdcommons/dili": 0.9056521739130434,
-    "tdcommons/bioavailability-ma": 0.5154639175257731,
-    "tdcommons/vdss-lombardo": 0.5660132954802323,
-    "tdcommons/cyp3a4-substrate-carbonmangels": 0.573123869801085,
-    "tdcommons/pgp-broccatelli": 0.916355638496401,
-    "tdcommons/caco2-wang": 0.31856524820167637,
-    "tdcommons/herg": 0.8572901325478645,
-    "tdcommons/bbb-martins": 0.8838727329580988,
-    "tdcommons/ames": 0.8442460200904659,
-    "tdcommons/ld50-zhu": 0.5306984867830237
+    "polaris/pkis2-ret-wt-cls-v2": 0.6426572957717763,
+    "polaris/pkis2-ret-wt-reg-v2": 849.0530698521792,
+    "polaris/pkis2-kit-wt-cls-v2": 0.6004836555381771,
+    "polaris/pkis2-kit-wt-reg-v2": 893.3710615815303,
+    "polaris/pkis2-egfr-wt-reg-v2": 440.5758689880552,
+    "polaris/adme-fang-solu-1": 0.6400193543667096,
+    "polaris/adme-fang-rppb-1": 0.4145490491869022,
+    "polaris/adme-fang-hppb-1": 0.6024942202653071,
+    "polaris/adme-fang-perm-1": 0.7812837305931727,
+    "polaris/adme-fang-rclint-1": 0.7062028712524958,
+    "polaris/adme-fang-hclint-1": 0.6989874014075668,
+    "tdcommons/lipophilicity-astrazeneca": 0.4455941903307324,
+    "tdcommons/ppbr-az": 7.7637004908252925,
+    "tdcommons/clearance-hepatocyte-az": 0.3961616864519215,
+    "tdcommons/cyp2d6-substrate-carbonmangels": 0.6658237198704868,
+    "tdcommons/half-life-obach": 0.24491729897754796,
+    "tdcommons/cyp2c9-substrate-carbonmangels": 0.4174469605142508,
+    "tdcommons/clearance-microsome-az": 0.6051858267378684,
+    "tdcommons/dili": 0.918695652173913,
+    "tdcommons/bioavailability-ma": 0.5696707682075157,
+    "tdcommons/vdss-lombardo": 0.5625609048954062,
+    "tdcommons/cyp3a4-substrate-carbonmangels": 0.5717676311030742,
+    "tdcommons/pgp-broccatelli": 0.9184884030925087,
+    "tdcommons/caco2-wang": 0.37365340510113065,
+    "tdcommons/herg": 0.8497790868924889,
+    "tdcommons/bbb-martins": 0.8585444027517198,
+    "tdcommons/ames": 0.8384009869000764,
+    "tdcommons/ld50-zhu": 0.5868010731833875
 }
 ```
 ## Random Seed 117
@@ -294,180 +294,1041 @@ results_dict = {
 |    | Test set   | Target label   | Metric      |    Score |
 |---:|:-----------|:---------------|:------------|---------:|
 |  0 | test       | CLS_RET        | accuracy    | 0.839623 |
-|  1 | test       | CLS_RET        | cohen_kappa | 0        |
+|  1 | test       | CLS_RET        | mcc         | 0        |
 |  2 | test       | CLS_RET        | f1          | 0        |
-|  3 | test       | CLS_RET        | roc_auc     | 0.785856 |
-|  4 | test       | CLS_RET        | pr_auc      | 0.495969 |
-|  5 | test       | CLS_RET        | mcc         | 0        |
+|  3 | test       | CLS_RET        | roc_auc     | 0.816259 |
+|  4 | test       | CLS_RET        | pr_auc      | 0.586799 |
+|  5 | test       | CLS_RET        | cohen_kappa | 0        |
 
 
 ### `polaris/pkis2-ret-wt-reg-v2`
 
 |    | Test set   | Target label   | Metric              |      Score |
 |---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | RET            | explained_var       |   0.383766 |
-|  1 | test       | RET            | mean_absolute_error |  21.4595   |
-|  2 | test       | RET            | r2                  |   0.368895 |
-|  3 | test       | RET            | mean_squared_error  | 749.378    |
-|  4 | test       | RET            | pearsonr            |   0.628333 |
-|  5 | test       | RET            | spearmanr           |   0.615741 |
+|  0 | test       | RET            | explained_var       |   0.414206 |
+|  1 | test       | RET            | pearsonr            |   0.653407 |
+|  2 | test       | RET            | mean_squared_error  | 799.39     |
+|  3 | test       | RET            | spearmanr           |   0.595542 |
+|  4 | test       | RET            | mean_absolute_error |  20.7404   |
+|  5 | test       | RET            | r2                  |   0.326775 |
 
 
 ### `polaris/pkis2-kit-wt-cls-v2`
 
 |    | Test set   | Target label   | Metric      |    Score |
 |---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_KIT        | accuracy    | 0.836207 |
-|  1 | test       | CLS_KIT        | cohen_kappa | 0.368119 |
-|  2 | test       | CLS_KIT        | f1          | 0.457143 |
-|  3 | test       | CLS_KIT        | roc_auc     | 0.827853 |
-|  4 | test       | CLS_KIT        | pr_auc      | 0.65221  |
-|  5 | test       | CLS_KIT        | mcc         | 0.385806 |
+|  0 | test       | CLS_KIT        | accuracy    | 0.853448 |
+|  1 | test       | CLS_KIT        | mcc         | 0.531571 |
+|  2 | test       | CLS_KIT        | f1          | 0.622222 |
+|  3 | test       | CLS_KIT        | roc_auc     | 0.812863 |
+|  4 | test       | CLS_KIT        | pr_auc      | 0.647871 |
+|  5 | test       | CLS_KIT        | cohen_kappa | 0.531369 |
 
 
 ### `polaris/pkis2-kit-wt-reg-v2`
 
 |    | Test set   | Target label   | Metric              |      Score |
 |---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | KIT            | explained_var       |   0.308637 |
-|  1 | test       | KIT            | mean_absolute_error |  21.6413   |
-|  2 | test       | KIT            | r2                  |   0.2949   |
-|  3 | test       | KIT            | mean_squared_error  | 850.833    |
-|  4 | test       | KIT            | pearsonr            |   0.591899 |
-|  5 | test       | KIT            | spearmanr           |   0.568458 |
+|  0 | test       | KIT            | explained_var       |   0.288042 |
+|  1 | test       | KIT            | pearsonr            |   0.582519 |
+|  2 | test       | KIT            | mean_squared_error  | 879.41     |
+|  3 | test       | KIT            | spearmanr           |   0.530677 |
+|  4 | test       | KIT            | mean_absolute_error |  22.4112   |
+|  5 | test       | KIT            | r2                  |   0.271218 |
 
 
 ### `polaris/pkis2-egfr-wt-reg-v2`
 
 |    | Test set   | Target label   | Metric              |      Score |
 |---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | EGFR           | explained_var       |   0.400966 |
-|  1 | test       | EGFR           | mean_absolute_error |  16.8287   |
-|  2 | test       | EGFR           | r2                  |   0.381388 |
-|  3 | test       | EGFR           | mean_squared_error  | 498.458    |
-|  4 | test       | EGFR           | pearsonr            |   0.637753 |
-|  5 | test       | EGFR           | spearmanr           |   0.319236 |
+|  0 | test       | EGFR           | explained_var       |   0.394602 |
+|  1 | test       | EGFR           | pearsonr            |   0.633351 |
+|  2 | test       | EGFR           | mean_squared_error  | 498.304    |
+|  3 | test       | EGFR           | spearmanr           |   0.279231 |
+|  4 | test       | EGFR           | mean_absolute_error |  16.9102   |
+|  5 | test       | EGFR           | r2                  |   0.381579 |
 
 
 ### `polaris/adme-fang-solu-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.402533 |
-|  1 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.419603 |
-|  2 | test       | LOG_SOLUBILITY | r2                  | 0.394305 |
-|  3 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.328395 |
-|  4 | test       | LOG_SOLUBILITY | pearsonr            | 0.636501 |
-|  5 | test       | LOG_SOLUBILITY | spearmanr           | 0.548309 |
+|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.385002 |
+|  1 | test       | LOG_SOLUBILITY | pearsonr            | 0.632645 |
+|  2 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.333443 |
+|  3 | test       | LOG_SOLUBILITY | spearmanr           | 0.541746 |
+|  4 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.386273 |
+|  5 | test       | LOG_SOLUBILITY | r2                  | 0.384993 |
 
 
 ### `polaris/adme-fang-rppb-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RPPB       | explained_var       | 0.506465 |
-|  1 | test       | LOG_RPPB       | mean_absolute_error | 0.492679 |
-|  2 | test       | LOG_RPPB       | r2                  | 0.506251 |
-|  3 | test       | LOG_RPPB       | mean_squared_error  | 0.438687 |
-|  4 | test       | LOG_RPPB       | pearsonr            | 0.721598 |
-|  5 | test       | LOG_RPPB       | spearmanr           | 0.768696 |
+|  0 | test       | LOG_RPPB       | explained_var       | 0.269736 |
+|  1 | test       | LOG_RPPB       | pearsonr            | 0.519625 |
+|  2 | test       | LOG_RPPB       | mean_squared_error  | 0.650421 |
+|  3 | test       | LOG_RPPB       | spearmanr           | 0.665217 |
+|  4 | test       | LOG_RPPB       | mean_absolute_error | 0.554073 |
+|  5 | test       | LOG_RPPB       | r2                  | 0.267942 |
 
 
 ### `polaris/adme-fang-hppb-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HPPB       | explained_var       | 0.425209 |
-|  1 | test       | LOG_HPPB       | mean_absolute_error | 0.555817 |
-|  2 | test       | LOG_HPPB       | r2                  | 0.256976 |
-|  3 | test       | LOG_HPPB       | mean_squared_error  | 0.450004 |
-|  4 | test       | LOG_HPPB       | pearsonr            | 0.664292 |
-|  5 | test       | LOG_HPPB       | spearmanr           | 0.674612 |
+|  0 | test       | LOG_HPPB       | explained_var       | 0.395336 |
+|  1 | test       | LOG_HPPB       | pearsonr            | 0.634619 |
+|  2 | test       | LOG_HPPB       | mean_squared_error  | 0.36717  |
+|  3 | test       | LOG_HPPB       | spearmanr           | 0.623271 |
+|  4 | test       | LOG_HPPB       | mean_absolute_error | 0.488171 |
+|  5 | test       | LOG_HPPB       | r2                  | 0.393747 |
 
 
 ### `polaris/adme-fang-perm-1`
 
 |    | Test set   | Target label     | Metric              |    Score |
 |---:|:-----------|:-----------------|:--------------------|---------:|
-|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.627545 |
-|  1 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.321005 |
-|  2 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.627527 |
-|  3 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.18452  |
-|  4 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.793579 |
-|  5 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.797834 |
+|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.595398 |
+|  1 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.773696 |
+|  2 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.204187 |
+|  3 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.77325  |
+|  4 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.343815 |
+|  5 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.587828 |
 
 
 ### `polaris/adme-fang-rclint-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.512489 |
-|  1 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.424216 |
-|  2 | test       | LOG_RLM_CLint  | r2                  | 0.508799 |
-|  3 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.277304 |
-|  4 | test       | LOG_RLM_CLint  | pearsonr            | 0.716043 |
-|  5 | test       | LOG_RLM_CLint  | spearmanr           | 0.726161 |
+|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.511617 |
+|  1 | test       | LOG_RLM_CLint  | pearsonr            | 0.715278 |
+|  2 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.281447 |
+|  3 | test       | LOG_RLM_CLint  | spearmanr           | 0.723036 |
+|  4 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.423705 |
+|  5 | test       | LOG_RLM_CLint  | r2                  | 0.501461 |
 
 
 ### `polaris/adme-fang-hclint-1`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.461356 |
-|  1 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.363541 |
-|  2 | test       | LOG_HLM_CLint  | r2                  | 0.455277 |
-|  3 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.211576 |
-|  4 | test       | LOG_HLM_CLint  | pearsonr            | 0.689017 |
-|  5 | test       | LOG_HLM_CLint  | spearmanr           | 0.699438 |
+|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.44286  |
+|  1 | test       | LOG_HLM_CLint  | pearsonr            | 0.68236  |
+|  2 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.216912 |
+|  3 | test       | LOG_HLM_CLint  | spearmanr           | 0.693282 |
+|  4 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.359759 |
+|  5 | test       | LOG_HLM_CLint  | r2                  | 0.441538 |
 
 
 ### `tdcommons/lipophilicity-astrazeneca`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.442658 |
+|  0 | test       | Y              | mean_absolute_error | 0.454409 |
 
 
 ### `tdcommons/ppbr-az`
 
 |    | Test set   | Target label   | Metric              |   Score |
 |---:|:-----------|:---------------|:--------------------|--------:|
-|  0 | test       | Y              | mean_absolute_error | 8.39371 |
+|  0 | test       | Y              | mean_absolute_error | 7.50136 |
 
 
 ### `tdcommons/clearance-hepatocyte-az`
 
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.395943 |
+|    | Test set   | Target label   | Metric    |   Score |
+|---:|:-----------|:---------------|:----------|--------:|
+|  0 | test       | Y              | spearmanr | 0.41307 |
 
 
 ### `tdcommons/cyp2d6-substrate-carbonmangels`
 
 |    | Test set   | Target label   | Metric   |    Score |
 |---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.743528 |
+|  0 | test       | Y              | pr_auc   | 0.705717 |
 
 
 ### `tdcommons/half-life-obach`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.198378 |
+|  0 | test       | Y              | spearmanr | 0.163867 |
 
 
 ### `tdcommons/cyp2c9-substrate-carbonmangels`
 
-|    | Test set   | Target label   | Metric   |   Score |
-|---:|:-----------|:---------------|:---------|--------:|
-|  0 | test       | Y              | pr_auc   | 0.43083 |
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.416455 |
 
 
 ### `tdcommons/clearance-microsome-az`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.617324 |
+|  0 | test       | Y              | spearmanr | 0.581184 |
+
+
+### `tdcommons/dili`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.925217 |
+
+
+### `tdcommons/bioavailability-ma`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.505155 |
+
+
+### `tdcommons/vdss-lombardo`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.516555 |
+
+
+### `tdcommons/cyp3a4-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.559109 |
+
+
+### `tdcommons/pgp-broccatelli`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.896561 |
+
+
+### `tdcommons/caco2-wang`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.312954 |
+
+
+### `tdcommons/herg`
+
+|    | Test set   | Target label   | Metric   |   Score |
+|---:|:-----------|:---------------|:---------|--------:|
+|  0 | test       | Y              | roc_auc  | 0.82268 |
+
+
+### `tdcommons/bbb-martins`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.894778 |
+
+
+### `tdcommons/ames`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.843455 |
+
+
+### `tdcommons/ld50-zhu`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.594967 |
+
+
+### Summary
+
+```
+results_dict = {
+    "polaris/pkis2-ret-wt-cls-v2": 0.5867989435337546,
+    "polaris/pkis2-ret-wt-reg-v2": 799.3904621515268,
+    "polaris/pkis2-kit-wt-cls-v2": 0.6478710289211332,
+    "polaris/pkis2-kit-wt-reg-v2": 879.4100811337046,
+    "polaris/pkis2-egfr-wt-reg-v2": 498.30408472254993,
+    "polaris/adme-fang-solu-1": 0.6326447734704839,
+    "polaris/adme-fang-rppb-1": 0.5196253248409931,
+    "polaris/adme-fang-hppb-1": 0.6346185484023408,
+    "polaris/adme-fang-perm-1": 0.7736963692501686,
+    "polaris/adme-fang-rclint-1": 0.7152777596127174,
+    "polaris/adme-fang-hclint-1": 0.6823596861511351,
+    "tdcommons/lipophilicity-astrazeneca": 0.4544085133189247,
+    "tdcommons/ppbr-az": 7.501364053579478,
+    "tdcommons/clearance-hepatocyte-az": 0.4130697723001206,
+    "tdcommons/cyp2d6-substrate-carbonmangels": 0.7057168639728413,
+    "tdcommons/half-life-obach": 0.16386743287002348,
+    "tdcommons/cyp2c9-substrate-carbonmangels": 0.4164547276775561,
+    "tdcommons/clearance-microsome-az": 0.581184233401406,
+    "tdcommons/dili": 0.9252173913043479,
+    "tdcommons/bioavailability-ma": 0.5051546391752577,
+    "tdcommons/vdss-lombardo": 0.5165551709816185,
+    "tdcommons/cyp3a4-substrate-carbonmangels": 0.5591094032549728,
+    "tdcommons/pgp-broccatelli": 0.8965609170887763,
+    "tdcommons/caco2-wang": 0.3129537760689537,
+    "tdcommons/herg": 0.822680412371134,
+    "tdcommons/bbb-martins": 0.8947779862414009,
+    "tdcommons/ames": 0.8434549335213143,
+    "tdcommons/ld50-zhu": 0.5949671279619446
+}
+```
+## Random Seed 709
+
+### `polaris/pkis2-ret-wt-cls-v2`
+
+|    | Test set   | Target label   | Metric      |    Score |
+|---:|:-----------|:---------------|:------------|---------:|
+|  0 | test       | CLS_RET        | accuracy    | 0.867925 |
+|  1 | test       | CLS_RET        | mcc         | 0.387824 |
+|  2 | test       | CLS_RET        | f1          | 0.363636 |
+|  3 | test       | CLS_RET        | roc_auc     | 0.857237 |
+|  4 | test       | CLS_RET        | pr_auc      | 0.636575 |
+|  5 | test       | CLS_RET        | cohen_kappa | 0.313599 |
+
+
+### `polaris/pkis2-ret-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | RET            | explained_var       |   0.279527 |
+|  1 | test       | RET            | pearsonr            |   0.533306 |
+|  2 | test       | RET            | mean_squared_error  | 859.595    |
+|  3 | test       | RET            | spearmanr           |   0.534722 |
+|  4 | test       | RET            | mean_absolute_error |  22.493    |
+|  5 | test       | RET            | r2                  |   0.276072 |
+
+
+### `polaris/pkis2-kit-wt-cls-v2`
+
+|    | Test set   | Target label   | Metric      |    Score |
+|---:|:-----------|:---------------|:------------|---------:|
+|  0 | test       | CLS_KIT        | accuracy    | 0.827586 |
+|  1 | test       | CLS_KIT        | mcc         | 0.321498 |
+|  2 | test       | CLS_KIT        | f1          | 0.375    |
+|  3 | test       | CLS_KIT        | roc_auc     | 0.808511 |
+|  4 | test       | CLS_KIT        | pr_auc      | 0.587766 |
+|  5 | test       | CLS_KIT        | cohen_kappa | 0.290954 |
+
+
+### `polaris/pkis2-kit-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | KIT            | explained_var       |   0.322409 |
+|  1 | test       | KIT            | pearsonr            |   0.595865 |
+|  2 | test       | KIT            | mean_squared_error  | 857.061    |
+|  3 | test       | KIT            | spearmanr           |   0.534344 |
+|  4 | test       | KIT            | mean_absolute_error |  21.8966   |
+|  5 | test       | KIT            | r2                  |   0.289739 |
+
+
+### `polaris/pkis2-egfr-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | EGFR           | explained_var       |   0.437289 |
+|  1 | test       | EGFR           | pearsonr            |   0.661873 |
+|  2 | test       | EGFR           | mean_squared_error  | 453.419    |
+|  3 | test       | EGFR           | spearmanr           |   0.291027 |
+|  4 | test       | EGFR           | mean_absolute_error |  16.6743   |
+|  5 | test       | EGFR           | r2                  |   0.437283 |
+
+
+### `polaris/adme-fang-solu-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.406    |
+|  1 | test       | LOG_SOLUBILITY | pearsonr            | 0.637374 |
+|  2 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.327957 |
+|  3 | test       | LOG_SOLUBILITY | spearmanr           | 0.51676  |
+|  4 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.385684 |
+|  5 | test       | LOG_SOLUBILITY | r2                  | 0.395112 |
+
+
+### `polaris/adme-fang-rppb-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_RPPB       | explained_var       | 0.337104 |
+|  1 | test       | LOG_RPPB       | pearsonr            | 0.580789 |
+|  2 | test       | LOG_RPPB       | mean_squared_error  | 0.590556 |
+|  3 | test       | LOG_RPPB       | spearmanr           | 0.666957 |
+|  4 | test       | LOG_RPPB       | mean_absolute_error | 0.506247 |
+|  5 | test       | LOG_RPPB       | r2                  | 0.33532  |
+
+
+### `polaris/adme-fang-hppb-1`
+
+|    | Test set   | Target label   | Metric              |       Score |
+|---:|:-----------|:---------------|:--------------------|------------:|
+|  0 | test       | LOG_HPPB       | explained_var       |  0.0906801  |
+|  1 | test       | LOG_HPPB       | pearsonr            |  0.671123   |
+|  2 | test       | LOG_HPPB       | mean_squared_error  |  0.610806   |
+|  3 | test       | LOG_HPPB       | spearmanr           |  0.676293   |
+|  4 | test       | LOG_HPPB       | mean_absolute_error |  0.69426    |
+|  5 | test       | LOG_HPPB       | r2                  | -0.00853216 |
+
+
+### `polaris/adme-fang-perm-1`
+
+|    | Test set   | Target label     | Metric              |    Score |
+|---:|:-----------|:-----------------|:--------------------|---------:|
+|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.599186 |
+|  1 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.774493 |
+|  2 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.199011 |
+|  3 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.784    |
+|  4 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.342616 |
+|  5 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.598277 |
+
+
+### `polaris/adme-fang-rclint-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.493539 |
+|  1 | test       | LOG_RLM_CLint  | pearsonr            | 0.703389 |
+|  2 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.287708 |
+|  3 | test       | LOG_RLM_CLint  | spearmanr           | 0.708297 |
+|  4 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.431557 |
+|  5 | test       | LOG_RLM_CLint  | r2                  | 0.490371 |
+
+
+### `polaris/adme-fang-hclint-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.453535 |
+|  1 | test       | LOG_HLM_CLint  | pearsonr            | 0.697756 |
+|  2 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.214451 |
+|  3 | test       | LOG_HLM_CLint  | spearmanr           | 0.707177 |
+|  4 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.359777 |
+|  5 | test       | LOG_HLM_CLint  | r2                  | 0.447875 |
+
+
+### `tdcommons/lipophilicity-astrazeneca`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.445457 |
+
+
+### `tdcommons/ppbr-az`
+
+|    | Test set   | Target label   | Metric              |   Score |
+|---:|:-----------|:---------------|:--------------------|--------:|
+|  0 | test       | Y              | mean_absolute_error | 7.69787 |
+
+
+### `tdcommons/clearance-hepatocyte-az`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.398029 |
+
+
+### `tdcommons/cyp2d6-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.692144 |
+
+
+### `tdcommons/half-life-obach`
+
+|    | Test set   | Target label   | Metric    |     Score |
+|---:|:-----------|:---------------|:----------|----------:|
+|  0 | test       | Y              | spearmanr | 0.0675633 |
+
+
+### `tdcommons/cyp2c9-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.424075 |
+
+
+### `tdcommons/clearance-microsome-az`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.624166 |
+
+
+### `tdcommons/dili`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.924783 |
+
+
+### `tdcommons/bioavailability-ma`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.454938 |
+
+
+### `tdcommons/vdss-lombardo`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.473564 |
+
+
+### `tdcommons/cyp3a4-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.611551 |
+
+
+### `tdcommons/pgp-broccatelli`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.918022 |
+
+
+### `tdcommons/caco2-wang`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.323094 |
+
+
+### `tdcommons/herg`
+
+|    | Test set   | Target label   | Metric   |   Score |
+|---:|:-----------|:---------------|:---------|--------:|
+|  0 | test       | Y              | roc_auc  | 0.81458 |
+
+
+### `tdcommons/bbb-martins`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.902283 |
+
+
+### `tdcommons/ames`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.842552 |
+
+
+### `tdcommons/ld50-zhu`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.583426 |
+
+
+### Summary
+
+```
+results_dict = {
+    "polaris/pkis2-ret-wt-cls-v2": 0.6365752729029,
+    "polaris/pkis2-ret-wt-reg-v2": 859.5954308492272,
+    "polaris/pkis2-kit-wt-cls-v2": 0.5877661405317551,
+    "polaris/pkis2-kit-wt-reg-v2": 857.0606570851212,
+    "polaris/pkis2-egfr-wt-reg-v2": 453.4193730999389,
+    "polaris/adme-fang-solu-1": 0.637373827546844,
+    "polaris/adme-fang-rppb-1": 0.5807889014785247,
+    "polaris/adme-fang-hppb-1": 0.6711227696608865,
+    "polaris/adme-fang-perm-1": 0.7744932323149158,
+    "polaris/adme-fang-rclint-1": 0.7033892720819905,
+    "polaris/adme-fang-hclint-1": 0.697756113189267,
+    "tdcommons/lipophilicity-astrazeneca": 0.44545669123672305,
+    "tdcommons/ppbr-az": 7.697867514622232,
+    "tdcommons/clearance-hepatocyte-az": 0.3980288519016042,
+    "tdcommons/cyp2d6-substrate-carbonmangels": 0.6921441686694793,
+    "tdcommons/half-life-obach": 0.06756334904949929,
+    "tdcommons/cyp2c9-substrate-carbonmangels": 0.4240746669581145,
+    "tdcommons/clearance-microsome-az": 0.6241659552124907,
+    "tdcommons/dili": 0.9247826086956522,
+    "tdcommons/bioavailability-ma": 0.4549384768872631,
+    "tdcommons/vdss-lombardo": 0.473563772808027,
+    "tdcommons/cyp3a4-substrate-carbonmangels": 0.6115506329113924,
+    "tdcommons/pgp-broccatelli": 0.9180218608371101,
+    "tdcommons/caco2-wang": 0.32309417550917413,
+    "tdcommons/herg": 0.814580265095729,
+    "tdcommons/bbb-martins": 0.9022826766729206,
+    "tdcommons/ames": 0.8425522332530498,
+    "tdcommons/ld50-zhu": 0.5834256771407689
+}
+```
+## Random Seed 1701
+
+### `polaris/pkis2-ret-wt-cls-v2`
+
+|    | Test set   | Target label   | Metric      |    Score |
+|---:|:-----------|:---------------|:------------|---------:|
+|  0 | test       | CLS_RET        | accuracy    | 0.877358 |
+|  1 | test       | CLS_RET        | mcc         | 0.459084 |
+|  2 | test       | CLS_RET        | f1          | 0.48     |
+|  3 | test       | CLS_RET        | roc_auc     | 0.835426 |
+|  4 | test       | CLS_RET        | pr_auc      | 0.625595 |
+|  5 | test       | CLS_RET        | cohen_kappa | 0.420521 |
+
+
+### `polaris/pkis2-ret-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | RET            | explained_var       |   0.385798 |
+|  1 | test       | RET            | pearsonr            |   0.621328 |
+|  2 | test       | RET            | mean_squared_error  | 729.802    |
+|  3 | test       | RET            | spearmanr           |   0.589452 |
+|  4 | test       | RET            | mean_absolute_error |  21.3134   |
+|  5 | test       | RET            | r2                  |   0.385381 |
+
+
+### `polaris/pkis2-kit-wt-cls-v2`
+
+|    | Test set   | Target label   | Metric      |    Score |
+|---:|:-----------|:---------------|:------------|---------:|
+|  0 | test       | CLS_KIT        | accuracy    | 0.853448 |
+|  1 | test       | CLS_KIT        | mcc         | 0.468918 |
+|  2 | test       | CLS_KIT        | f1          | 0.540541 |
+|  3 | test       | CLS_KIT        | roc_auc     | 0.823017 |
+|  4 | test       | CLS_KIT        | pr_auc      | 0.644339 |
+|  5 | test       | CLS_KIT        | cohen_kappa | 0.457048 |
+
+
+### `polaris/pkis2-kit-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | KIT            | explained_var       |   0.351166 |
+|  1 | test       | KIT            | pearsonr            |   0.609931 |
+|  2 | test       | KIT            | mean_squared_error  | 813.031    |
+|  3 | test       | KIT            | spearmanr           |   0.541247 |
+|  4 | test       | KIT            | mean_absolute_error |  21.2161   |
+|  5 | test       | KIT            | r2                  |   0.326227 |
+
+
+### `polaris/pkis2-egfr-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | EGFR           | explained_var       |   0.399875 |
+|  1 | test       | EGFR           | pearsonr            |   0.635476 |
+|  2 | test       | EGFR           | mean_squared_error  | 503.937    |
+|  3 | test       | EGFR           | spearmanr           |   0.310109 |
+|  4 | test       | EGFR           | mean_absolute_error |  18.5174   |
+|  5 | test       | EGFR           | r2                  |   0.374588 |
+
+
+### `polaris/adme-fang-solu-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.39324  |
+|  1 | test       | LOG_SOLUBILITY | pearsonr            | 0.62709  |
+|  2 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.333039 |
+|  3 | test       | LOG_SOLUBILITY | spearmanr           | 0.559476 |
+|  4 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.378949 |
+|  5 | test       | LOG_SOLUBILITY | r2                  | 0.385739 |
+
+
+### `polaris/adme-fang-rppb-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_RPPB       | explained_var       | 0.244043 |
+|  1 | test       | LOG_RPPB       | pearsonr            | 0.494448 |
+|  2 | test       | LOG_RPPB       | mean_squared_error  | 0.674532 |
+|  3 | test       | LOG_RPPB       | spearmanr           | 0.683478 |
+|  4 | test       | LOG_RPPB       | mean_absolute_error | 0.592549 |
+|  5 | test       | LOG_RPPB       | r2                  | 0.240803 |
+
+
+### `polaris/adme-fang-hppb-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_HPPB       | explained_var       | 0.37199  |
+|  1 | test       | LOG_HPPB       | pearsonr            | 0.673924 |
+|  2 | test       | LOG_HPPB       | mean_squared_error  | 0.393345 |
+|  3 | test       | LOG_HPPB       | spearmanr           | 0.64558  |
+|  4 | test       | LOG_HPPB       | mean_absolute_error | 0.489469 |
+|  5 | test       | LOG_HPPB       | r2                  | 0.350529 |
+
+
+### `polaris/adme-fang-perm-1`
+
+|    | Test set   | Target label     | Metric              |    Score |
+|---:|:-----------|:-----------------|:--------------------|---------:|
+|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.568345 |
+|  1 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.763884 |
+|  2 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.214277 |
+|  3 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.772038 |
+|  4 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.360324 |
+|  5 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.567459 |
+
+
+### `polaris/adme-fang-rclint-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.517065 |
+|  1 | test       | LOG_RLM_CLint  | pearsonr            | 0.720261 |
+|  2 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.272797 |
+|  3 | test       | LOG_RLM_CLint  | spearmanr           | 0.725342 |
+|  4 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.419794 |
+|  5 | test       | LOG_RLM_CLint  | r2                  | 0.516784 |
+
+
+### `polaris/adme-fang-hclint-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.470904 |
+|  1 | test       | LOG_HLM_CLint  | pearsonr            | 0.700774 |
+|  2 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.214043 |
+|  3 | test       | LOG_HLM_CLint  | spearmanr           | 0.722711 |
+|  4 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.351894 |
+|  5 | test       | LOG_HLM_CLint  | r2                  | 0.448924 |
+
+
+### `tdcommons/lipophilicity-astrazeneca`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.443725 |
+
+
+### `tdcommons/ppbr-az`
+
+|    | Test set   | Target label   | Metric              |   Score |
+|---:|:-----------|:---------------|:--------------------|--------:|
+|  0 | test       | Y              | mean_absolute_error | 7.88206 |
+
+
+### `tdcommons/clearance-hepatocyte-az`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.433703 |
+
+
+### `tdcommons/cyp2d6-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.617585 |
+
+
+### `tdcommons/half-life-obach`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.199195 |
+
+
+### `tdcommons/cyp2c9-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.376455 |
+
+
+### `tdcommons/clearance-microsome-az`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.608637 |
+
+
+### `tdcommons/dili`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.918696 |
+
+
+### `tdcommons/bioavailability-ma`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.482541 |
+
+
+### `tdcommons/vdss-lombardo`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.448394 |
+
+
+### `tdcommons/cyp3a4-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |   Score |
+|---:|:-----------|:---------------|:---------|--------:|
+|  0 | test       | Y              | roc_auc  | 0.59019 |
+
+
+### `tdcommons/pgp-broccatelli`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.903759 |
+
+
+### `tdcommons/caco2-wang`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.347801 |
+
+
+### `tdcommons/herg`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.825037 |
+
+
+### `tdcommons/bbb-martins`
+
+|    | Test set   | Target label   | Metric   |   Score |
+|---:|:-----------|:---------------|:---------|--------:|
+|  0 | test       | Y              | roc_auc  | 0.90154 |
+
+
+### `tdcommons/ames`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.840402 |
+
+
+### `tdcommons/ld50-zhu`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.561842 |
+
+
+### Summary
+
+```
+results_dict = {
+    "polaris/pkis2-ret-wt-cls-v2": 0.6255948485030051,
+    "polaris/pkis2-ret-wt-reg-v2": 729.8018388811814,
+    "polaris/pkis2-kit-wt-cls-v2": 0.6443386249590073,
+    "polaris/pkis2-kit-wt-reg-v2": 813.0309841262914,
+    "polaris/pkis2-egfr-wt-reg-v2": 503.9370303263191,
+    "polaris/adme-fang-solu-1": 0.6270895853747629,
+    "polaris/adme-fang-rppb-1": 0.4944483824895757,
+    "polaris/adme-fang-hppb-1": 0.6739242759866819,
+    "polaris/adme-fang-perm-1": 0.7638838212337935,
+    "polaris/adme-fang-rclint-1": 0.7202613334592175,
+    "polaris/adme-fang-hclint-1": 0.7007737925939004,
+    "tdcommons/lipophilicity-astrazeneca": 0.4437253016687575,
+    "tdcommons/ppbr-az": 7.882058114749587,
+    "tdcommons/clearance-hepatocyte-az": 0.43370262512183566,
+    "tdcommons/cyp2d6-substrate-carbonmangels": 0.6175845506169894,
+    "tdcommons/half-life-obach": 0.1991951084008923,
+    "tdcommons/cyp2c9-substrate-carbonmangels": 0.37645480914079976,
+    "tdcommons/clearance-microsome-az": 0.6086370891695884,
+    "tdcommons/dili": 0.918695652173913,
+    "tdcommons/bioavailability-ma": 0.48254073827735283,
+    "tdcommons/vdss-lombardo": 0.4483937515465038,
+    "tdcommons/cyp3a4-substrate-carbonmangels": 0.5901898734177216,
+    "tdcommons/pgp-broccatelli": 0.9037589976006397,
+    "tdcommons/caco2-wang": 0.3478011164013873,
+    "tdcommons/herg": 0.8250368188512519,
+    "tdcommons/bbb-martins": 0.9015400250156348,
+    "tdcommons/ames": 0.840402200943821,
+    "tdcommons/ld50-zhu": 0.5618417036743061
+}
+```
+## Random Seed 9001
+
+### `polaris/pkis2-ret-wt-cls-v2`
+
+|    | Test set   | Target label   | Metric      |    Score |
+|---:|:-----------|:---------------|:------------|---------:|
+|  0 | test       | CLS_RET        | accuracy    | 0.858491 |
+|  1 | test       | CLS_RET        | mcc         | 0.317299 |
+|  2 | test       | CLS_RET        | f1          | 0.210526 |
+|  3 | test       | CLS_RET        | roc_auc     | 0.817581 |
+|  4 | test       | CLS_RET        | pr_auc      | 0.713188 |
+|  5 | test       | CLS_RET        | cohen_kappa | 0.182939 |
+
+
+### `polaris/pkis2-ret-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | RET            | explained_var       |   0.2927   |
+|  1 | test       | RET            | pearsonr            |   0.54116  |
+|  2 | test       | RET            | mean_squared_error  | 854.083    |
+|  3 | test       | RET            | spearmanr           |   0.502054 |
+|  4 | test       | RET            | mean_absolute_error |  22.8261   |
+|  5 | test       | RET            | r2                  |   0.280715 |
+
+
+### `polaris/pkis2-kit-wt-cls-v2`
+
+|    | Test set   | Target label   | Metric      |    Score |
+|---:|:-----------|:---------------|:------------|---------:|
+|  0 | test       | CLS_KIT        | accuracy    | 0.862069 |
+|  1 | test       | CLS_KIT        | mcc         | 0.475801 |
+|  2 | test       | CLS_KIT        | f1          | 0.466667 |
+|  3 | test       | CLS_KIT        | roc_auc     | 0.854932 |
+|  4 | test       | CLS_KIT        | pr_auc      | 0.687118 |
+|  5 | test       | CLS_KIT        | cohen_kappa | 0.40665  |
+
+
+### `polaris/pkis2-kit-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | KIT            | explained_var       |   0.332641 |
+|  1 | test       | KIT            | pearsonr            |   0.586174 |
+|  2 | test       | KIT            | mean_squared_error  | 847.448    |
+|  3 | test       | KIT            | spearmanr           |   0.51778  |
+|  4 | test       | KIT            | mean_absolute_error |  21.1532   |
+|  5 | test       | KIT            | r2                  |   0.297705 |
+
+
+### `polaris/pkis2-egfr-wt-reg-v2`
+
+|    | Test set   | Target label   | Metric              |      Score |
+|---:|:-----------|:---------------|:--------------------|-----------:|
+|  0 | test       | EGFR           | explained_var       |   0.442045 |
+|  1 | test       | EGFR           | pearsonr            |   0.672037 |
+|  2 | test       | EGFR           | mean_squared_error  | 452.62     |
+|  3 | test       | EGFR           | spearmanr           |   0.355172 |
+|  4 | test       | EGFR           | mean_absolute_error |  16.4054   |
+|  5 | test       | EGFR           | r2                  |   0.438276 |
+
+
+### `polaris/adme-fang-solu-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.418559 |
+|  1 | test       | LOG_SOLUBILITY | pearsonr            | 0.655309 |
+|  2 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.326274 |
+|  3 | test       | LOG_SOLUBILITY | spearmanr           | 0.531203 |
+|  4 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.374998 |
+|  5 | test       | LOG_SOLUBILITY | r2                  | 0.398217 |
+
+
+### `polaris/adme-fang-rppb-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_RPPB       | explained_var       | 0.211122 |
+|  1 | test       | LOG_RPPB       | pearsonr            | 0.51646  |
+|  2 | test       | LOG_RPPB       | mean_squared_error  | 0.719622 |
+|  3 | test       | LOG_RPPB       | spearmanr           | 0.638261 |
+|  4 | test       | LOG_RPPB       | mean_absolute_error | 0.679802 |
+|  5 | test       | LOG_RPPB       | r2                  | 0.190054 |
+
+
+### `polaris/adme-fang-hppb-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_HPPB       | explained_var       | 0.483925 |
+|  1 | test       | LOG_HPPB       | pearsonr            | 0.695919 |
+|  2 | test       | LOG_HPPB       | mean_squared_error  | 0.516584 |
+|  3 | test       | LOG_HPPB       | spearmanr           | 0.721216 |
+|  4 | test       | LOG_HPPB       | mean_absolute_error | 0.63035  |
+|  5 | test       | LOG_HPPB       | r2                  | 0.147042 |
+
+
+### `polaris/adme-fang-perm-1`
+
+|    | Test set   | Target label     | Metric              |    Score |
+|---:|:-----------|:-----------------|:--------------------|---------:|
+|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.571405 |
+|  1 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.765897 |
+|  2 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.212357 |
+|  3 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.777377 |
+|  4 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.336679 |
+|  5 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.571336 |
+
+
+### `polaris/adme-fang-rclint-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.524114 |
+|  1 | test       | LOG_RLM_CLint  | pearsonr            | 0.723974 |
+|  2 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.268692 |
+|  3 | test       | LOG_RLM_CLint  | spearmanr           | 0.735666 |
+|  4 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.414158 |
+|  5 | test       | LOG_RLM_CLint  | r2                  | 0.524054 |
+
+
+### `polaris/adme-fang-hclint-1`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.46925  |
+|  1 | test       | LOG_HLM_CLint  | pearsonr            | 0.694166 |
+|  2 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.206715 |
+|  3 | test       | LOG_HLM_CLint  | spearmanr           | 0.705848 |
+|  4 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.354527 |
+|  5 | test       | LOG_HLM_CLint  | r2                  | 0.467792 |
+
+
+### `tdcommons/lipophilicity-astrazeneca`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.452859 |
+
+
+### `tdcommons/ppbr-az`
+
+|    | Test set   | Target label   | Metric              |   Score |
+|---:|:-----------|:---------------|:--------------------|--------:|
+|  0 | test       | Y              | mean_absolute_error | 7.63005 |
+
+
+### `tdcommons/clearance-hepatocyte-az`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.370687 |
+
+
+### `tdcommons/cyp2d6-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.650287 |
+
+
+### `tdcommons/half-life-obach`
+
+|    | Test set   | Target label   | Metric    |   Score |
+|---:|:-----------|:---------------|:----------|--------:|
+|  0 | test       | Y              | spearmanr | 0.13313 |
+
+
+### `tdcommons/cyp2c9-substrate-carbonmangels`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | pr_auc   | 0.446504 |
+
+
+### `tdcommons/clearance-microsome-az`
+
+|    | Test set   | Target label   | Metric    |    Score |
+|---:|:-----------|:---------------|:----------|---------:|
+|  0 | test       | Y              | spearmanr | 0.601941 |
 
 
 ### `tdcommons/dili`
@@ -479,959 +1340,98 @@ results_dict = {
 
 ### `tdcommons/bioavailability-ma`
 
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.467243 |
+|    | Test set   | Target label   | Metric   |   Score |
+|---:|:-----------|:---------------|:---------|--------:|
+|  0 | test       | Y              | roc_auc  | 0.49019 |
 
 
 ### `tdcommons/vdss-lombardo`
 
 |    | Test set   | Target label   | Metric    |    Score |
 |---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.562002 |
+|  0 | test       | Y              | spearmanr | 0.376193 |
 
 
 ### `tdcommons/cyp3a4-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.586686 |
-
-
-### `tdcommons/pgp-broccatelli`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.929286 |
-
-
-### `tdcommons/caco2-wang`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.350153 |
-
-
-### `tdcommons/herg`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.842857 |
-
-
-### `tdcommons/bbb-martins`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.894035 |
-
-
-### `tdcommons/ames`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.824218 |
-
-
-### `tdcommons/ld50-zhu`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.581079 |
-
-
-### Summary
-
-```
-results_dict = {
-    "polaris/pkis2-ret-wt-cls-v2": 0.4959690375930785,
-    "polaris/pkis2-ret-wt-reg-v2": 749.3776224045953,
-    "polaris/pkis2-kit-wt-cls-v2": 0.6522101618873388,
-    "polaris/pkis2-kit-wt-reg-v2": 850.8327053675309,
-    "polaris/pkis2-egfr-wt-reg-v2": 498.45836096167943,
-    "polaris/adme-fang-solu-1": 0.6365014487884583,
-    "polaris/adme-fang-rppb-1": 0.7215976814633236,
-    "polaris/adme-fang-hppb-1": 0.6642921277811368,
-    "polaris/adme-fang-perm-1": 0.7935794318285769,
-    "polaris/adme-fang-rclint-1": 0.7160427992889494,
-    "polaris/adme-fang-hclint-1": 0.6890165173590018,
-    "tdcommons/lipophilicity-astrazeneca": 0.44265769668987814,
-    "tdcommons/ppbr-az": 8.393712850444432,
-    "tdcommons/clearance-hepatocyte-az": 0.39594292623534966,
-    "tdcommons/cyp2d6-substrate-carbonmangels": 0.7435275062266357,
-    "tdcommons/half-life-obach": 0.19837802027861381,
-    "tdcommons/cyp2c9-substrate-carbonmangels": 0.430830129898371,
-    "tdcommons/clearance-microsome-az": 0.6173241570091421,
-    "tdcommons/dili": 0.9273913043478261,
-    "tdcommons/bioavailability-ma": 0.4672430994346525,
-    "tdcommons/vdss-lombardo": 0.5620019275405866,
-    "tdcommons/cyp3a4-substrate-carbonmangels": 0.5866862567811936,
-    "tdcommons/pgp-broccatelli": 0.9292855238603039,
-    "tdcommons/caco2-wang": 0.3501533667297363,
-    "tdcommons/herg": 0.8428571428571429,
-    "tdcommons/bbb-martins": 0.8940353345841151,
-    "tdcommons/ames": 0.8242182145724412,
-    "tdcommons/ld50-zhu": 0.5810786921206927
-}
-```
-## Random Seed 709
-
-### `polaris/pkis2-ret-wt-cls-v2`
-
-|    | Test set   | Target label   | Metric      |    Score |
-|---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_RET        | accuracy    | 0.877358 |
-|  1 | test       | CLS_RET        | cohen_kappa | 0.453608 |
-|  2 | test       | CLS_RET        | f1          | 0.518519 |
-|  3 | test       | CLS_RET        | roc_auc     | 0.844679 |
-|  4 | test       | CLS_RET        | pr_auc      | 0.63602  |
-|  5 | test       | CLS_RET        | mcc         | 0.474614 |
-
-
-### `polaris/pkis2-ret-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | RET            | explained_var       |   0.395084 |
-|  1 | test       | RET            | mean_absolute_error |  20.3788   |
-|  2 | test       | RET            | r2                  |   0.373619 |
-|  3 | test       | RET            | mean_squared_error  | 743.768    |
-|  4 | test       | RET            | pearsonr            |   0.635059 |
-|  5 | test       | RET            | spearmanr           |   0.576623 |
-
-
-### `polaris/pkis2-kit-wt-cls-v2`
-
-|    | Test set   | Target label   | Metric      |    Score |
-|---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_KIT        | accuracy    | 0.844828 |
-|  1 | test       | CLS_KIT        | cohen_kappa | 0.332481 |
-|  2 | test       | CLS_KIT        | f1          | 0.4      |
-|  3 | test       | CLS_KIT        | roc_auc     | 0.84381  |
-|  4 | test       | CLS_KIT        | pr_auc      | 0.651346 |
-|  5 | test       | CLS_KIT        | mcc         | 0.389019 |
-
-
-### `polaris/pkis2-kit-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | KIT            | explained_var       |   0.341407 |
-|  1 | test       | KIT            | mean_absolute_error |  21.9573   |
-|  2 | test       | KIT            | r2                  |   0.337914 |
-|  3 | test       | KIT            | mean_squared_error  | 798.929    |
-|  4 | test       | KIT            | pearsonr            |   0.595502 |
-|  5 | test       | KIT            | spearmanr           |   0.534167 |
-
-
-### `polaris/pkis2-egfr-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | EGFR           | explained_var       |   0.446298 |
-|  1 | test       | EGFR           | mean_absolute_error |  16.4874   |
-|  2 | test       | EGFR           | r2                  |   0.443824 |
-|  3 | test       | EGFR           | mean_squared_error  | 448.149    |
-|  4 | test       | EGFR           | pearsonr            |   0.670535 |
-|  5 | test       | EGFR           | spearmanr           |   0.446847 |
-
-
-### `polaris/adme-fang-solu-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.366916 |
-|  1 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.396904 |
-|  2 | test       | LOG_SOLUBILITY | r2                  | 0.36532  |
-|  3 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.34411  |
-|  4 | test       | LOG_SOLUBILITY | pearsonr            | 0.617937 |
-|  5 | test       | LOG_SOLUBILITY | spearmanr           | 0.510926 |
-
-
-### `polaris/adme-fang-rppb-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RPPB       | explained_var       | 0.54667  |
-|  1 | test       | LOG_RPPB       | mean_absolute_error | 0.428722 |
-|  2 | test       | LOG_RPPB       | r2                  | 0.53767  |
-|  3 | test       | LOG_RPPB       | mean_squared_error  | 0.410772 |
-|  4 | test       | LOG_RPPB       | pearsonr            | 0.769199 |
-|  5 | test       | LOG_RPPB       | spearmanr           | 0.790435 |
-
-
-### `polaris/adme-fang-hppb-1`
-
-|    | Test set   | Target label   | Metric              |     Score |
-|---:|:-----------|:---------------|:--------------------|----------:|
-|  0 | test       | LOG_HPPB       | explained_var       | 0.122972  |
-|  1 | test       | LOG_HPPB       | mean_absolute_error | 0.685562  |
-|  2 | test       | LOG_HPPB       | r2                  | 0.0271126 |
-|  3 | test       | LOG_HPPB       | mean_squared_error  | 0.589218  |
-|  4 | test       | LOG_HPPB       | pearsonr            | 0.649981  |
-|  5 | test       | LOG_HPPB       | spearmanr           | 0.673084  |
-
-
-### `polaris/adme-fang-perm-1`
-
-|    | Test set   | Target label     | Metric              |    Score |
-|---:|:-----------|:-----------------|:--------------------|---------:|
-|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.599261 |
-|  1 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.339574 |
-|  2 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.59379  |
-|  3 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.201233 |
-|  4 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.779365 |
-|  5 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.796275 |
-
-
-### `polaris/adme-fang-rclint-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.501988 |
-|  1 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.423585 |
-|  2 | test       | LOG_RLM_CLint  | r2                  | 0.500566 |
-|  3 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.281952 |
-|  4 | test       | LOG_RLM_CLint  | pearsonr            | 0.708521 |
-|  5 | test       | LOG_RLM_CLint  | spearmanr           | 0.708333 |
-
-
-### `polaris/adme-fang-hclint-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.480772 |
-|  1 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.353019 |
-|  2 | test       | LOG_HLM_CLint  | r2                  | 0.478261 |
-|  3 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.202649 |
-|  4 | test       | LOG_HLM_CLint  | pearsonr            | 0.699238 |
-|  5 | test       | LOG_HLM_CLint  | spearmanr           | 0.704951 |
-
-
-### `tdcommons/lipophilicity-astrazeneca`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.443978 |
-
-
-### `tdcommons/ppbr-az`
-
-|    | Test set   | Target label   | Metric              |   Score |
-|---:|:-----------|:---------------|:--------------------|--------:|
-|  0 | test       | Y              | mean_absolute_error | 7.74382 |
-
-
-### `tdcommons/clearance-hepatocyte-az`
-
-|    | Test set   | Target label   | Metric    |   Score |
-|---:|:-----------|:---------------|:----------|--------:|
-|  0 | test       | Y              | spearmanr | 0.36156 |
-
-
-### `tdcommons/cyp2d6-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.676349 |
-
-
-### `tdcommons/half-life-obach`
-
-|    | Test set   | Target label   | Metric    |     Score |
-|---:|:-----------|:---------------|:----------|----------:|
-|  0 | test       | Y              | spearmanr | 0.0975152 |
-
-
-### `tdcommons/cyp2c9-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.373924 |
-
-
-### `tdcommons/clearance-microsome-az`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.625995 |
-
-
-### `tdcommons/dili`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.906522 |
-
-
-### `tdcommons/bioavailability-ma`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.451613 |
-
-
-### `tdcommons/vdss-lombardo`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.581212 |
-
-
-### `tdcommons/cyp3a4-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.577645 |
-
-
-### `tdcommons/pgp-broccatelli`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.917689 |
-
-
-### `tdcommons/caco2-wang`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.333837 |
-
-
-### `tdcommons/herg`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.850074 |
-
-
-### `tdcommons/bbb-martins`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.903182 |
-
-
-### `tdcommons/ames`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.836688 |
-
-
-### `tdcommons/ld50-zhu`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.550446 |
-
-
-### Summary
-
-```
-results_dict = {
-    "polaris/pkis2-ret-wt-cls-v2": 0.6360199312946145,
-    "polaris/pkis2-ret-wt-reg-v2": 743.7680012543683,
-    "polaris/pkis2-kit-wt-cls-v2": 0.6513455586119767,
-    "polaris/pkis2-kit-wt-reg-v2": 798.9289340420196,
-    "polaris/pkis2-egfr-wt-reg-v2": 448.1488455407627,
-    "polaris/adme-fang-solu-1": 0.6179374050632648,
-    "polaris/adme-fang-rppb-1": 0.7691989146462169,
-    "polaris/adme-fang-hppb-1": 0.6499811699811321,
-    "polaris/adme-fang-perm-1": 0.779365217068966,
-    "polaris/adme-fang-rclint-1": 0.7085213949673453,
-    "polaris/adme-fang-hclint-1": 0.6992377065590448,
-    "tdcommons/lipophilicity-astrazeneca": 0.4439784519445329,
-    "tdcommons/ppbr-az": 7.743821088487218,
-    "tdcommons/clearance-hepatocyte-az": 0.36155983293355287,
-    "tdcommons/cyp2d6-substrate-carbonmangels": 0.6763492831984566,
-    "tdcommons/half-life-obach": 0.09751519902314694,
-    "tdcommons/cyp2c9-substrate-carbonmangels": 0.37392417319219545,
-    "tdcommons/clearance-microsome-az": 0.6259952029110873,
-    "tdcommons/dili": 0.9065217391304348,
-    "tdcommons/bioavailability-ma": 0.45161290322580644,
-    "tdcommons/vdss-lombardo": 0.5812117920555936,
-    "tdcommons/cyp3a4-substrate-carbonmangels": 0.5776446654611211,
-    "tdcommons/pgp-broccatelli": 0.9176886163689683,
-    "tdcommons/caco2-wang": 0.3338366170969534,
-    "tdcommons/herg": 0.8500736377025038,
-    "tdcommons/bbb-martins": 0.9031816760475295,
-    "tdcommons/ames": 0.8366876187119386,
-    "tdcommons/ld50-zhu": 0.5504462091532386
-}
-```
-## Random Seed 1701
-
-### `polaris/pkis2-ret-wt-cls-v2`
-
-|    | Test set   | Target label   | Metric      |    Score |
-|---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_RET        | accuracy    | 0.858491 |
-|  1 | test       | CLS_RET        | cohen_kappa | 0.182939 |
-|  2 | test       | CLS_RET        | f1          | 0.210526 |
-|  3 | test       | CLS_RET        | roc_auc     | 0.888962 |
-|  4 | test       | CLS_RET        | pr_auc      | 0.763933 |
-|  5 | test       | CLS_RET        | mcc         | 0.317299 |
-
-
-### `polaris/pkis2-ret-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | RET            | explained_var       |   0.437186 |
-|  1 | test       | RET            | mean_absolute_error |  20.4916   |
-|  2 | test       | RET            | r2                  |   0.436909 |
-|  3 | test       | RET            | mean_squared_error  | 668.617    |
-|  4 | test       | RET            | pearsonr            |   0.661209 |
-|  5 | test       | RET            | spearmanr           |   0.58078  |
-
-
-### `polaris/pkis2-kit-wt-cls-v2`
-
-|    | Test set   | Target label   | Metric      |    Score |
-|---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_KIT        | accuracy    | 0.87931  |
-|  1 | test       | CLS_KIT        | cohen_kappa | 0.52459  |
-|  2 | test       | CLS_KIT        | f1          | 0.588235 |
-|  3 | test       | CLS_KIT        | roc_auc     | 0.852031 |
-|  4 | test       | CLS_KIT        | pr_auc      | 0.716179 |
-|  5 | test       | CLS_KIT        | mcc         | 0.557732 |
-
-
-### `polaris/pkis2-kit-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | KIT            | explained_var       |   0.353888 |
-|  1 | test       | KIT            | mean_absolute_error |  21.5564   |
-|  2 | test       | KIT            | r2                  |   0.319602 |
-|  3 | test       | KIT            | mean_squared_error  | 821.025    |
-|  4 | test       | KIT            | pearsonr            |   0.602301 |
-|  5 | test       | KIT            | spearmanr           |   0.561452 |
-
-
-### `polaris/pkis2-egfr-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | EGFR           | explained_var       |   0.391102 |
-|  1 | test       | EGFR           | mean_absolute_error |  17.1569   |
-|  2 | test       | EGFR           | r2                  |   0.388456 |
-|  3 | test       | EGFR           | mean_squared_error  | 492.763    |
-|  4 | test       | EGFR           | pearsonr            |   0.62615  |
-|  5 | test       | EGFR           | spearmanr           |   0.318814 |
-
-
-### `polaris/adme-fang-solu-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.353717 |
-|  1 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.392209 |
-|  2 | test       | LOG_SOLUBILITY | r2                  | 0.334767 |
-|  3 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.360675 |
-|  4 | test       | LOG_SOLUBILITY | pearsonr            | 0.594743 |
-|  5 | test       | LOG_SOLUBILITY | spearmanr           | 0.52615  |
-
-
-### `polaris/adme-fang-rppb-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RPPB       | explained_var       | 0.250299 |
-|  1 | test       | LOG_RPPB       | mean_absolute_error | 0.681513 |
-|  2 | test       | LOG_RPPB       | r2                  | 0.215427 |
-|  3 | test       | LOG_RPPB       | mean_squared_error  | 0.697079 |
-|  4 | test       | LOG_RPPB       | pearsonr            | 0.54261  |
-|  5 | test       | LOG_RPPB       | spearmanr           | 0.64087  |
-
-
-### `polaris/adme-fang-hppb-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HPPB       | explained_var       | 0.444736 |
-|  1 | test       | LOG_HPPB       | mean_absolute_error | 0.49989  |
-|  2 | test       | LOG_HPPB       | r2                  | 0.357312 |
-|  3 | test       | LOG_HPPB       | mean_squared_error  | 0.389237 |
-|  4 | test       | LOG_HPPB       | pearsonr            | 0.696068 |
-|  5 | test       | LOG_HPPB       | spearmanr           | 0.648483 |
-
-
-### `polaris/adme-fang-perm-1`
-
-|    | Test set   | Target label     | Metric              |    Score |
-|---:|:-----------|:-----------------|:--------------------|---------:|
-|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.61264  |
-|  1 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.341579 |
-|  2 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.605081 |
-|  3 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.19564  |
-|  4 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.782778 |
-|  5 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.804782 |
-
-
-### `polaris/adme-fang-rclint-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.515868 |
-|  1 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.417163 |
-|  2 | test       | LOG_RLM_CLint  | r2                  | 0.515174 |
-|  3 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.273706 |
-|  4 | test       | LOG_RLM_CLint  | pearsonr            | 0.721558 |
-|  5 | test       | LOG_RLM_CLint  | spearmanr           | 0.727718 |
-
-
-### `polaris/adme-fang-hclint-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.505319 |
-|  1 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.346949 |
-|  2 | test       | LOG_HLM_CLint  | r2                  | 0.505233 |
-|  3 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.192172 |
-|  4 | test       | LOG_HLM_CLint  | pearsonr            | 0.719987 |
-|  5 | test       | LOG_HLM_CLint  | spearmanr           | 0.728273 |
-
-
-### `tdcommons/lipophilicity-astrazeneca`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.447477 |
-
-
-### `tdcommons/ppbr-az`
-
-|    | Test set   | Target label   | Metric              |   Score |
-|---:|:-----------|:---------------|:--------------------|--------:|
-|  0 | test       | Y              | mean_absolute_error | 7.39472 |
-
-
-### `tdcommons/clearance-hepatocyte-az`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.436333 |
-
-
-### `tdcommons/cyp2d6-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.625768 |
-
-
-### `tdcommons/half-life-obach`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.162875 |
-
-
-### `tdcommons/cyp2c9-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.396448 |
-
-
-### `tdcommons/clearance-microsome-az`
-
-|    | Test set   | Target label   | Metric    |   Score |
-|---:|:-----------|:---------------|:----------|--------:|
-|  0 | test       | Y              | spearmanr | 0.62404 |
-
-
-### `tdcommons/dili`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.906957 |
-
-
-### `tdcommons/bioavailability-ma`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.552045 |
-
-
-### `tdcommons/vdss-lombardo`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.487288 |
-
-
-### `tdcommons/cyp3a4-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.631329 |
-
-
-### `tdcommons/pgp-broccatelli`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.911424 |
-
-
-### `tdcommons/caco2-wang`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.353924 |
-
-
-### `tdcommons/herg`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.865979 |
-
-
-### `tdcommons/bbb-martins`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.893996 |
-
-
-### `tdcommons/ames`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.839862 |
-
-
-### `tdcommons/ld50-zhu`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.599977 |
-
-
-### Summary
-
-```
-results_dict = {
-    "polaris/pkis2-ret-wt-cls-v2": 0.7639328318740084,
-    "polaris/pkis2-ret-wt-reg-v2": 668.6169901466196,
-    "polaris/pkis2-kit-wt-cls-v2": 0.7161794044708276,
-    "polaris/pkis2-kit-wt-reg-v2": 821.0248176055244,
-    "polaris/pkis2-egfr-wt-reg-v2": 492.7631237888853,
-    "polaris/adme-fang-solu-1": 0.5947428026177881,
-    "polaris/adme-fang-rppb-1": 0.5426103861586902,
-    "polaris/adme-fang-hppb-1": 0.6960681855213934,
-    "polaris/adme-fang-perm-1": 0.7827784562143681,
-    "polaris/adme-fang-rclint-1": 0.7215582437017292,
-    "polaris/adme-fang-hclint-1": 0.7199866705603281,
-    "tdcommons/lipophilicity-astrazeneca": 0.44747663489409856,
-    "tdcommons/ppbr-az": 7.3947175958459415,
-    "tdcommons/clearance-hepatocyte-az": 0.43633296611544065,
-    "tdcommons/cyp2d6-substrate-carbonmangels": 0.6257680659888534,
-    "tdcommons/half-life-obach": 0.16287493159835903,
-    "tdcommons/cyp2c9-substrate-carbonmangels": 0.3964479074341395,
-    "tdcommons/clearance-microsome-az": 0.6240401667933101,
-    "tdcommons/dili": 0.9069565217391304,
-    "tdcommons/bioavailability-ma": 0.5520452278017959,
-    "tdcommons/vdss-lombardo": 0.4872877695309941,
-    "tdcommons/cyp3a4-substrate-carbonmangels": 0.6313291139240506,
-    "tdcommons/pgp-broccatelli": 0.9114236203679019,
-    "tdcommons/caco2-wang": 0.35392350732556016,
-    "tdcommons/herg": 0.865979381443299,
-    "tdcommons/bbb-martins": 0.8939962476547842,
-    "tdcommons/ames": 0.8398617556639058,
-    "tdcommons/ld50-zhu": 0.5999766730713748
-}
-```
-## Random Seed 9001
-
-### `polaris/pkis2-ret-wt-cls-v2`
-
-|    | Test set   | Target label   | Metric      |    Score |
-|---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_RET        | accuracy    | 0.877358 |
-|  1 | test       | CLS_RET        | cohen_kappa | 0.509609 |
-|  2 | test       | CLS_RET        | f1          | 0.580645 |
-|  3 | test       | CLS_RET        | roc_auc     | 0.846001 |
-|  4 | test       | CLS_RET        | pr_auc      | 0.630741 |
-|  5 | test       | CLS_RET        | mcc         | 0.512903 |
-
-
-### `polaris/pkis2-ret-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | RET            | explained_var       |   0.36316  |
-|  1 | test       | RET            | mean_absolute_error |  21.6864   |
-|  2 | test       | RET            | r2                  |   0.333743 |
-|  3 | test       | RET            | mean_squared_error  | 791.116    |
-|  4 | test       | RET            | pearsonr            |   0.602725 |
-|  5 | test       | RET            | spearmanr           |   0.586055 |
-
-
-### `polaris/pkis2-kit-wt-cls-v2`
-
-|    | Test set   | Target label   | Metric      |    Score |
-|---:|:-----------|:---------------|:------------|---------:|
-|  0 | test       | CLS_KIT        | accuracy    | 0.887931 |
-|  1 | test       | CLS_KIT        | cohen_kappa | 0.567661 |
-|  2 | test       | CLS_KIT        | f1          | 0.628571 |
-|  3 | test       | CLS_KIT        | roc_auc     | 0.883946 |
-|  4 | test       | CLS_KIT        | pr_auc      | 0.710276 |
-|  5 | test       | CLS_KIT        | mcc         | 0.594935 |
-
-
-### `polaris/pkis2-kit-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | KIT            | explained_var       |   0.332209 |
-|  1 | test       | KIT            | mean_absolute_error |  21.8184   |
-|  2 | test       | KIT            | r2                  |   0.266306 |
-|  3 | test       | KIT            | mean_squared_error  | 885.337    |
-|  4 | test       | KIT            | pearsonr            |   0.588761 |
-|  5 | test       | KIT            | spearmanr           |   0.50008  |
-
-
-### `polaris/pkis2-egfr-wt-reg-v2`
-
-|    | Test set   | Target label   | Metric              |      Score |
-|---:|:-----------|:---------------|:--------------------|-----------:|
-|  0 | test       | EGFR           | explained_var       |   0.368464 |
-|  1 | test       | EGFR           | mean_absolute_error |  17.5627   |
-|  2 | test       | EGFR           | r2                  |   0.360459 |
-|  3 | test       | EGFR           | mean_squared_error  | 515.322    |
-|  4 | test       | EGFR           | pearsonr            |   0.607216 |
-|  5 | test       | EGFR           | spearmanr           |   0.418146 |
-
-
-### `polaris/adme-fang-solu-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_SOLUBILITY | explained_var       | 0.389941 |
-|  1 | test       | LOG_SOLUBILITY | mean_absolute_error | 0.387549 |
-|  2 | test       | LOG_SOLUBILITY | r2                  | 0.375879 |
-|  3 | test       | LOG_SOLUBILITY | mean_squared_error  | 0.338385 |
-|  4 | test       | LOG_SOLUBILITY | pearsonr            | 0.624515 |
-|  5 | test       | LOG_SOLUBILITY | spearmanr           | 0.541111 |
-
-
-### `polaris/adme-fang-rppb-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RPPB       | explained_var       | 0.48615  |
-|  1 | test       | LOG_RPPB       | mean_absolute_error | 0.474851 |
-|  2 | test       | LOG_RPPB       | r2                  | 0.486019 |
-|  3 | test       | LOG_RPPB       | mean_squared_error  | 0.456663 |
-|  4 | test       | LOG_RPPB       | pearsonr            | 0.734261 |
-|  5 | test       | LOG_RPPB       | spearmanr           | 0.804348 |
-
-
-### `polaris/adme-fang-hppb-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HPPB       | explained_var       | 0.40851  |
-|  1 | test       | LOG_HPPB       | mean_absolute_error | 0.53795  |
-|  2 | test       | LOG_HPPB       | r2                  | 0.360875 |
-|  3 | test       | LOG_HPPB       | mean_squared_error  | 0.387079 |
-|  4 | test       | LOG_HPPB       | pearsonr            | 0.64022  |
-|  5 | test       | LOG_HPPB       | spearmanr           | 0.676751 |
-
-
-### `polaris/adme-fang-perm-1`
-
-|    | Test set   | Target label     | Metric              |    Score |
-|---:|:-----------|:-----------------|:--------------------|---------:|
-|  0 | test       | LOG_MDR1-MDCK_ER | explained_var       | 0.592948 |
-|  1 | test       | LOG_MDR1-MDCK_ER | mean_absolute_error | 0.339965 |
-|  2 | test       | LOG_MDR1-MDCK_ER | r2                  | 0.592312 |
-|  3 | test       | LOG_MDR1-MDCK_ER | mean_squared_error  | 0.201966 |
-|  4 | test       | LOG_MDR1-MDCK_ER | pearsonr            | 0.77166  |
-|  5 | test       | LOG_MDR1-MDCK_ER | spearmanr           | 0.778201 |
-
-
-### `polaris/adme-fang-rclint-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_RLM_CLint  | explained_var       | 0.502798 |
-|  1 | test       | LOG_RLM_CLint  | mean_absolute_error | 0.425544 |
-|  2 | test       | LOG_RLM_CLint  | r2                  | 0.499822 |
-|  3 | test       | LOG_RLM_CLint  | mean_squared_error  | 0.282372 |
-|  4 | test       | LOG_RLM_CLint  | pearsonr            | 0.714519 |
-|  5 | test       | LOG_RLM_CLint  | spearmanr           | 0.718885 |
-
-
-### `polaris/adme-fang-hclint-1`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | LOG_HLM_CLint  | explained_var       | 0.458761 |
-|  1 | test       | LOG_HLM_CLint  | mean_absolute_error | 0.355358 |
-|  2 | test       | LOG_HLM_CLint  | r2                  | 0.455843 |
-|  3 | test       | LOG_HLM_CLint  | mean_squared_error  | 0.211356 |
-|  4 | test       | LOG_HLM_CLint  | pearsonr            | 0.681038 |
-|  5 | test       | LOG_HLM_CLint  | spearmanr           | 0.681043 |
-
-
-### `tdcommons/lipophilicity-astrazeneca`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.433554 |
-
-
-### `tdcommons/ppbr-az`
-
-|    | Test set   | Target label   | Metric              |   Score |
-|---:|:-----------|:---------------|:--------------------|--------:|
-|  0 | test       | Y              | mean_absolute_error | 7.80462 |
-
-
-### `tdcommons/clearance-hepatocyte-az`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.417315 |
-
-
-### `tdcommons/cyp2d6-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.657027 |
-
-
-### `tdcommons/half-life-obach`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.156968 |
-
-
-### `tdcommons/cyp2c9-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | pr_auc   | 0.438502 |
-
-
-### `tdcommons/clearance-microsome-az`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.618316 |
-
-
-### `tdcommons/dili`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.922174 |
-
-
-### `tdcommons/bioavailability-ma`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.511806 |
-
-
-### `tdcommons/vdss-lombardo`
-
-|    | Test set   | Target label   | Metric    |    Score |
-|---:|:-----------|:---------------|:----------|---------:|
-|  0 | test       | Y              | spearmanr | 0.487584 |
-
-
-### `tdcommons/cyp3a4-substrate-carbonmangels`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.650882 |
-
-
-### `tdcommons/pgp-broccatelli`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.917489 |
-
-
-### `tdcommons/caco2-wang`
-
-|    | Test set   | Target label   | Metric              |    Score |
-|---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.325783 |
-
-
-### `tdcommons/herg`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.829013 |
-
-
-### `tdcommons/bbb-martins`
-
-|    | Test set   | Target label   | Metric   |    Score |
-|---:|:-----------|:---------------|:---------|---------:|
-|  0 | test       | Y              | roc_auc  | 0.902654 |
-
-
-### `tdcommons/ames`
 
 |    | Test set   | Target label   | Metric   |   Score |
 |---:|:-----------|:---------------|:---------|--------:|
-|  0 | test       | Y              | roc_auc  | 0.84286 |
+|  0 | test       | Y              | roc_auc  | 0.55278 |
+
+
+### `tdcommons/pgp-broccatelli`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.918555 |
+
+
+### `tdcommons/caco2-wang`
+
+|    | Test set   | Target label   | Metric              |    Score |
+|---:|:-----------|:---------------|:--------------------|---------:|
+|  0 | test       | Y              | mean_absolute_error | 0.319981 |
+
+
+### `tdcommons/herg`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.839028 |
+
+
+### `tdcommons/bbb-martins`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.889384 |
+
+
+### `tdcommons/ames`
+
+|    | Test set   | Target label   | Metric   |    Score |
+|---:|:-----------|:---------------|:---------|---------:|
+|  0 | test       | Y              | roc_auc  | 0.839317 |
 
 
 ### `tdcommons/ld50-zhu`
 
 |    | Test set   | Target label   | Metric              |    Score |
 |---:|:-----------|:---------------|:--------------------|---------:|
-|  0 | test       | Y              | mean_absolute_error | 0.554471 |
+|  0 | test       | Y              | mean_absolute_error | 0.556273 |
 
 
 ### Summary
 
 ```
 results_dict = {
-    "polaris/pkis2-ret-wt-cls-v2": 0.6307410255719698,
-    "polaris/pkis2-ret-wt-reg-v2": 791.1164241478227,
-    "polaris/pkis2-kit-wt-cls-v2": 0.7102762635433089,
-    "polaris/pkis2-kit-wt-reg-v2": 885.3373248939089,
-    "polaris/pkis2-egfr-wt-reg-v2": 515.3221628839755,
-    "polaris/adme-fang-solu-1": 0.624514853110473,
-    "polaris/adme-fang-rppb-1": 0.7342609636259282,
-    "polaris/adme-fang-hppb-1": 0.6402202581571836,
-    "polaris/adme-fang-perm-1": 0.7716595243000447,
-    "polaris/adme-fang-rclint-1": 0.7145185906016944,
-    "polaris/adme-fang-hclint-1": 0.6810383121490247,
-    "tdcommons/lipophilicity-astrazeneca": 0.43355431265490396,
-    "tdcommons/ppbr-az": 7.804617922651533,
-    "tdcommons/clearance-hepatocyte-az": 0.4173154964480448,
-    "tdcommons/cyp2d6-substrate-carbonmangels": 0.657027177977552,
-    "tdcommons/half-life-obach": 0.1569675064277368,
-    "tdcommons/cyp2c9-substrate-carbonmangels": 0.4385021050765278,
-    "tdcommons/clearance-microsome-az": 0.61831607512123,
-    "tdcommons/dili": 0.9221739130434782,
-    "tdcommons/bioavailability-ma": 0.5118057864981709,
-    "tdcommons/vdss-lombardo": 0.48758420009168735,
-    "tdcommons/cyp3a4-substrate-carbonmangels": 0.6508815551537072,
-    "tdcommons/pgp-broccatelli": 0.9174886696880831,
-    "tdcommons/caco2-wang": 0.3257828086717543,
-    "tdcommons/herg": 0.8290132547864507,
-    "tdcommons/bbb-martins": 0.9026540025015637,
-    "tdcommons/ames": 0.8428596604593785,
-    "tdcommons/ld50-zhu": 0.5544710675002112
+    "polaris/pkis2-ret-wt-cls-v2": 0.7131882234756786,
+    "polaris/pkis2-ret-wt-reg-v2": 854.0825005789593,
+    "polaris/pkis2-kit-wt-cls-v2": 0.6871179811132668,
+    "polaris/pkis2-kit-wt-reg-v2": 847.4480744659508,
+    "polaris/pkis2-egfr-wt-reg-v2": 452.6198174783641,
+    "polaris/adme-fang-solu-1": 0.6553091790934225,
+    "polaris/adme-fang-rppb-1": 0.516459877006685,
+    "polaris/adme-fang-hppb-1": 0.6959185352213773,
+    "polaris/adme-fang-perm-1": 0.7658970554352469,
+    "polaris/adme-fang-rclint-1": 0.7239735955944371,
+    "polaris/adme-fang-hclint-1": 0.6941662521949008,
+    "tdcommons/lipophilicity-astrazeneca": 0.45285874856653674,
+    "tdcommons/ppbr-az": 7.6300466231071455,
+    "tdcommons/clearance-hepatocyte-az": 0.37068749591853384,
+    "tdcommons/cyp2d6-substrate-carbonmangels": 0.6502873939121387,
+    "tdcommons/half-life-obach": 0.13313048487840115,
+    "tdcommons/cyp2c9-substrate-carbonmangels": 0.4465042124715072,
+    "tdcommons/clearance-microsome-az": 0.601940904638516,
+    "tdcommons/dili": 0.927391304347826,
+    "tdcommons/bioavailability-ma": 0.490189557698703,
+    "tdcommons/vdss-lombardo": 0.376193170839052,
+    "tdcommons/cyp3a4-substrate-carbonmangels": 0.5527802893309222,
+    "tdcommons/pgp-broccatelli": 0.9185550519861372,
+    "tdcommons/caco2-wang": 0.31998121350785136,
+    "tdcommons/herg": 0.8390279823269514,
+    "tdcommons/bbb-martins": 0.889383989993746,
+    "tdcommons/ames": 0.8393173941138459,
+    "tdcommons/ld50-zhu": 0.556273441999949
 }
 ```
